@@ -1,0 +1,69 @@
+---
+import { Image, Picture, getImage } from "astro:assets";
+import Layout from "../../layouts/Layout.astro";
+
+const unplash: string =
+    "https://pub-93b65ee4a9864ab0b605fcdb1807e5c8.r2.dev/584a37ba-4631-45ea-8994-678f168caff4";
+const optimizedBackground = await getImage({
+    src: unplash,
+    format: "webp",
+    quality: 75,
+    inferSize: true,
+});
+---
+
+<Layout title="Admin">
+    <div class="flex h-screen">
+        <div
+            class="flex flex-col w-1/6 bg-slate-100 justify-between items-start"
+        >
+            <!-- Sidebar -->
+            <div class="w-full p-0 m-0">
+                <div
+                    class="bg-orange-500 h-20 flex flex-col items-start justify-center text-white px-5"
+                >
+                    <h1 class="text-xl font-bold">
+                        <span><i class="bi bi-qr-code"></i></span> SnapMenu
+                    </h1>
+                    <p>Panel Admin: McDorian</p>
+                </div>
+                <ul class="py-4 font-semibold">
+                    <li
+                        class="px-4 py-2 rounded-lg hover:bg-orange-300 hover:text-white"
+                    >
+                        <span><i class="bi bi-house-door-fill mx-3"></i></span
+                        >Home
+                    </li>
+                    <li
+                        class="px-4 py-2 rounded-lg hover:bg-orange-300 hover:text-white"
+                    >
+                        <span><i class="bi bi-person-fill mx-3"></i></span>Users
+                    </li>
+                    <li
+                        class="px-4 py-2 rounded-lg hover:bg-orange-300 hover:text-white"
+                    >
+                        <span
+                            ><i class="bi bi-file-earmark-ruled-fill mx-3"
+                            ></i></span
+                        >Categories
+                    </li>
+                    <li
+                        class="px-4 py-2 rounded-lg hover:bg-orange-300 hover:text-white"
+                    >
+                        <span><i class="bi bi-box-seam-fill mx-3"></i></span
+                        >Products
+                    </li>
+                </ul>
+            </div>
+            <div class="w-full px-2">
+                <button
+                    type="button"
+                    class="w-full rounded-lg bg-orange-500 px-5 py-2 font-medium text-white my-2 text-xl hover:bg-white hover:text-orange-500 hover:border-orange-500 border-2 border-orange-500"
+                >
+                    <span><i class="bi bi-box-arrow-in-left"></i></span>Logout
+                </button>
+            </div>
+        </div>
+        <div class="w-5/6 bg-slate-200"></div>
+    </div>
+</Layout>

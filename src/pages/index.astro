@@ -1,0 +1,383 @@
+---
+import { Image } from "astro:assets";
+import SvgLogo from "../assets/SvgQr.astro";
+import Layout from "../layouts/Layout.astro";
+
+export const prerender = true;
+---
+
+<Layout title="SnapMenu">
+	<nav class="bg-slate-50 fixed w-screen z-10">
+		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+			<div class="flex items-center justify-between h-16">
+				<div class="flex w-full items-center justify-between">
+					<div class="flex">
+						<h1
+							class="text-xl font-bold pacifico-regular flex items-center gap-2"
+						>
+							<span
+								><img
+									src="/favicon.svg"
+									alt=""
+									srcset=""
+									width="30px"
+								/></span
+							> SnapMenu
+						</h1>
+					</div>
+					<div class="hidden md:block">
+						<div class="ml-10 flex items-baseline space-x-4">
+							<a
+								href="#home"
+								class="hover:bg-orange-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+								>Home</a
+							>
+							<a
+								href="#about"
+								class="hover:bg-orange-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+								>About</a
+							>
+							<a
+								href="#services"
+								class="hover:bg-orange-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+								>Services</a
+							>
+							<a
+								href="#contact"
+								class="hover:bg-orange-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+								>Contact</a
+							>
+							<a
+								href="/login"
+								class="bg-orange-500 text-white px-2 py-1 rounded-md text-sm font-medium hover:bg-white hover:text-orange-500 hover:border-orange-500 border-2"
+								>Login</a
+							>
+							<a
+								href="/register"
+								class="bg-orange-500 text-white px-2 py-1 rounded-md text-sm font-medium hover:bg-white hover:text-orange-500 hover:border-orange-500 border-2"
+								>Get Started</a
+							>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</nav>
+	<main class="w-full bg-slate-100">
+		<section
+			id="home"
+			class="flex items-center justify-center h-screen bg-[url(https://cdn.pixabay.com/photo/2017/10/22/21/02/food-2879265_1280.jpg)] bg-cover"
+		>
+			<div
+				class="flex flex-col text-center bg-slate-50 p-2 rounded xl:h-3/5 xl:w-1/4 justify-center items-center space-y-10 border-8 border-orange-200 border-double"
+			>
+				<h2 class="text-5xl font-bold mb-4 pacifico-regular">
+					SnapMenu
+				</h2>
+				<span class="flex w-1/2">
+					<SvgLogo />
+				</span>
+				<p class="text-lg">Create your own SnapMenu</p>
+				<a
+					href="#"
+					class="bg-orange-500 text-white px-4 py-2 rounded-md mt-4 inline-block hover:text-orange-500 hover:border-orange-500 border-2 hover:bg-white"
+					>Demo</a
+				>
+			</div>
+		</section>
+		<section
+			id="about"
+			class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 mb-5 fade-in"
+		>
+			<h2 class="text-3xl font-bold mb-8">About</h2>
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+				<div class="flex flex-col justify-center">
+					<h3 class="text-2xl font-bold mb-4">Our Mission</h3>
+					<p class="text-lg">
+						At SnapMenu, our mission is to provide restaurants with
+						an easy and efficient way to create and manage their own
+						QR menus. We believe that technology can greatly enhance
+						the dining experience, and we strive to empower
+						restaurants to leverage the power of digital menus.
+					</p>
+				</div>
+				<div class="flex flex-col justify-center">
+					<h3 class="text-2xl font-bold mb-4">Our Team</h3>
+					<p class="text-lg">
+						Our team is made up of passionate individuals who are
+						dedicated to revolutionizing the restaurant industry.
+						With years of experience in software development and a
+						deep understanding of the needs of restaurants, we are
+						committed to delivering innovative solutions that help
+						restaurants thrive in the digital age.
+					</p>
+				</div>
+			</div>
+			<div class="flex justify-between mt-20 text-white fade-in">
+				<div
+					class="flex flex-col justify-center items-center bg-orange-500 xl:w-20 xl:h-20 xl:text-3xl rounded h-14 w-14"
+				>
+					<i class="bi bi-qr-code-scan"></i>
+					<h3 class="xl:text-xl font-bold">Scan</h3>
+				</div>
+				<div
+					class="flex flex-col justify-center items-center bg-orange-500 xl:w-20 xl:h-20 xl:text-3xl rounded h-14 w-14"
+				>
+					<i class="bi bi-palette-fill"></i>
+					<h3 class="xl:text-xl font-bold">Design</h3>
+				</div>
+
+				<div
+					class="flex flex-col justify-center items-center bg-orange-500 xl:w-20 xl:h-20 xl:text-3xl rounded h-14 w-14"
+				>
+					<i class="bi bi-credit-card-2-front-fill"></i>
+					<h3 class="xl:text-xl font-bold">Order</h3>
+				</div>
+				<div
+					class="flex flex-col justify-center items-center bg-orange-500 xl:w-20 xl:h-20 xl:text-3xl rounded h-14 w-14"
+				>
+					<i class="bi bi-share-fill"></i>
+					<h3 class="xl:text-xl font-bold">Share</h3>
+				</div>
+				<div
+					class="flex flex-col justify-center items-center bg-orange-500 xl:w-20 xl:h-20 xl:text-3xl rounded h-14 w-14"
+				>
+					<i class="bi bi-chat-left-text-fill"></i>
+					<h3 class="xl:text-xl font-bold">Supp</h3>
+				</div>
+			</div>
+		</section>
+		<section
+			id="services"
+			class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5"
+		>
+			<h2 class="text-3xl font-bold mb-8">Pricing Plans</h2>
+			<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+				<div
+					class="flex flex-col justify-between bg-white rounded-lg shadow-lg p-6 fade-in-right"
+				>
+					<h3 class="text-2xl font-bold mb-4">Basic</h3>
+					<ul class="list-disc px-6">
+						<li>
+							Creation of a basic QR menu with up to 100 menu
+							items.
+						</li>
+						<li>
+							Possibility to incorporate WhatsApp links for
+							orders.
+						</li>
+						<li>Custom restaurant profile.</li>
+						<li>Email support.</li>
+					</ul>
+					<div class="mt-2">
+						<p class="text-2xl font-bold mb-1">$4.99/month</p>
+						<a
+							href="#"
+							class="bg-orange-500 text-white px-4 py-2 rounded-md mt-4 inline-block hover:bg-white hover:text-orange-500 hover:border-orange-500 border-2"
+							>Choose Plan</a
+						>
+					</div>
+				</div>
+				<div
+					class="flex flex-col justify-between bg-white rounded-lg shadow-lg p-6 fade-in-down"
+				>
+					<h3 class="text-2xl font-bold mb-4">Standard</h3>
+					<ul class="list-disc px-6">
+						<li>
+							Creation of up to 3 QR menus with up to 300 menu
+							items each.
+						</li>
+						<li>Possibility to upload product images.</li>
+						<li>Advanced customization of the QR menu design.</li>
+						<li>Weekly data backups.</li>
+						<li>Email and live chat support.</li>
+					</ul>
+					<div class="mt-2">
+						<p class="text-2xl font-bold mb-1">$7.99/month</p>
+						<a
+							href="#"
+							class="bg-orange-500 text-white px-4 py-2 rounded-md mt-4 inline-block hover:bg-white hover:text-orange-500 hover:border-orange-500 border-2"
+							>Choose Plan</a
+						>
+					</div>
+				</div>
+				<div
+					class="flex flex-col justify-between bg-white rounded-lg shadow-lg p-6 fade-in-left"
+				>
+					<h3 class="text-2xl font-bold mb-4">Premium</h3>
+					<ul class="list-disc px-6">
+						<li>
+							Creation of up to 5 QR menus with unlimited menu
+							items.
+						</li>
+						<li>Possibility to upload product images.</li>
+						<li>
+							Complete customization of the QR menu design with
+							custom logo and colors.
+						</li>
+						<li>
+							Priority support via email, live chat, and phone
+							assistance.
+						</li>
+						<li>Weekly data backups.</li>
+					</ul>
+					<div class="mt-2">
+						<p class="text-2xl font-bold mb-1">$9.99/month</p>
+						<a
+							href="#"
+							class="bg-orange-500 text-white px-4 py-2 rounded-md mt-4 inline-block hover:bg-white hover:text-orange-500 hover:border-orange-500 border-2"
+							>Choose Plan</a
+						>
+					</div>
+				</div>
+			</div>
+		</section>
+		<section
+			id="contact"
+			class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 fade-in"
+		>
+			<h2 class="text-3xl font-bold mb-8">Contact</h2>
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+				<div class="flex flex-col justify-center">
+					<h3 class="text-2xl font-bold mb-4">Contact Information</h3>
+					<p class="text-lg">
+						123 Main Street<br />
+						City, State, ZIP<br />
+						Phone: 123-456-7890<br />
+						Email: info@example.com
+					</p>
+				</div>
+				<div
+					class="flex flex-col justify-center w-full bg-white rounded-lg shadow-lg p-6"
+				>
+					<h3 class="text-2xl font-bold mb-4">Contact Form</h3>
+					<form class="w-full">
+						<label for="name" class="block mb-2">Name</label>
+						<input
+							type="text"
+							id="name"
+							name="name"
+							class="border border-gray-300 px-4 py-2 mb-4 w-full"
+							required
+						/>
+						<label for="email" class="block mb-2">Email</label>
+						<input
+							type="email"
+							id="email"
+							name="email"
+							class="border border-gray-300 px-4 py-2 mb-4 w-full"
+							required
+						/>
+						<label for="message" class="block mb-2">Message</label>
+						<textarea
+							id="message"
+							name="message"
+							class="border border-gray-300 px-4 py-2 mb-4 w-full"
+							required></textarea>
+						<button
+							type="submit"
+							class="bg-orange-500 text-white px-4 py-2 rounded-md mt-4 inline-block hover:bg-white hover:text-orange-500 hover:border-orange-500 border-2"
+							>Submit</button
+						>
+					</form>
+				</div>
+			</div>
+		</section>
+	</main>
+	<footer class="bg-slate-50 py-4">
+		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+			<div class="flex justify-between items-center">
+				<p class="text-sm text-gray-500">
+					© 2024 SnapMenu. All rights reserved.
+				</p>
+				<div class="flex space-x-4">
+					<a href="#" class="text-gray-500 hover:text-gray-700"
+						>Privacy Policy</a
+					>
+					<a href="#" class="text-gray-500 hover:text-gray-700"
+						>Terms of Service</a
+					>
+				</div>
+			</div>
+		</div>
+	</footer>
+</Layout>
+
+<style>
+	@import url("https://fonts.googleapis.com/css2?family=Pacifico&display=swap");
+	.pacifico-regular {
+		font-family: "Pacifico", cursive;
+		font-weight: 400;
+		font-style: normal;
+	}
+
+	.fade-in-left {
+		animation-name: fade-in-left;
+		animation-timeline: view(block 70% 0%);
+		animation-duration: 0.6s;
+		animation-timing-function: ease-in-out;
+	}
+
+	@keyframes fade-in-left {
+		0% {
+			opacity: 0;
+			transform: translateX(50px);
+		}
+		100% {
+			opacity: 1;
+			transform: translateX(0);
+		}
+	}
+
+	.fade-in-right {
+		animation-name: fade-in-right;
+		animation-timeline: view(block 70% 0%);
+		animation-duration: 0.6s;
+		animation-timing-function: ease-in-out;
+	}
+
+	@keyframes fade-in-right {
+		0% {
+			opacity: 0;
+			transform: translateX(-50px);
+		}
+		100% {
+			opacity: 1;
+			transform: translateX(0);
+		}
+	}
+
+	.fade-in-down {
+		animation-name: fade-in-down;
+		animation-timeline: view(70% 0%);
+		animation-duration: 0.6s;
+		animation-timing-function: ease-in-out;
+	}
+
+	@keyframes fade-in-down {
+		0% {
+			opacity: 0;
+			transform: translateY(-50px);
+		}
+		100% {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	.fade-in {
+		animation-name: fade-in;
+		animation-timeline: view(70% 0%);
+		animation-duration: 0.6s;
+		animation-timing-function: ease-in-out;
+	}
+
+	@keyframes fade-in {
+		0% {
+			opacity: 0;
+		}
+		100% {
+			opacity: 1;
+		}
+	}
+</style>

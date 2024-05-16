@@ -1,0 +1,90 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="Login">
+    <section class="relative flex flex-wrap lg:h-screen lg:items-center">
+        <span>
+            <a
+                href="/"
+                class="absolute top-1 left-1 text-gray-500 flex justify-center items-center text-sm hover:underline"
+            >
+                <i class="bi bi-arrow-left-square-fill text-orange-500 text-xl"
+                ></i>Home
+            </a>
+        </span>
+        <div
+            class="flex flex-col w-full px-4 py-12 sm:px-6 sm:py-16 lg:w-1/2 lg:px-8 lg:py-24 h-screen justify-center items-center"
+        >
+            <div class="mx-auto max-w-lg text-center">
+                <h1 class="text-2xl font-bold sm:text-3xl">
+                    Get started today!
+                </h1>
+
+                <p class="mt-4 text-gray-500">Login to your account</p>
+            </div>
+
+            <form action="#" class="w-2/5 mb-0 mt-8 space-y-4">
+                <div class="w-full">
+                    <label for="email" class="sr-only">Email</label>
+
+                    <div class="relative">
+                        <input
+                            type="email"
+                            class="w-full rounded-lg border-gray-200 p-4 pe-12 text-sm shadow-sm"
+                            placeholder="Enter email"
+                        />
+
+                        <span
+                            class="absolute inset-y-0 end-0 grid place-content-center px-4 text-gray-500"
+                        >
+                            <i class="bi bi-at"></i>
+                        </span>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="password" class="sr-only">Password</label>
+
+                    <div class="relative">
+                        <input
+                            type="password"
+                            class="w-full rounded-lg border-gray-200 p-4 pe-12 text-sm shadow-sm"
+                            placeholder="Enter password"
+                        />
+
+                        <span
+                            class="absolute inset-y-0 end-0 grid place-content-center px-4 text-gray-500"
+                        >
+                            <i class="bi bi-key-fill"></i>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <p class="text-sm text-gray-500">
+                        No account?
+                        <a class="underline" href="register">Sign up</a>
+                    </p>
+
+                    <button
+                        type="submit"
+                        class="inline-block rounded-lg bg-orange-500 px-5 py-3 text-sm font-medium text-white"
+                    >
+                        Sign in
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div
+            class="relative h-64 w-full sm:h-96 lg:h-full lg:w-1/2 hidden lg:flex"
+        >
+            <img
+                alt=""
+                src="./assets/snapmenu.jpeg"
+                class="absolute inset-0 h-full w-full object-cover"
+            />
+        </div>
+    </section>
+</Layout>
