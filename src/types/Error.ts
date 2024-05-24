@@ -1,5 +1,5 @@
 export interface IErrorUser {
-    username?: string;
-    email?: string;
-    password?: string;
+    username?: string | null | undefined;
+    email?: string | null | undefined;
+    password?: string | null | undefined;
 }

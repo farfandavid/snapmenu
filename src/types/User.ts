@@ -1,8 +1,10 @@
 import type { ObjectId } from "mongoose";
 
 export interface IUser {
-    id: ObjectId;
-    username: string;
-    email: string;
-    password: string;
+    id?: ObjectId;
+    displayName?: string;
+    uid?: string;
+    email?: string;
+    emailVerified?: boolean;
+    disabled?: boolean;
 };

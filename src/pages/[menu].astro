@@ -1,5 +1,7 @@
 ---
-
+if (Astro.url.pathname.startsWith("/dasboard")) {
+    return Astro.redirect(`/dashboard/`);
+}
 ---
 
 <h1>Menu</h1>

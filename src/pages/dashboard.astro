@@ -1,0 +1,29 @@
+---
+import DashboardLayout from "../layouts/DashboardLayout.astro";
+import Button from "../components/Button.astro";
+---
+
+<DashboardLayout>
+    <main class="flex flex-col items-center">
+        <h1 class="font-bold text-2xl">Welcome to SnapMenu</h1>
+        <p class="text-xl">Let's start by creating a Menu</p>
+        <div
+            class="flex roundedflex flex-col justify-between bg-white rounded-lg shadow-lg p-6 fade-in-right"
+        >
+            <h1 class="font-bold text-lg">
+                Let's choose the name of your restaurant or business.
+            </h1>
+            <p>This will also be the name of your menu page</p>
+            <form method="post">
+                <input
+                    type="text"
+                    name="menuName"
+                    placeholder="Menu Name"
+                    required
+                    class="rounded-lg p-2 border border-gray-300 w-full mt-2 mb-2"
+                />
+                <Button type="submit" className="">Create Menu</Button>
+            </form>
+        </div>
+    </main>
+</DashboardLayout>

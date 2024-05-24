@@ -4,7 +4,6 @@ import { getAllUsers, registerUser } from '../../controller/userController'
 import db from '../../db/db';
 import type { IUser } from '../../types/User';
 import { userValidators } from '../../validators/userValidators';
-import { date } from 'astro/zod';
 
 export const GET: APIRoute = async ({ params, request }) => {
   db.connectDB();
@@ -16,14 +15,22 @@ export const GET: APIRoute = async ({ params, request }) => {
 
 export const POST: APIRoute = async ({ request }) => {
   db.connectDB();
-  if (request.headers.get("Content-Type") === "application/json") {
-    const user: IUser = await request.json().catch((err) => {
-      return { err };
-    }
-    )
-    const data = userValidators(user);
-    return data;
+  const data = await request.json().catch((err) => {
+    return { err };
   }
+  );
+
+  if (userValidators(data)) {
+    return new Response(JSON.stringify(userValidators(data)), { headers: { 'content-type': 'application/json' } });
+  }
+
+  const user: IUser = data;
+  const newUser = await registerUser(user).catch((err) => {
+    return err;
+  }
+  );
   db.disconnectDB();
-  return new Response(JSON.stringify('data'), { headers: { 'content-type': 'application/json' } });
+  return newUser;
+
+
 }

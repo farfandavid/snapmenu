@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import User from '../models/userModel';
 import type { IUser } from '../types/User';
+import db from '../db/db';
 
 export const getAllUsers = async () => {
   try {
@@ -11,24 +12,25 @@ export const getAllUsers = async () => {
   }
 };
 
-export const getUserById = async (id: string) => {
+export const getUserById = async (uid: string) => {
   try {
-    const user = await User
-      .findById(id);
-    return JSON.stringify(user);
+    db.connectDB();
+    const user = await User.findOne({ uid: uid });
+    return user;
   }
   catch (err: any) {
-    return JSON.stringify({ message: err.message });
+    throw new Error(err.message);
   }
 }
 
 export const registerUser = async (user: IUser) => {
+  console.log("User register Mongodb")
   try {
+    db.connectDB();
     const newUser = new User({ _id: new mongoose.Types.ObjectId(), ...user });
-    console.log(newUser);
     await newUser.save();
-    return JSON.stringify(newUser);
+    return true;
   } catch (err: any) {
-    return JSON.stringify({ message: err.message });
+    throw new Error(err.message);
   }
 }
