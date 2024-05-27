@@ -1,13 +1,15 @@
+import mongoose from 'mongoose';
 import Menu from '../models/menuModel'; // Importa tus modelos de Mongoose aquí
+import type { IMenu } from '../types/Menu';
 
 // Funciones CRUD para la colección de menú
-export const createMenu = async (menuData: any) => {
+export const createMenu = async (menuData: IMenu) => {
     try {
-        const menu = await Menu.create(menuData);
+        const menu = await Menu.create({ _id: new mongoose.Types.ObjectId(), ...menuData });
         await menu.save();
         return menu;
-    } catch (error) {
-        throw new Error('Error al crear el menú');
+    } catch (error: any) {
+        return { errorCode: error.code } as any;
     }
 };
 
@@ -23,6 +25,15 @@ export const getMenuById = async (id: string) => {
 export const getMenuByUser = async (user: string) => {
     try {
         const menu = await Menu.find({ user: user });
+        return menu;
+    } catch (error) {
+        throw new Error('Error al obtener el menú');
+    }
+}
+
+export const getMenuByName = async (name: string) => {
+    try {
+        const menu = await Menu.findOne({ name: name });
         return menu;
     } catch (error) {
         throw new Error('Error al obtener el menú');

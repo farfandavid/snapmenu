@@ -19,8 +19,17 @@ import Button from "../components/Button.astro";
                     type="text"
                     name="menuName"
                     placeholder="Menu Name"
+                    autocomplete="off"
                     required
                     class="rounded-lg p-2 border border-gray-300 w-full mt-2 mb-2"
+                />
+                <input
+                    type="text"
+                    name="description"
+                    placeholder="Description"
+                    required
+                    class="rounded-lg p-2 border border-gray-300 w-full mt-2 mb-2"
+                    maxlength="60"
                 />
                 <Button type="submit" className="">Create Menu</Button>
             </form>
@@ -34,16 +43,17 @@ import Button from "../components/Button.astro";
         e.preventDefault();
         const formData = new FormData(form);
         const menuName = formData.get("menuName");
+        const description = formData.get("description");
         const response = await fetch("/api/menu/create", {
             method: "POST",
-            body: JSON.stringify({ name: menuName }),
+            body: JSON.stringify({ name: menuName, description }),
             headers: {
                 "Content-Type": "application/json",
             },
         });
         const data = await response.json();
-        if (data.success) {
-            window.location.href = `/dashboard/${menuName}`;
+        if (data.error) {
+            alert(data.error);
         }
     });
 </script>

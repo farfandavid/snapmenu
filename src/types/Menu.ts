@@ -1,7 +1,7 @@
 import type { ObjectId } from "mongoose";
 
-interface Product {
-    _id: ObjectId;
+interface IProduct {
+    _id?: ObjectId;
     name: string;
     description: string;
     price: number;
@@ -9,21 +9,21 @@ interface Product {
     active: boolean;
 }
 
-interface Categories {
-    _id: ObjectId;
+interface ICategories {
+    _id?: ObjectId;
     name: string;
     description: string;
     active: boolean;
-    products?: Product[];
+    products?: IProduct[];
 }
 
-interface Menu {
-    _id: ObjectId;
+interface IMenu {
+    _id?: ObjectId;
     name: string;
     user: string;
     description: string;
     active: boolean;
-    categories?: Categories[];
+    categories?: ICategories[];
 }
 
-export type { Menu, Categories, Product };
+export type { IMenu, ICategories, IProduct };
