@@ -1,3 +1,3 @@
 declare module 'jsonwebtoken';
-declare module 'bcrypt';
+declare module 'bcryptjs';
 declare module 'firebase/auth';

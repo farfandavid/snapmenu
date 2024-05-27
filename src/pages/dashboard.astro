@@ -14,7 +14,7 @@ import Button from "../components/Button.astro";
                 Let's choose the name of your restaurant or business.
             </h1>
             <p>This will also be the name of your menu page</p>
-            <form method="post">
+            <form action="api/menu/create" method="POST" id="form-menu">
                 <input
                     type="text"
                     name="menuName"
@@ -27,3 +27,23 @@ import Button from "../components/Button.astro";
         </div>
     </main>
 </DashboardLayout>
+<script>
+    const form = document.getElementById("form-menu") as HTMLFormElement;
+
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const formData = new FormData(form);
+        const menuName = formData.get("menuName");
+        const response = await fetch("/api/menu/create", {
+            method: "POST",
+            body: JSON.stringify({ name: menuName }),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+        const data = await response.json();
+        if (data.success) {
+            window.location.href = `/dashboard/${menuName}`;
+        }
+    });
+</script>

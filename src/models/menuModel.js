@@ -62,7 +62,7 @@ const menuSchema = new mongoose.Schema(
       required: true
     },
     user: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: String,
       ref: "User",
       required: true
     },
@@ -83,14 +83,5 @@ const menuSchema = new mongoose.Schema(
     timestamps: true
   });
 
-menuSchema.pre("save", function (next) {
-  try {
-    if (typeof this.user === "string") {
-      this.user = mongoose.Types.ObjectId(this.user);
-    }
-  } catch (err) {
-    next(err);
-  }
-});
 
-export default mongoose.model("Menu", menuSchema);
+export default mongoose.model("Menu", menuSchema)

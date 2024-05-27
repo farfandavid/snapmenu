@@ -11,6 +11,7 @@ const decodedCookie = await auth.verifySessionCookie(sessionCookie || "");
 const user = await auth.getUser(decodedCookie.uid);
 
 const userExists = await getUserById(user.uid);
+console.log(userExists);
 if (!userExists) {
     await registerUser(user);
 }

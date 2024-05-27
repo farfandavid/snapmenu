@@ -29,6 +29,7 @@ export const registerUser = async (user: IUser) => {
     db.connectDB();
     const newUser = new User({ _id: new mongoose.Types.ObjectId(), ...user });
     await newUser.save();
+    console.log("User registered", newUser)
     return true;
   } catch (err: any) {
     throw new Error(err.message);
