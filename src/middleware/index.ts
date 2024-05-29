@@ -10,15 +10,23 @@ export const onRequest = defineMiddleware(async (context, next) => {
     console.log("In onRequest middleware");
     if (context.url.pathname.startsWith("/dashboard")) {
         const auth = getAuth(app);
-        if (!context.cookies.has("session")) return context.redirect("/login");
-        const idToken = await auth.verifySessionCookie(context.cookies.get("session")?.value || "")
-            .then((decodedClaims) => {
-                return next();
-            })
+        const sessionCookie = context.cookies.get("session")?.value;
+        const decodedCookie = await auth.verifySessionCookie(sessionCookie || "")
             .catch((error) => {
-                return context.redirect("/login");
-            });
-        return idToken;
+                return null;
+            }
+            );
+        if (!decodedCookie) {
+            context.cookies.delete("session");
+            return context.redirect("/login");
+        }
+        const user = await auth.getUser(decodedCookie.uid).catch((error) => {
+            return null;
+        });
+        if (!user) {
+            context.cookies.delete("session");
+            return context.redirect("/login");
+        }
     }
 
     if (context.url.pathname === '/api/users' && context.request.method === 'POST' && context.request.headers.get("Content-Type") === "application/json") {

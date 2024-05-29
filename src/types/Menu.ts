@@ -20,10 +20,11 @@ interface ICategories {
 interface IMenu {
     _id?: ObjectId;
     name: string;
-    user: string;
+    userEmail: string;
     description: string;
     active: boolean;
     categories?: ICategories[];
+    error?: string;
 }
 
 export type { IMenu, ICategories, IProduct };

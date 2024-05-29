@@ -16,7 +16,8 @@ export const POST: APIRoute = async ({ request, cookies }) => {
             return new Response(JSON.stringify({ error: 'Unauthorized' }), { headers: { 'content-type': 'application/json' }, status: 401 });
         }
         const { name, description } = await request.json();
-        const menu = await createMenu({ name, description, user: user.uid, active: true });
+        const menu = await createMenu({ name, description, userEmail: user.email || "", active: true })
+        //const menu = await createMenu({ name, description, userEmail: user.email, active: true });
         if (menu.errorCode === 11000) {
             return new Response(JSON.stringify({ error: 'Menu already exists' }), { headers: { 'content-type': 'application/json' }, status: 409 });
         }

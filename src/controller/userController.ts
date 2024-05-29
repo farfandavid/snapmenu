@@ -23,6 +23,17 @@ export const getUserById = async (uid: string) => {
   }
 }
 
+export const getUserByEmail = async (email: string) => {
+  try {
+    db.connectDB();
+    const user = await User.findOne({ email: email });
+    return user;
+  }
+  catch (err: any) {
+    throw new Error(err.message);
+  }
+}
+
 export const registerUser = async (user: IUser) => {
   console.log("User register Mongodb")
   try {
@@ -31,6 +42,25 @@ export const registerUser = async (user: IUser) => {
     await newUser.save();
     console.log("User registered", newUser)
     return true;
+  } catch (err: any) {
+    console.log({
+      error: {
+        code: err.code,
+      }
+    })
+    return {
+      error: {
+        code: err.code,
+      }
+    };
+  }
+}
+
+export const updateUser = async (email: string, user: IUser) => {
+  try {
+    db.connectDB();
+    const updatedUser = await User.findOneAndUpdate({ email: email }, user, { new: true });
+    return updatedUser;
   } catch (err: any) {
     throw new Error(err.message);
   }

@@ -1,6 +1,10 @@
 ---
-import { getUserById, registerUser } from "../controller/userController";
-import db from "../db/db";
+import {
+    getUserById,
+    registerUser,
+    getUserByEmail,
+    updateUser,
+} from "../controller/userController";
 import { app } from "../firebase/server";
 import { getAuth } from "firebase-admin/auth";
 
@@ -8,16 +12,19 @@ const auth = getAuth(app);
 
 const sessionCookie = Astro.cookies.get("session")?.value;
 const decodedCookie = await auth.verifySessionCookie(sessionCookie || "");
-const user = await auth.getUser(decodedCookie.uid);
+const userAuth = await auth.getUser(decodedCookie.uid).catch((error) => {
+    return null;
+});
 
-const userExists = await getUserById(user.uid);
-console.log(userExists);
-if (!userExists) {
-    await registerUser(user);
-}
-
-if (!user) {
-    return Astro.redirect("/login");
+if (!userAuth) {
+    Astro.cookies.delete("session");
+} else {
+    const userDB = await getUserByEmail(userAuth.email || "");
+    if (!userDB) {
+        await registerUser(userAuth);
+    } else if (userDB && userDB.uid !== userAuth.uid) {
+        await updateUser(userAuth.email || "", userAuth);
+    }
 }
 ---
 
@@ -34,7 +41,7 @@ if (!user) {
             rel="stylesheet"
             href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
         />
-        <title>{user.displayName}</title>
+        <title>{userAuth?.displayName}</title>
     </head>
     <body>
         <div
@@ -53,7 +60,7 @@ if (!user) {
                             <h1 class="text-xl font-bold">
                                 <span><i class="bi bi-qr-code"></i></span> SnapMenu
                             </h1>
-                            <p>Welcome: {user.displayName}</p>
+                            <p>Welcome: {userAuth?.displayName}</p>
                         </div>
                         <button
                             id="toggleSidebar"

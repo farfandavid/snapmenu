@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import Menu from '../models/menuModel'; // Importa tus modelos de Mongoose aquí
 import type { IMenu } from '../types/Menu';
+import { any } from 'astro/zod';
 
 // Funciones CRUD para la colección de menú
 export const createMenu = async (menuData: IMenu) => {
@@ -22,9 +23,9 @@ export const getMenuById = async (id: string) => {
     }
 }
 
-export const getMenuByUser = async (user: string) => {
+export const getMenuByUserEmail = async (userEmail: string) => {
     try {
-        const menu = await Menu.find({ user: user });
+        const menu = await Menu.find({ userEmail: userEmail });
         return menu;
     } catch (error) {
         throw new Error('Error al obtener el menú');
@@ -35,8 +36,9 @@ export const getMenuByName = async (name: string) => {
     try {
         const menu = await Menu.findOne({ name: name });
         return menu;
-    } catch (error) {
-        throw new Error('Error al obtener el menú');
+    } catch (error: any) {
+        console.log(error);
+        return { errorCode: error.code } as any;
     }
 }
 

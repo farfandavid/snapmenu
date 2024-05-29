@@ -61,7 +61,7 @@ const menuSchema = new mongoose.Schema(
       unique: true,
       required: true
     },
-    user: {
+    userEmail: {
       type: String,
       ref: "User",
       required: true

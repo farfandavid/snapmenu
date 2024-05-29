@@ -27,6 +27,7 @@ import Button from "../components/Button.astro";
                     type="text"
                     name="description"
                     placeholder="Description"
+                    autocomplete="off"
                     required
                     class="rounded-lg p-2 border border-gray-300 w-full mt-2 mb-2"
                     maxlength="60"
@@ -52,8 +53,12 @@ import Button from "../components/Button.astro";
             },
         });
         const data = await response.json();
+        console.log(data);
         if (data.error) {
             alert(data.error);
+        }
+        if (data.name) {
+            alert(`Menu ${data.name} created successfully`);
         }
     });
 </script>
