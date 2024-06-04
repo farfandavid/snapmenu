@@ -1,31 +1,11 @@
 ---
 import {
-    getUserById,
     registerUser,
     getUserByEmail,
     updateUser,
 } from "../controller/userController";
-import { app } from "../firebase/server";
-import { getAuth } from "firebase-admin/auth";
 
-const auth = getAuth(app);
-
-const sessionCookie = Astro.cookies.get("session")?.value;
-const decodedCookie = await auth.verifySessionCookie(sessionCookie || "");
-const userAuth = await auth.getUser(decodedCookie.uid).catch((error) => {
-    return null;
-});
-
-if (!userAuth) {
-    Astro.cookies.delete("session");
-} else {
-    const userDB = await getUserByEmail(userAuth.email || "");
-    if (!userDB) {
-        await registerUser(userAuth);
-    } else if (userDB && userDB.uid !== userAuth.uid) {
-        await updateUser(userAuth.email || "", userAuth);
-    }
-}
+const user = Astro.locals.user;
 ---
 
 <!doctype html>
@@ -41,7 +21,7 @@ if (!userAuth) {
             rel="stylesheet"
             href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
         />
-        <title>{userAuth?.displayName}</title>
+        <title>{user?.displayName}</title>
     </head>
     <body>
         <div
@@ -60,7 +40,7 @@ if (!userAuth) {
                             <h1 class="text-xl font-bold">
                                 <span><i class="bi bi-qr-code"></i></span> SnapMenu
                             </h1>
-                            <p>Welcome: {userAuth?.displayName}</p>
+                            <p>Welcome: {user?.displayName}</p>
                         </div>
                         <button
                             id="toggleSidebar"
@@ -120,7 +100,7 @@ if (!userAuth) {
             <!-- Contenido principal -->
             <main
                 id="main-content"
-                class="bg-slate-100 p-4 max-md:row-span-11 md:col-span-3 xl:col-span-5 2xl:col-span-5 overflow-y-scroll"
+                class="bg-slate-100 max-md:row-span-11 md:col-span-3 xl:col-span-5 2xl:col-span-5 overflow-y-scroll"
             >
                 <!-- Añade más contenido si es necesario para probar el scroll -->
                 <slot />

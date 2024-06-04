@@ -1,0 +1,1 @@
+export const PRIVATE_ROUTES = ['/admin', '/dashboard', '/dashboard/products', '/api/menu/create', '/api/menu/categories', '/api/menu/menuUser']

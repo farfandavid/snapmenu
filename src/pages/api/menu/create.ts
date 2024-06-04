@@ -1,33 +1,32 @@
 import type { APIRoute } from "astro";
-import { getAuth } from "firebase-admin/auth";
-import mongoose from "mongoose";
 import { createMenu } from "../../../controller/menuController";
+import { getUserByEmail } from "../../../controller/userController";
 
-export const POST: APIRoute = async ({ request, cookies }) => {
+export const POST: APIRoute = async ({ request, cookies, locals }) => {
     try {
-        const auth = getAuth();
-        if (cookies.has('session') === false) {
-            return new Response(JSON.stringify({ error: 'Unauthorized' }), { headers: { 'content-type': 'application/json' }, status: 401 });
-        }
-        const sessionCookie = cookies.get("session")?.value;
-        const decodedCookie = await auth.verifySessionCookie(sessionCookie || "")
-        const user = await auth.getUser(decodedCookie.uid);
+        const user = await getUserByEmail(locals.user.email || "");
         if (!user) {
-            return new Response(JSON.stringify({ error: 'Unauthorized' }), { headers: { 'content-type': 'application/json' }, status: 401 });
+            return new Response(JSON.stringify({ error: "User not found" }), { headers: { 'content-type': 'application/json' }, status: 404 });
+        }
+        if (user.menuList.length >= user.menuLimit) {
+            return new Response(JSON.stringify({ error: "Menu limit exceeded" }), { headers: { 'content-type': 'application/json' }, status: 403 });
         }
         const { name, description } = await request.json();
-        const menu = await createMenu({ name, description, userEmail: user.email || "", active: true })
-        //const menu = await createMenu({ name, description, userEmail: user.email, active: true });
-        if (menu.errorCode === 11000) {
-            return new Response(JSON.stringify({ error: 'Menu already exists' }), { headers: { 'content-type': 'application/json' }, status: 409 });
+        if (!name || !description) {
+            return new Response(JSON.stringify({ error: "Name and description are required" }), { headers: { 'content-type': 'application/json' }, status: 400 });
         }
-        return new Response(JSON.stringify(menu), { status: 200 });
+        const trimmedName = name.replace(/\s+/g, '');
+        const menu = await createMenu({ name: trimmedName, description, userEmail: user.email || "", active: true })
+        user.menuList.push(menu._id);
+        await user.save();
+        return new Response(JSON.stringify(menu), { status: 200, headers: { 'content-type': 'application/json' } });
     } catch (err: any) {
         return new Response(JSON.stringify({ error: err.message }), { headers: { 'content-type': 'application/json' }, status: 500 });
     }
     //return new Response("Hello, world!", { status: 200 });
 }
 
-export const GET: APIRoute = async ({ request }) => {
-    return new Response("Hello, world!", { status: 200 });
+export const GET: APIRoute = async ({ request, locals }) => {
+    console.log(locals);
+    return new Response(JSON.stringify("health check"), { status: 200, headers: { 'content-type': 'application/json' } });
 }

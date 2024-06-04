@@ -1,20 +1,24 @@
 import React, { useEffect, useState } from "react";
 
 interface IProduct {
-    id: string;
+    _id: string;
     name: string;
     price: number;
     description: string;
+    active: boolean;
     quantity: number;
 }
 
 interface Category {
-    id: string;
-    title: string;
+    _id: string;
+    name: string;
     products: IProduct[];
+    active: boolean;
 }
 
 export default function ProductsMain() {
+    const [menu, setMenu] = useState([]);
+    const [menuSelected, setMenuSelected] = useState("");
     const [showModal, setShowModal] = useState(false);
     const [tables, setTables] = useState([] as Category[]);
     const [save, setSave] = useState(false);
@@ -23,23 +27,56 @@ export default function ProductsMain() {
     const countProducts = tables.reduce((acc, table) => {
         return acc + table.products.length;
     }, 0);
+    // Load
+    useEffect(() => {
+        const fetchCategories = async () => {
+            const response = await fetch("/api/menu/categories");
+            const data = await response.json();
+            setMenu(data.map(({ _id, name, categories }: { _id: any, name: string, categories: [] }) => ({ _id, name, categories })));
+            setMenuSelected(data[0]._id);
+            setTables(data[0].categories);
+        };
+        fetchCategories();
+
+    }, []);
+
+    // Save
     useEffect(() => {
         if (!trigger) return;
-
-        const simulatePostRequest = async () => {
-            setSave(true);
-            // Simular la solicitud POST con setTimeout
-            await new Promise(resolve => setTimeout(resolve, 2000))
-                .then(() => window.alert("Saved"))
-                .catch((error) => console.error(error));
+        setSave(true);
+        const savePost = async () => {
+            const res = await fetch("/api/menu/categories", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ menuId: menuSelected, categoriesData: tables })
+            });
+            const data = await res.json();
             setSave(false);
             setTrigger(false);
-            console.log(tables);
+            setTables(data.categories);
+            alert("Saved");
         };
-        simulatePostRequest();
-
+        setTimeout(savePost, 750);
     }, [trigger]);
 
+    // Change Menu
+    useEffect(() => {
+        if (!menuSelected) return;
+        const changeMenu = async () => {
+            const response = await fetch("/api/menu/categories", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ menuId: menuSelected })
+            });
+            const data = await response.json();
+            setTables(data.categories);
+        };
+        changeMenu();
+    }, [menuSelected]);
     // Categories
     const addCategory = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -48,9 +85,10 @@ export default function ProductsMain() {
             return;
         }
         setTables([...tables, {
-            id: crypto.randomUUID(),
-            title: title,
-            products: []
+            _id: crypto.randomUUID(),
+            name: title,
+            products: [],
+            active: true
         }]);
         setShowModal(false);
     }
@@ -67,18 +105,15 @@ export default function ProductsMain() {
             }
             return {
                 ...table,
-                title: event.target.value
+                name: event.target.value
             }
         });
         setTables([...newTables])
 
     }
 
-
-
     const enableEditCategory = (index: number, event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         changeClass(event);
-        console.log(event.currentTarget.parentElement?.parentElement)
         event.currentTarget.parentElement?.parentElement?.querySelectorAll("input").forEach((input) => {
             if (input.hasAttribute("disabled")) {
                 input.removeAttribute("disabled");
@@ -95,11 +130,12 @@ export default function ProductsMain() {
     // Products
     const addProduct = (index: number) => {
         tables[index].products.push({
-            id: crypto.randomUUID(),
+            _id: crypto.randomUUID(),
             name: "Product Example",
             price: 300,
             description: "Description Example",
-            quantity: 0
+            quantity: 0,
+            active: true
         });
         setTables([...tables]);
     }
@@ -161,33 +197,53 @@ export default function ProductsMain() {
     }
 
     const changeClass = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        if (event.currentTarget.classList.contains("bg-blue-500")) {
-            event.currentTarget.classList.remove("bg-blue-500");
-            event.currentTarget.classList.add("bg-green-500");
+        if (event.currentTarget.classList.contains("text-blue-500")) {
+            event.currentTarget.classList.remove("text-blue-500");
+            event.currentTarget.classList.add("text-green-500");
         } else {
-            event.currentTarget.classList.remove("bg-green-500");
-            event.currentTarget.classList.add("bg-blue-500");
+            event.currentTarget.classList.remove("text-green-500");
+            event.currentTarget.classList.add("text-blue-500");
         }
         event.currentTarget.childNodes.forEach((child) => {
             const icon = child as HTMLElement;
             if (icon.classList.contains("bi-pen-fill")) {
                 icon.classList.remove("bi-pen-fill");
-                icon.classList.add("bi-check2-circle");
+                icon.classList.add("bi-check-circle-fill");
             } else {
-                icon.classList.remove("bi-check2-circle");
+                icon.classList.remove("bi-check-circle-fill");
                 icon.classList.add("bi-pen-fill");
             }
         });
     }
     return (
-        <div className="w-full flex flex-col items-center">
-            <h1 className="text-4xl font-bold text-center">Products</h1>
-            <div className="fixed right-6 flex">
-                <button className=" bg-orange-500 px-2 py-1 rounded text-white flex justify-center items-center mx-1" onClick={() => setShowModal(!showModal)}><i className="bi bi-plus-circle-fill text-xl mx-1"></i>Add Category</button>
-                <button className="bg-blue-500 text-white px-2 py-1 rounded flex justify-center items-center mx-1 disabled:bg-blue-300" disabled={trigger} onClick={() => setTrigger(!trigger)}>
-                    {save ? <i className="bi bi-hourglass animate-spin text-xl mx-1"></i> : <i className="bi bi-floppy-fill text-xl mx-1"></i>} Save</button>
-            </div>
+        <div className="w-full flex flex-col items-center relative p-0">
+            <div className="sticky top-0 flex flex-col justify-between w-full items-center gap-1 bg-white m-0 px-4 pt-1">
+                <div className="flex justify-between w-full">
+                    <div className="flex gap-1 items-center">
+                        <h1 className="text-xl font-bold text-center">Menu</h1>
+                        <select name="menu" id="menu-select" onChange={(e) => setMenuSelected(e.target.value)} defaultValue={menuSelected}
+                            className="px-2 py-1 ring-1 ring-slate-600 rounded">
+                            {menu.map((menu: any) => (
+                                <option key={menu._id} value={menu._id}
+                                    className="rounded-none">{menu.name}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="flex">
+                        <button className=" bg-orange-500 px-2 py-1 rounded text-white flex justify-center items-center mx-1" onClick={() => setShowModal(!showModal)}><i className="bi bi-plus-circle-fill text-xl mx-1"></i>Add Category</button>
+                        <button className="bg-blue-500 text-white px-2 py-1 rounded flex justify-center items-center mx-1 disabled:bg-blue-300" disabled={trigger} onClick={() => setTrigger(!trigger)}>
+                            {save ? <i className="bi bi-hourglass animate-spin text-xl mx-1"></i> : <i className="bi bi-floppy-fill text-xl mx-1"></i>} Save</button>
+                    </div>
+                </div>
 
+                <div className="flex flex-col items-start w-full">
+                    <div className="flex gap-2">
+                        <p className="text-center text-slate-500">Categories: {tables.length}</p>
+                        <p className="text-center text-slate-500">Total Products: {countProducts}/100</p>
+                    </div>
+                    <hr className="w-full border-slate-500" />
+                </div>
+            </div>
             {showModal &&
                 <div id="modal" className="w-screen h-screen bg-slate-500/50 fixed left-0 top-0 flex justify-center items-center">
                     <div className="flex bg-white flex-col p-4 items-center justify-center rounded border-2">
@@ -202,82 +258,84 @@ export default function ProductsMain() {
 
                     </div>
                 </div>}
-            {tables.map((table, index) => {
-                return (
-                    <div key={"table" + index} id={"table" + index} className="flex flex-col items-center bg-slate-50 mb-2 max-md:w-full w-2/3 rounded mt-2 shadow-lg border-2 border-slate-100">
-                        <div className="flex w-full justify-between bg-orange-400 p-2 rounded">
-                            <input className="text-white font-bold bg-transparent p-0 rounded" value={table.title} size={table.title.length} disabled onChange={(e) => editCategory(index, e)} />
-                            <div>
-                                <button onClick={() => deleteCategory(index)} className="bg-red-500 text-white px-1 py-1 mx-1 rounded-full w-8 h-8 hover:bg-red-600"><i className="bi bi-trash-fill"></i></button>
-                                <button onClick={(e) => enableEditCategory(index, e)} className="bg-blue-500 text-white px-1 py-1 mx-1 rounded-full w-8 h-8 hover:ring-1 ring-slate-500"><i className="bi bi-pen-fill"></i></button>
+            <div className="w-full flex flex-col items-center px-2">
+                {tables.map((table, index) => {
+                    return (
+                        <div key={"table" + index} id={"table" + index} className="flex flex-col items-center bg-slate-50 mb-2 max-md:w-full w-2/3 rounded mt-2 shadow-lg border-2 border-slate-100">
+                            <div className="flex w-full justify-between bg-orange-400 p-2 rounded">
+                                <input className="text-white font-bold bg-transparent p-0 rounded" value={table.name} size={table.name.length} disabled onChange={(e) => editCategory(index, e)} />
+                                <div>
+                                    <button onClick={() => deleteCategory(index)} className="text-red-500 bg-slate-50 px-1 py-1 mx-1 rounded-full w-8 h-8 hover:ring-1 hover:ring-slate-500"><i className="bi bi-trash-fill"></i></button>
+                                    <button onClick={(e) => enableEditCategory(index, e)} className="text-blue-500 px-1 py-1 mx-1 rounded-full w-8 h-8 bg-slate-50 hover:ring-1 hover:ring-slate-500"><i className="bi bi-pen-fill"></i></button>
+                                </div>
+                            </div>
+                            <table className="w-full">
+                                <thead>
+                                    <tr>
+                                        <th className="py-1">Name</th>
+                                        <th className="py-1">Description</th>
+                                        <th className="py-1">Price</th>
+                                        <th className="py-1">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {table.products.map((product, indexProduct) => (
+                                        <tr key={product._id.toString()} id={product._id.toString()} className="max-md:text-xl ">
+
+                                            <td className="border">
+                                                <input
+                                                    type="text"
+                                                    data-field="name"
+                                                    value={product.name}
+                                                    onChange={(e) => editProduct(index, indexProduct, e)}
+                                                    disabled
+                                                    className="border p-1 w-full active:bg-white active:border-blue-300 disabled:bg-gray-50 enabled:bg-white enabled:border-blue-300 enabled:ring-1 ring-blue-300 text-wrap break-words"
+                                                />
+                                            </td>
+                                            <td className="border">
+                                                <input
+                                                    type="text"
+                                                    value={product.description}
+                                                    data-field="description"
+                                                    onChange={(e) => editProduct(index, indexProduct, e)}
+                                                    disabled
+                                                    className="border p-1 w-full active:bg-white active:border-blue-300 disabled:bg-gray-50 enabled:bg-white enabled:border-blue-300 enabled:ring-1 ring-blue-300 text-wrap break-words"
+                                                />
+                                            </td>
+                                            <td className="border">
+                                                <input
+                                                    type="number"
+                                                    value={product.price}
+                                                    data-field="price"
+                                                    onChange={(e) => editProduct(index, indexProduct, e)}
+                                                    disabled
+                                                    className="border p-1 w-full active:bg-white active:border-blue-300 disabled:bg-gray-50 enabled:bg-white enabled:border-blue-300 enabled:ring-1 ring-blue-300 text-wrap break-words"
+                                                />
+                                            </td>
+                                            <td className="border">
+                                                <div className="flex max-md:text-3xl gap-1 items-center justify-center">
+                                                    <button
+                                                        className=" text-red-500 px-1 rounded hover:ring-1 ring-slate-500"
+                                                        onClick={() => deleteProduct(index, indexProduct)}
+                                                    ><i className="bi bi-trash-fill"></i></button>
+                                                    <button
+                                                        className="text-blue-500 px-1 rounded hover:ring-1 ring-slate-500"
+                                                        onClick={(e) => enableEditProduct(index, indexProduct, e)}
+                                                    ><i className="bi bi-pen-fill"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+
+                            </table>
+                            <div className="flex w-full">
+                                <button className="bg-green-500 m-1 rounded w-full active:bg-green-500 hover:ring-1 ring-green-800 ring-inset hover:bg-green-700" onClick={() => addProduct(index)}> <i className="bi bi-plus-square text-white"></i> </button>
                             </div>
                         </div>
-                        <table className="w-full">
-                            <thead>
-                                <tr>
-                                    <th className="py-1">Name</th>
-                                    <th className="py-1">Description</th>
-                                    <th className="py-1">Price</th>
-                                    <th className="py-1">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {table.products.map((product, indexProduct) => (
-                                    <tr key={product.id} id={product.id} className="max-md:text-xl">
-
-                                        <td className="border">
-                                            <input
-                                                type="text"
-                                                data-field="name"
-                                                value={product.name}
-                                                onChange={(e) => editProduct(index, indexProduct, e)}
-                                                disabled
-                                                className="border p-1 w-full active:bg-white active:border-blue-300 disabled:bg-gray-50 enabled:bg-white enabled:border-blue-300 enabled:ring-1 ring-blue-300 text-wrap break-words"
-                                            />
-                                        </td>
-                                        <td className="border">
-                                            <input
-                                                type="text"
-                                                value={product.description}
-                                                data-field="description"
-                                                onChange={(e) => editProduct(index, indexProduct, e)}
-                                                disabled
-                                                className="border p-1 w-full active:bg-white active:border-blue-300 disabled:bg-gray-50 enabled:bg-white enabled:border-blue-300 enabled:ring-1 ring-blue-300 text-wrap break-words"
-                                            />
-                                        </td>
-                                        <td className="border">
-                                            <input
-                                                type="number"
-                                                value={product.price}
-                                                data-field="price"
-                                                onChange={(e) => editProduct(index, indexProduct, e)}
-                                                disabled
-                                                className="border p-1 w-full active:bg-white active:border-blue-300 disabled:bg-gray-50 enabled:bg-white enabled:border-blue-300 enabled:ring-1 ring-blue-300 text-wrap break-words"
-                                            />
-                                        </td>
-                                        <td className="border flex justify-center">
-                                            <div className="flex max-md:flex-wrap max-md:text-3xl">
-                                                <button
-                                                    className="bg-red-500 text-white px-1 m-1 rounded hover:ring-1 ring-slate-500"
-                                                    onClick={() => deleteProduct(index, indexProduct)}
-                                                ><i className="bi bi-trash-fill"></i></button>
-                                                <button
-                                                    className="bg-blue-500 text-white px-1 m-1 rounded hover:ring-1 ring-slate-500"
-                                                    onClick={(e) => enableEditProduct(index, indexProduct, e)}
-                                                ><i className="bi bi-pen-fill"></i></button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-
-                        </table>
-                        <div className="flex w-full">
-                            <button className="bg-green-500 m-1 rounded w-full active:bg-green-500 hover:ring-1 ring-green-800 ring-inset hover:bg-green-700" onClick={() => addProduct(index)}> <i className="bi bi-plus-square text-white"></i> </button>
-                        </div>
-                    </div>
-                );
-            })}
+                    );
+                })}
+            </div>
         </div>
     );
 }

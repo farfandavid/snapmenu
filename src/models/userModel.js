@@ -56,6 +56,14 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       required: true
     },
+    menuList: {
+      type: Array,
+      required: true
+    },
+    menuLimit: {
+      type: Number,
+      required: true
+    },
     suscription: {
       type: subscriptionSchema,
       required: false

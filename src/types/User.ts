@@ -6,5 +6,7 @@ export interface IUser {
     uid?: string;
     email?: string;
     emailVerified?: boolean;
+    menuList: string[];
+    menuLimit: number;
     disabled?: boolean;
 };

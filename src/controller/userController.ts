@@ -30,7 +30,8 @@ export const getUserByEmail = async (email: string) => {
     return user;
   }
   catch (err: any) {
-    throw new Error(err.message);
+    console.log(err);
+    return null;
   }
 }
 
@@ -38,21 +39,43 @@ export const registerUser = async (user: IUser) => {
   console.log("User register Mongodb")
   try {
     db.connectDB();
-    const newUser = new User({ _id: new mongoose.Types.ObjectId(), ...user });
+    const newUser = new User(
+      {
+        _id: new mongoose.Types.ObjectId(),
+        displayName: user.displayName,
+        uid: user.uid,
+        email: user.email,
+        emailVerified: user.emailVerified,
+        menuList: user.menuList, menuLimit: 0,
+        disabled: user.disabled
+      }
+    );
     await newUser.save();
     console.log("User registered", newUser)
     return true;
   } catch (err: any) {
-    console.log({
-      error: {
-        code: err.code,
-      }
-    })
+    console.log({ error: err })
     return {
       error: {
         code: err.code,
       }
     };
+  }
+}
+
+export const addMenuToUser = async (email: string, menuId: string) => {
+  try {
+    db.connectDB();
+    const user = await User.findOne({ email: email });
+    if (!user) {
+      throw new Error("User not found");
+    }
+    user.menu.push(menuId);
+    await user.save();
+    return user;
+  }
+  catch (err: any) {
+    throw new Error(err.message);
   }
 }
 

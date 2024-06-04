@@ -1,26 +1,7 @@
 import { defineMiddleware } from "astro/middleware";
-import jwt from "jsonwebtoken";
 
-export const auth = defineMiddleware(async (context, next) => {
-  console.log("In auth middleware");
-  const token = context.cookies.get("token")?.value;
-  const user_id = context.cookies.get("user_id")?.value;
-  const verify = jwt.verify(token, import.meta.env.JWT_SECRET, (err: any, decoded: any) => {
-    if (err) {
-      console.log("Failed to authenticate token");
-      return context.redirect("/login");
-    }
-    let userId = decoded.id;
-    if (userId !== user_id) {
-      console.log("Failed to authenticate token, Redirecting to login page");
-      return Response.redirect(new URL("/login", context.url));
-    } else {
-      console.log("Authenticated token");
-      return next();
-    }
-  }
-  );
-  return verify;
+export const auth = defineMiddleware(async ({ request, cookies }, next) => {
+  return next();
 });
 
 /* const checkAuth = async (req, res, next) => {

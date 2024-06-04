@@ -1,0 +1,27 @@
+---
+import MenuLayout from "../../layouts/MenuLayout.astro";
+import type { IMenu } from "../../types/Menu";
+import { PRIVATE_ROUTES } from "../../utils/constant";
+
+if (PRIVATE_ROUTES.includes(Astro.url.pathname)) {
+    return Astro.redirect("/dashboard");
+}
+
+const { menu } = Astro.params;
+const currentMenu = await fetch(
+    `http://localhost:4321/api/menu/getMenu?menuName=${menu}`,
+);
+const menuData: IMenu = await currentMenu.json();
+if (menuData.error) {
+    return Astro.redirect("/404");
+}
+---
+
+<MenuLayout title={menuData.name}>
+    <h1>{menuData.name}</h1>
+    <h1>{menuData._id}</h1>
+    <h1>{menuData.categories}</h1>
+    <h1>{menuData.description}</h1>
+    <h1>{menuData.active}</h1>
+    <h1>{menuData.userEmail}</h1>
+</MenuLayout>

@@ -1,30 +1,34 @@
 import mongoose from 'mongoose';
 import Menu from '../models/menuModel'; // Importa tus modelos de Mongoose aquí
 import type { IMenu } from '../types/Menu';
-import { any } from 'astro/zod';
+import db from '../db/db';
 
 // Funciones CRUD para la colección de menú
 export const createMenu = async (menuData: IMenu) => {
     try {
+        db.connectDB();
         const menu = await Menu.create({ _id: new mongoose.Types.ObjectId(), ...menuData });
         await menu.save();
         return menu;
     } catch (error: any) {
-        return { errorCode: error.code } as any;
+        throw new Error('Error al crear el menú el nombre ya esta en uso', error);
     }
 };
 
 export const getMenuById = async (id: string) => {
     try {
+        db.connectDB();
         const menu = await Menu.findById(id);
         return menu;
     } catch (error) {
-        throw new Error('Error al obtener el menú');
+        console.error(error);
+        return null;
     }
 }
 
 export const getMenuByUserEmail = async (userEmail: string) => {
     try {
+        db.connectDB();
         const menu = await Menu.find({ userEmail: userEmail });
         return menu;
     } catch (error) {
@@ -34,6 +38,7 @@ export const getMenuByUserEmail = async (userEmail: string) => {
 
 export const getMenuByName = async (name: string) => {
     try {
+        db.connectDB();
         const menu = await Menu.findOne({ name: name });
         return menu;
     } catch (error: any) {
@@ -44,6 +49,7 @@ export const getMenuByName = async (name: string) => {
 
 export const getAllMenus = async () => {
     try {
+        db.connectDB();
         const menu = await Menu.find();
         return menu;
     } catch (error) {
@@ -53,6 +59,7 @@ export const getAllMenus = async () => {
 
 export const updateMenuById = async (id: string, menuData: any) => {
     try {
+        db.connectDB();
         const menu = await Menu.findByIdAndUpdate(id, menuData, { new: true });
         return menu;
     } catch (error) {
@@ -62,6 +69,7 @@ export const updateMenuById = async (id: string, menuData: any) => {
 
 export const deleteMenu = async (id: string) => {
     try {
+        db.connectDB();
         await Menu.findByIdAndDelete(id);
         return 'Menú eliminado correctamente';
     } catch (error) {
@@ -72,6 +80,7 @@ export const deleteMenu = async (id: string) => {
 // Funciones CRUD para la colección de categorías
 export const createCategory = async (menuId: string, categoryData: any) => {
     try {
+        db.connectDB();
         const menu = await Menu.findById(menuId);
         if (!menu) {
             throw new Error('El menú no existe');
@@ -85,6 +94,7 @@ export const createCategory = async (menuId: string, categoryData: any) => {
 
 export const getAllCategoriesByMenuId = async (menuId: string) => {
     try {
+        db.connectDB();
         const menu = await Menu.findById(menuId);
         if (!menu) {
             throw new Error('El menú no existe');
@@ -97,6 +107,7 @@ export const getAllCategoriesByMenuId = async (menuId: string) => {
 
 export const updateCategory = async (menuId: string, categoryId: string, categoryData: any) => {
     try {
+        db.connectDB();
         const menu = await Menu.findById(menuId);
         if (!menu) {
             throw new Error('El menú no existe');
@@ -114,8 +125,26 @@ export const updateCategory = async (menuId: string, categoryId: string, categor
     }
 };
 
+export const updateCategories = async (userEmail: string, menuId: string, categoriesData: any) => {
+    try {
+        db.connectDB();
+        const menu = await Menu.findOneAndUpdate({ _id: menuId, userEmail: userEmail }, { categories: categoriesData }, { new: true });
+        //const menu = await Menu.findById(menuId, 'categories');
+        if (!menu) {
+            throw new Error('El menú no existe');
+        }
+        menu.categories = categoriesData;
+        await menu.save();
+        return menu;
+    } catch (error) {
+        console.log(error);
+        throw new Error('Error al actualizar las categorías');
+    }
+}
+
 export const deleteCategoryById = async (menuId: string, categoryId: string) => {
     try {
+        db.connectDB();
         const menu = await Menu.findById(menuId);
         if (!menu) {
             throw new Error('El menú no existe');
@@ -130,6 +159,7 @@ export const deleteCategoryById = async (menuId: string, categoryId: string) => 
 // Funciones CRUD para la colección de productos
 export const createProduct = async (menuId: string, categoryId: string, productData: any) => {
     try {
+        db.connectDB();
         const menu = await Menu.findById(menuId);
         if (!menu) {
             throw new Error('El menú no existe');
@@ -148,6 +178,7 @@ export const createProduct = async (menuId: string, categoryId: string, productD
 
 export const getAllProductsByCategoryId = async (menuId: string, categoryId: string) => {
     try {
+        db.connectDB();
         const menu = await Menu.findById(menuId);
         if (!menu) {
             throw new Error('El menú no existe');
@@ -179,6 +210,7 @@ export const getAllProductsByCategoryId = async (menuId: string, categoryId: str
 
 export const updateProductById = async (menuId: string, categoryId: string, productId: string, productData: any) => {
     try {
+        db.connectDB();
         const menu = await Menu.findById(menuId);
         if (!menu) {
             throw new Error('El menú no existe');
@@ -201,6 +233,7 @@ export const updateProductById = async (menuId: string, categoryId: string, prod
 
 export const deleteProduct = async (menuId: string, categoryId: string, productId: string) => {
     try {
+        db.connectDB();
         const menu = await Menu.findById(menuId);
         if (!menu) {
             throw new Error('El menú no existe');

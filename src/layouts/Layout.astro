@@ -7,7 +7,7 @@ const { title } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="es">
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="description" content="Astro description" />
@@ -27,6 +27,8 @@ const { title } = Astro.props;
 	</body>
 </html>
 <style is:global>
+	@import url("https://fonts.googleapis.com/css2?family=Pacifico&display=swap");
+
 	:root {
 		box-sizing: border-box;
 	}
@@ -40,5 +42,81 @@ const { title } = Astro.props;
 		margin: 0;
 		padding: 0;
 		box-sizing: border-box;
+	}
+
+	.pacifico-regular {
+		font-family: "Pacifico", cursive;
+		font-weight: 400;
+		font-style: normal;
+	}
+
+	.fade-in-left {
+		animation-name: fade-in-left;
+		animation-timeline: view(block 70% 0%);
+		animation-duration: 0.6s;
+		animation-timing-function: ease-in-out;
+	}
+
+	@keyframes fade-in-left {
+		0% {
+			opacity: 0;
+			transform: translateX(50px);
+		}
+		100% {
+			opacity: 1;
+			transform: translateX(0);
+		}
+	}
+
+	.fade-in-right {
+		animation-name: fade-in-right;
+		animation-timeline: view(block 70% 0%);
+		animation-duration: 0.6s;
+		animation-timing-function: ease-in-out;
+	}
+
+	@keyframes fade-in-right {
+		0% {
+			opacity: 0;
+			transform: translateX(-50px);
+		}
+		100% {
+			opacity: 1;
+			transform: translateX(0);
+		}
+	}
+
+	.fade-in-down {
+		animation-name: fade-in-down;
+		animation-timeline: view(70% 0%);
+		animation-duration: 0.6s;
+		animation-timing-function: ease-in-out;
+	}
+
+	@keyframes fade-in-down {
+		0% {
+			opacity: 0;
+			transform: translateY(-50px);
+		}
+		100% {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	.fade-in {
+		animation-name: fade-in;
+		animation-timeline: view(70% 0%);
+		animation-duration: 0.6s;
+		animation-timing-function: ease-in-out;
+	}
+
+	@keyframes fade-in {
+		0% {
+			opacity: 0;
+		}
+		100% {
+			opacity: 1;
+		}
 	}
 </style>
