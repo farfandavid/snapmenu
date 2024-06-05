@@ -3,6 +3,7 @@ import { getAuth, type AuthProviderConfig } from "firebase-admin/auth";
 import { app } from "../../../firebase/server";
 import { registerUser } from "../../../controller/userController";
 import db from "../../../db/db";
+import type { IUser } from "../../../types/User";
 
 export const POST: APIRoute = async ({ request, redirect }) => {
     const auth = getAuth(app);
@@ -54,12 +55,12 @@ export const POST: APIRoute = async ({ request, redirect }) => {
             disabled: true,
             emailVerified: false,
         }).then((user) => {
-            registerUser(user);
+            registerUser({
+                displayName: user.displayName, email: user.email, uid: user.uid,
+                menuList: [],
+                menuLimit: 0
+            })
         });
-        /* await auth.generateEmailVerificationLink(email).then((link) => {
-            console.log("Link de verificación: ", link);
-        }
-        ); */
 
     } catch (error: any) {
         console.error("Error al crear el usuario: ", error);

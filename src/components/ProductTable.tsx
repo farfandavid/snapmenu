@@ -13,7 +13,7 @@ interface Category {
     products: IProduct[];
     active: boolean;
 }
-export const ProductTable = ({ index, table }: { index: string, table: Category }) => {
+export const ProductTable = ({ index, table, editCategory, deleteCategory, enableEditCategory, editProduct, enableEditProduct, deleteProduct, addProduct }: { index: string, table: Category, editCategory: any, deleteCategory: any, enableEditCategory: any, editProduct: any, enableEditProduct: any, deleteProduct: any, addProduct: any }) => {
     return (
         <div key={"table" + index} id={"table" + index} className="flex flex-col items-center bg-slate-50 mb-2 max-md:w-full w-2/3 rounded mt-2 shadow-lg border-2 border-slate-100">
             <div className="flex w-full justify-between bg-orange-400 p-2 rounded">
