@@ -1,6 +1,7 @@
 ---
 import RegisterForm from "../components/RegisterForm";
 import Layout from "../layouts/Layout.astro";
+import { PUBLIC_ROUTES } from "../utils/constant";
 ---
 
 <Layout title="Register">
@@ -107,7 +108,7 @@ import Layout from "../layouts/Layout.astro";
                 <div class="flex items-center justify-between">
                     <p class="mt-4 text-gray-500">
                         ¿Ya tienes una cuenta? <a
-                            href="/login"
+                            href={PUBLIC_ROUTES.SIGN_IN}
                             class="underline">Login</a
                         >
                     </p>

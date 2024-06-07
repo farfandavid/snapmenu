@@ -1,33 +1,129 @@
 ---
-
+const CONTACT_CONTENT = {
+    title: "Contacto",
+    description:
+        "Estamos aquí para ayudarte. Puedes contactarnos a través de los siguientes medios:",
+    email: "info@example.com",
+    whatsapp: "+543886455301",
+    facebook: "https://www.facebook.com",
+    instagram: "https://www.instagram.com",
+};
 ---
 
-<section
-    id="contact"
-    class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 fade-in"
->
-    <h2 class="text-3xl font-bold mb-8">Contact</h2>
+<section id="contact" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
+    <h2 class="text-3xl font-bold mb-8 fade-in">{CONTACT_CONTENT.title}</h2>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div class="flex flex-col justify-center">
-            <h3 class="text-2xl font-bold mb-4">Contact Information</h3>
-            <p class="text-lg">
-                123 Main Street<br />
-                City, State, ZIP<br />
-                Phone: 123-456-7890<br />
-                Email: info@example.com
-            </p>
+        <div class="flex flex-col">
+            <h3 class="text-2xl font-semibold mb-4 fade-in">
+                {CONTACT_CONTENT.description}
+            </h3>
+            <div
+                class="flex justify-between bg-white p-5 items-center text-xl mb-2 shadow-md rounded fade-in"
+            >
+                <div class="flex font-medium gap-1 items-center">
+                    <i class="bi bi-envelope-at-fill text-orange-500 text-2xl"
+                    ></i>
+                    <a
+                        id="email-copy"
+                        href=`mailto:${CONTACT_CONTENT.email}`
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="hover:underline"
+                    >
+                        {CONTACT_CONTENT.email}
+                    </a>
+                </div>
+                <button
+                    class="bg-orange-500 text-white w-10 h-10 rounded hover:ring-1 hover:ring-orange-500 hover:bg-white hover:text-orange-500"
+                    data-copy="email-copy"
+                >
+                    <i class="bi bi-clipboard-fill"></i>
+                </button>
+            </div>
+            <div
+                class="flex justify-between bg-white p-5 items-center text-xl mb-2 shadow-md rounded fade-in"
+            >
+                <div class="flex font-medium gap-1 items-center">
+                    <i class="bi bi-whatsapp text-green-500 text-2xl"></i>
+                    <a
+                        id="whatsapp-copy"
+                        href={`https://wa.me/${CONTACT_CONTENT.whatsapp}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="hover:underline"
+                    >
+                        {CONTACT_CONTENT.whatsapp}
+                    </a>
+                </div>
+                <button
+                    class="bg-green-500 text-white w-10 h-10 rounded hover:ring-1 hover:ring-green-500 hover:bg-white hover:text-green-500"
+                    data-copy="whatsapp-copy"
+                >
+                    <i class="bi bi-clipboard-fill"></i>
+                </button>
+            </div>
+            <div
+                class="flex justify-between bg-white p-5 items-center text-xl mb-2 shadow-md rounded fade-in"
+            >
+                <div class="flex font-medium gap-1 items-center">
+                    <i class="bi bi-facebook text-blue-500 text-2xl"></i>
+                    <a
+                        id="facebook-copy"
+                        href={CONTACT_CONTENT.facebook}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="hover:underline"
+                    >
+                        Facebook
+                    </a>
+                </div>
+                <button
+                    class="bg-blue-500 text-white w-10 h-10 rounded hover:ring-1 hover:ring-blue-500 hover:bg-white hover:text-blue-500"
+                    data-copy="facebook-copy"
+                >
+                    <i class="bi bi-clipboard-fill"></i>
+                </button>
+            </div>
+            <div
+                class="flex justify-between bg-white p-5 items-center text-xl mb-2 shadow-md rounded max-md:fade-in"
+            >
+                <div class="flex font-medium gap-1 items-center">
+                    <i class="bi bi-instagram text-pink-500 text-2xl"></i>
+                    <a
+                        id="instagram-copy"
+                        href={CONTACT_CONTENT.instagram}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="hover:underline"
+                    >
+                        Instagram
+                    </a>
+                </div>
+                <button
+                    class="bg-pink-500 text-white w-10 h-10 rounded hover:ring-1 hover:ring-pink-500 hover:bg-white hover:text-pink-500"
+                    data-copy="instagram-copy"
+                >
+                    <i class="bi bi-clipboard-fill"></i>
+                </button>
+            </div>
         </div>
         <div
-            class="flex flex-col justify-center w-full bg-white rounded-lg shadow-lg p-6"
+            class="flex flex-col justify-center w-full bg-white rounded-lg shadow-lg p-6 fade-in"
         >
-            <h3 class="text-2xl font-bold mb-4">Contact Form</h3>
-            <form class="w-full">
-                <label for="name" class="block mb-2">Name</label>
+            <h3 class="text-2xl font-bold mb-4">Contactanos</h3>
+            <form
+                action="/api/email/server"
+                method="post"
+                class="w-full"
+                id="form-contact"
+            >
+                <label for="name" class="block mb-2">Nombre</label>
                 <input
                     type="text"
                     id="name"
                     name="name"
-                    class="border border-gray-300 px-4 py-2 mb-4 w-full"
+                    class="border border-gray-300 px-4 py-2 mb-4 w-full rounded"
+                    autocomplete="name"
                     required
                 />
                 <label for="email" class="block mb-2">Email</label>
@@ -35,21 +131,104 @@
                     type="email"
                     id="email"
                     name="email"
-                    class="border border-gray-300 px-4 py-2 mb-4 w-full"
+                    class="border border-gray-300 px-4 py-2 mb-4 w-full rounded"
+                    autocomplete="email"
                     required
                 />
-                <label for="message" class="block mb-2">Message</label>
+                <label for="message" class="block mb-2">Mensaje</label>
                 <textarea
                     id="message"
                     name="message"
-                    class="border border-gray-300 px-4 py-2 mb-4 w-full"
+                    class="border border-gray-300 px-4 py-2 mb-4 w-full rounded"
+                    autocomplete="off"
+                    maxlength="500"
                     required></textarea>
                 <button
                     type="submit"
-                    class="bg-orange-500 text-white px-4 py-2 rounded-md mt-4 inline-block hover:bg-white hover:text-orange-500 hover:border-orange-500 border-2"
-                    >Submit</button
+                    class="g-recaptcha bg-orange-500 text-white px-4 py-2 rounded-md mt-4 inline-block hover:bg-white hover:text-orange-500 hover:border-orange-500 border-2"
+                    data-sitekey="6Lf9VuQpAAAAAAR2Ub93R7uxzF0NNS6UsrtrDjgl"
+                    data-callback="onSubmit"
+                    data-action="submit">Enviar</button
                 >
+                <script is:inline>
+                    function onSubmit(token) {
+                        const formData = new FormData(
+                            document.getElementById("form-contact"),
+                        );
+                        fetch("/api/email/server", {
+                            method: "POST",
+                            body: formData,
+                        })
+                            .then((response) => {
+                                if (response.ok) {
+                                    alert("Mensaje enviado correctamente");
+                                    document
+                                        .getElementById("form-contact")
+                                        .reset();
+                                } else {
+                                    alert(
+                                        "Ocurrió un error al enviar el mensaje",
+                                    );
+                                }
+                            })
+                            .catch((error) => {
+                                console.error("Error:", error);
+                            });
+                    }
+                </script>
             </form>
         </div>
     </div>
 </section>
+<script>
+    const copyButton = document.querySelectorAll(
+        "[data-copy]",
+    ) as NodeListOf<HTMLButtonElement>;
+    const tooltip = document.createElement("div");
+    const formContact = document.getElementById(
+        "form-contact",
+    ) as HTMLFormElement;
+    // Copy text to clipboard
+    copyButton.forEach((button) => {
+        button.addEventListener("click", () => {
+            tooltip.classList.add(
+                "absolute",
+                "bg-gray-800",
+                "text-white",
+                "p-2",
+                "rounded",
+                "text-sm",
+            );
+            tooltip.textContent = "Copiado!";
+            button.appendChild(tooltip);
+            setTimeout(() => {
+                tooltip.remove();
+            }, 1000);
+            copyText(button.dataset.copy);
+        });
+    });
+    // Copy text to clipboard
+    function copyText(dataText: any) {
+        // Get the text field
+        const copyText = document.getElementById(dataText) as HTMLAnchorElement;
+        copyText.href.startsWith("mailto")
+            ? navigator.clipboard.writeText(copyText.href.slice(7))
+            : navigator.clipboard.writeText(copyText.href);
+    }
+
+    // Send email
+    /* formContact.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const formData = new FormData(formContact);
+        const response = await fetch(formContact.action, {
+            method: "POST",
+            body: formData,
+        });
+        if (response.ok) {
+            alert("Mensaje enviado correctamente");
+            formContact.reset();
+        } else {
+            alert("Ocurrió un error al enviar el mensaje");
+        }
+    }); */
+</script>

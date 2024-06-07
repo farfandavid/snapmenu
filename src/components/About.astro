@@ -1,40 +1,70 @@
 ---
 import FunctionCard from "./FunctionCard.astro";
+const ABOUT_CONTENT = {
+    title: "Nosotros",
+    mission: {
+        title: "Nuestra Misión",
+        content:
+            "En SnapMenu, nuestra misión es proporcionar a los restaurantes una forma fácil y eficiente de crear y gestionar sus propios menús QR. Creemos que la tecnología puede mejorar enormemente la experiencia de sus clientes, y nos esforzamos por capacitar a los restaurantes para que aprovechen el poder de los menús digitales.",
+    },
+    team: {
+        title: "Nuestro Equipo",
+        content:
+            "Nuestro equipo está formado por personas apasionadas que se dedican a revolucionar la industria de la restauración. Con años de experiencia en desarrollo de software y un profundo conocimiento de las necesidades de los restaurantes, nos comprometemos a ofrecer soluciones innovadoras que ayuden a los restaurantes a prosperar en la era digital.",
+    },
+};
 ---
 
-<section
-    id="about"
-    class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 mb-5 fade-in"
->
-    <h2 class="text-3xl font-bold mb-8">About</h2>
+<section id="about" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 mb-5">
+    <h2 class="text-3xl font-bold mb-8 fade-in">{ABOUT_CONTENT.title}</h2>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div class="flex flex-col justify-center">
-            <h3 class="text-2xl font-bold mb-4">Our Mission</h3>
+        <div class="flex flex-col justify-center fade-in">
+            <h3 class="text-2xl font-bold mb-4">
+                {ABOUT_CONTENT.mission.title}
+            </h3>
             <p class="text-lg">
-                At SnapMenu, our mission is to provide restaurants with an easy
-                and efficient way to create and manage their own QR menus. We
-                believe that technology can greatly enhance the dining
-                experience, and we strive to empower restaurants to leverage the
-                power of digital menus.
+                {ABOUT_CONTENT.mission.content}
             </p>
         </div>
-        <div class="flex flex-col justify-center">
-            <h3 class="text-2xl font-bold mb-4">Our Team</h3>
+        <div class="flex flex-col justify-center fade-in">
+            <h3 class="text-2xl font-bold mb-4">
+                {ABOUT_CONTENT.team.title}
+            </h3>
             <p class="text-lg">
-                Our team is made up of passionate individuals who are dedicated
-                to revolutionizing the restaurant industry. With years of
-                experience in software development and a deep understanding of
-                the needs of restaurants, we are committed to delivering
-                innovative solutions that help restaurants thrive in the digital
-                age.
+                {ABOUT_CONTENT.team.content}
             </p>
         </div>
     </div>
-    <div class="flex justify-between mt-20 text-white fade-in">
-        <FunctionCard icon="bi-qr-code-scan" title="Scan" />
-        <FunctionCard icon="bi-palette-fill" title="Design" />
-        <FunctionCard icon="bi-credit-card-2-front-fill" title="Order" />
-        <FunctionCard icon="bi-share-fill" title="Share" />
-        <FunctionCard icon="bi-chat-left-text-fill" title="Supp" />
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-5">
+        <FunctionCard
+            icon="bi-qr-code-scan"
+            title="Genera QR"
+            description="Crea códigos QR para tus menús y simplifica el acceso de tus clientes."
+        />
+        <FunctionCard
+            icon="bi-search-heart"
+            title="SEO Optimizado"
+            description="Asegura que tu Menú y Restaurante sea encontrado en los motores de búsqueda."
+        />
+        <FunctionCard
+            icon="bi-postcard-heart-fill"
+            title="Crea Menús"
+            description="Crea tu Menú Digital de forma fácil y rápida."
+        />
+        <FunctionCard
+            icon="bi-share-fill"
+            title="Comparte Fácilmente"
+            description="Comparte tus menús con tus clientes a través de códigos QR y enlaces compartibles."
+        />
+        <FunctionCard
+            icon="bi-pencil-fill"
+            title="Edita en Tiempo Real"
+            description="Realiza cambios en tus menús en tiempo real y sin intermediarios."
+        />
+        <FunctionCard
+            icon="bi-piggy-bank-fill"
+            title="Ahorra Tiempo y Recursos"
+            description="Optimiza la gestión de tus menús y ahorra recursos valiosos."
+        />
     </div>
 </section>

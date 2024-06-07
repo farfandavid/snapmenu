@@ -1,38 +1,23 @@
 import type { APIRoute } from "astro";
-import { getAuth, type AuthProviderConfig } from "firebase-admin/auth";
+import { getAuth } from "firebase-admin/auth";
 import { app } from "../../../firebase/server";
 import { registerUser } from "../../../controller/userController";
-import db from "../../../db/db";
-import type { IUser } from "../../../types/User";
+import { PUBLIC_ROUTES } from "../../../utils/constant";
+import { verifyRecaptcha } from "../../../utils/recaptcha";
 
 export const POST: APIRoute = async ({ request, redirect }) => {
     const auth = getAuth(app);
-
-    /* Recaptcha */
-    const recaptchaURL = 'https://www.google.com/recaptcha/api/siteverify';
-    const requestHeaders = {
-        'Content-Type': 'application/x-www-form-urlencoded'
-    };
     /* Obtener los datos del formulario */
-    const formData = await request.json();
-
-    const requestBody = new URLSearchParams({
-        secret: import.meta.env.RECAPTCHA_SECRET_KEY,   // This can be an environment variable
-        response: formData.token          // The token passed in from the client
+    const formData = await request.json().catch((err) => {
+        console.error("Error al analizar el cuerpo de la solicitud:", err);
+        return null;
     });
+    if (!formData) return new Response("Solicitud inválida", { status: 400 });
 
-    const response = await fetch(recaptchaURL, {
-        method: "POST",
-        headers: requestHeaders,
-        body: requestBody.toString()
-    });
-
-    const responseData = await response.json();
-    if (!responseData.success) {
-        return new Response(
-            "Recaptcha error",
-            { status: 400 }
-        );
+    // Verificar el token reCAPTCHA
+    if (!await verifyRecaptcha(formData.token || "")) {
+        console.error("Token reCAPTCHA inválido!");
+        return new Response("Token reCAPTCHA inválido!", { status: 403 });
     }
 
     const email = formData.email;
@@ -69,5 +54,5 @@ export const POST: APIRoute = async ({ request, redirect }) => {
             { status: 400 }
         );
     }
-    return redirect("/login");
+    return redirect(PUBLIC_ROUTES.SIGN_IN);
 };

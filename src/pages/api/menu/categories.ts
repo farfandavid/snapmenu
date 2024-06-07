@@ -7,6 +7,9 @@ import type { IUser } from "../../../types/User";
 // UPDATE: Actualiza las categorías de un menú
 export const PUT: APIRoute = async ({ request, locals }) => {
     const { menuId, categoriesData } = await request.json();
+    if (!menuId || !categoriesData) {
+        return new Response(JSON.stringify({ error: "Faltan datos" }), { status: 400, headers: { "Content-Type": "application/json" } });
+    }
     const menuUpdated = await updateCategories(locals.user.email || "", menuId, categoriesData);
     return new Response(JSON.stringify({ categories: menuUpdated.categories, _id: menuUpdated._id }), { status: 200, headers: { "Content-Type": "application/json" } });
 }

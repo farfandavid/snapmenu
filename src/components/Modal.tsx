@@ -1,6 +1,22 @@
 import type React from "react";
 
-export const Modal = ({ setShowModal, addCategory }: { show: boolean, setShowModal: React.Dispatch<React.SetStateAction<boolean>>, addCategory: any }) => {
+export const Modal = ({ setShowModal, setCategories, categories }: { setShowModal: React.Dispatch<React.SetStateAction<boolean>>, setCategories: any, categories: any }) => {
+
+    const addCategory = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        const title = (document.getElementById("titleCategory") as HTMLInputElement).value;
+        if (!title) {
+            return;
+        }
+        setCategories([...categories, {
+            _id: crypto.randomUUID(),
+            name: title,
+            products: [],
+            active: true
+        }]);
+        setShowModal(false);
+    }
+
     return (
         <div id="modal" className="w-screen h-screen bg-slate-500/50 fixed left-0 top-0 flex justify-center items-center">
             <div className="flex bg-white flex-col p-4 items-center justify-center rounded border-2">

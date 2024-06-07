@@ -137,8 +137,8 @@ export const updateCategories = async (userEmail: string, menuId: string, catego
         await menu.save();
         return menu;
     } catch (error) {
-        console.log(error);
-        throw new Error('Error al actualizar las categorías');
+        console.error(error);
+        return null;
     }
 }
 

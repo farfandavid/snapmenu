@@ -1,75 +1,69 @@
 ---
+import { PUBLIC_ROUTES } from "../utils/constant";
 
+const SERVICE_CONTENT = {
+    title: "Planes de Precios",
+    description:
+        "Elige el plan que mejor se adapte a tus necesidades y comienza a crear tu menú QR hoy mismo.",
+    plans: [
+        {
+            name: "Básico",
+            features: [
+                "Hasta 100 productos en un menú QR.",
+                "Posibilidad de incorporar enlaces de WhatsApp para pedidos.",
+                "Perfil personalizado del restaurante.",
+                "Soporte por correo electrónico.",
+            ],
+            price: "AR$4500/mes",
+        },
+        {
+            name: "Estándar",
+            features: [
+                "Hasta 300 productos en un menú QR.",
+                "Posibilidad de cargar imágenes de productos.",
+                "Personalización avanzada del diseño del menú QR.",
+                "Soporte por correo electrónico y chat en vivo.",
+            ],
+            price: "AR$6500/mes",
+        },
+        {
+            name: "Premium",
+            features: [
+                "Hasta 500 productos en un menú QR.",
+                "Posibilidad de cargar imágenes de productos.",
+                "Personalización a pedido del diseño del menú",
+                "Soporte prioritario por correo electrónico, chat en vivo y asistencia telefónica.",
+            ],
+            price: "AR$8500/mes",
+        },
+    ],
+};
 ---
 
 <section id="services" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
-    <h2 class="text-3xl font-bold mb-8">Pricing Plans</h2>
+    <h2 class="text-3xl font-bold mb-3">{SERVICE_CONTENT.title}</h2>
+    <p class="text-xl mb-8">{SERVICE_CONTENT.description}</p>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div
-            class="flex flex-col justify-between bg-white rounded-lg shadow-lg p-6 fade-in-right"
-        >
-            <h3 class="text-2xl font-bold mb-4">Basic</h3>
-            <ul class="list-disc px-6">
-                <li>Creation of a basic QR menu with up to 100 menu items.</li>
-                <li>Possibility to incorporate WhatsApp links for orders.</li>
-                <li>Custom restaurant profile.</li>
-                <li>Email support.</li>
-            </ul>
-            <div class="mt-2">
-                <p class="text-2xl font-bold mb-1">$4.99/month</p>
-                <a
-                    href="#"
-                    class="bg-orange-500 text-white px-4 py-2 rounded-md mt-4 inline-block hover:bg-white hover:text-orange-500 hover:border-orange-500 border-2"
-                    >Choose Plan</a
-                >
-            </div>
-        </div>
-        <div
-            class="flex flex-col justify-between bg-white rounded-lg shadow-lg p-6 fade-in-down"
-        >
-            <h3 class="text-2xl font-bold mb-4">Standard</h3>
-            <ul class="list-disc px-6">
-                <li>
-                    Creation of up to 3 QR menus with up to 300 menu items each.
-                </li>
-                <li>Possibility to upload product images.</li>
-                <li>Advanced customization of the QR menu design.</li>
-                <li>Weekly data backups.</li>
-                <li>Email and live chat support.</li>
-            </ul>
-            <div class="mt-2">
-                <p class="text-2xl font-bold mb-1">$7.99/month</p>
-                <a
-                    href="#"
-                    class="bg-orange-500 text-white px-4 py-2 rounded-md mt-4 inline-block hover:bg-white hover:text-orange-500 hover:border-orange-500 border-2"
-                    >Choose Plan</a
-                >
-            </div>
-        </div>
-        <div
-            class="flex flex-col justify-between bg-white rounded-lg shadow-lg p-6 fade-in-left"
-        >
-            <h3 class="text-2xl font-bold mb-4">Premium</h3>
-            <ul class="list-disc px-6">
-                <li>Creation of up to 5 QR menus with unlimited menu items.</li>
-                <li>Possibility to upload product images.</li>
-                <li>
-                    Complete customization of the QR menu design with custom
-                    logo and colors.
-                </li>
-                <li>
-                    Priority support via email, live chat, and phone assistance.
-                </li>
-                <li>Weekly data backups.</li>
-            </ul>
-            <div class="mt-2">
-                <p class="text-2xl font-bold mb-1">$9.99/month</p>
-                <a
-                    href="#"
-                    class="bg-orange-500 text-white px-4 py-2 rounded-md mt-4 inline-block hover:bg-white hover:text-orange-500 hover:border-orange-500 border-2"
-                    >Choose Plan</a
-                >
-            </div>
-        </div>
+        {
+            SERVICE_CONTENT.plans.map((plan) => (
+                <div class="flex flex-col justify-between bg-white rounded-lg shadow-lg p-6 fade-in">
+                    <h3 class="text-2xl font-bold mb-4">{plan.name}</h3>
+                    <ul class="list-disc px-6">
+                        {plan.features.map((feature) => (
+                            <li>{feature}</li>
+                        ))}
+                    </ul>
+                    <div class="mt-2">
+                        <p class="text-2xl font-bold mb-1">{plan.price}</p>
+                        <a
+                            href={PUBLIC_ROUTES.SIGN_IN}
+                            class="bg-orange-500 text-white px-4 py-2 rounded-md mt-4 inline-block hover:bg-white hover:text-orange-500 hover:border-orange-500 border-2"
+                        >
+                            Elegir Plan
+                        </a>
+                    </div>
+                </div>
+            ))
+        }
     </div>
 </section>

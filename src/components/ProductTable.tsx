@@ -13,14 +13,62 @@ interface Category {
     products: IProduct[];
     active: boolean;
 }
-export const ProductTable = ({ index, table, editCategory, deleteCategory, enableEditCategory, editProduct, enableEditProduct, deleteProduct, addProduct }: { index: string, table: Category, editCategory: any, deleteCategory: any, enableEditCategory: any, editProduct: any, enableEditProduct: any, deleteProduct: any, addProduct: any }) => {
+export const ProductTable = ({ index, category, editCategory, deleteCategory, editProduct, deleteProduct, addProduct }: { index: number, category: Category, editCategory: any, deleteCategory: any, editProduct: any, deleteProduct: any, addProduct: any }) => {
+
+    const changeClass = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        if (event.currentTarget.classList.contains("text-blue-500")) {
+            event.currentTarget.classList.remove("text-blue-500");
+            event.currentTarget.classList.add("text-green-500");
+        } else {
+            event.currentTarget.classList.remove("text-green-500");
+            event.currentTarget.classList.add("text-blue-500");
+        }
+        event.currentTarget.childNodes.forEach((child) => {
+            const icon = child as HTMLElement;
+            if (icon.classList.contains("bi-pen-fill")) {
+                icon.classList.remove("bi-pen-fill");
+                icon.classList.add("bi-check-circle-fill");
+            } else {
+                icon.classList.remove("bi-check-circle-fill");
+                icon.classList.add("bi-pen-fill");
+            }
+        });
+    }
+
+
+    const enableEditCategory = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        changeClass(event);
+        event.currentTarget.parentElement?.parentElement?.querySelectorAll("input").forEach((input) => {
+            if (input.hasAttribute("disabled")) {
+                input.removeAttribute("disabled");
+                input.classList.add("border-2");
+                input.classList.add("border-white");
+            } else {
+                input.setAttribute("disabled", "true");
+                input.classList.remove("border-2");
+                input.classList.remove("border-white");
+            }
+        });
+    }
+
+    const enableEditProduct = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        changeClass(event);
+        event.currentTarget.parentElement?.parentElement?.parentElement?.querySelectorAll("input").forEach((input) => {
+            if (input.hasAttribute("disabled")) {
+                input.removeAttribute("disabled");
+            } else {
+                input.setAttribute("disabled", "true");
+            }
+        });
+    }
+
     return (
         <div key={"table" + index} id={"table" + index} className="flex flex-col items-center bg-slate-50 mb-2 max-md:w-full w-2/3 rounded mt-2 shadow-lg border-2 border-slate-100">
             <div className="flex w-full justify-between bg-orange-400 p-2 rounded">
-                <input className="text-white font-bold bg-transparent p-0 rounded" value={table.name} size={table.name.length} disabled onChange={(e) => editCategory(index, e)} />
+                <input className="text-white font-bold bg-transparent p-0 rounded" value={category.name} size={category.name.length} disabled onChange={(e) => editCategory(index, e)} />
                 <div>
                     <button onClick={() => deleteCategory(index)} className="text-red-500 bg-slate-50 px-1 py-1 mx-1 rounded-full w-8 h-8 hover:ring-1 hover:ring-slate-500"><i className="bi bi-trash-fill"></i></button>
-                    <button onClick={(e) => enableEditCategory(index, e)} className="text-blue-500 px-1 py-1 mx-1 rounded-full w-8 h-8 bg-slate-50 hover:ring-1 hover:ring-slate-500"><i className="bi bi-pen-fill"></i></button>
+                    <button onClick={(e) => enableEditCategory(e)} className="text-blue-500 px-1 py-1 mx-1 rounded-full w-8 h-8 bg-slate-50 hover:ring-1 hover:ring-slate-500"><i className="bi bi-pen-fill"></i></button>
                 </div>
             </div>
             <table className="w-full">
@@ -33,7 +81,7 @@ export const ProductTable = ({ index, table, editCategory, deleteCategory, enabl
                     </tr>
                 </thead>
                 <tbody>
-                    {table.products.map((product, indexProduct) => (
+                    {category.products.map((product, indexProduct) => (
                         <tr key={product._id.toString()} id={product._id.toString()} className="max-md:text-xl ">
 
                             <td className="border">
@@ -74,7 +122,7 @@ export const ProductTable = ({ index, table, editCategory, deleteCategory, enabl
                                     ><i className="bi bi-trash-fill"></i></button>
                                     <button
                                         className="text-blue-500 px-1 rounded hover:ring-1 ring-slate-500"
-                                        onClick={(e) => enableEditProduct(index, indexProduct, e)}
+                                        onClick={(e) => enableEditProduct(e)}
                                     ><i className="bi bi-pen-fill"></i></button>
                                 </div>
                             </td>

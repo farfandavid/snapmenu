@@ -5,66 +5,79 @@ import Service from "../components/Service.astro";
 import Contact from "../components/Contact.astro";
 import Layout from "../layouts/Layout.astro";
 
+const NAVBAR = [
+	{
+		name: "Inicio",
+		link: "#home",
+	},
+	{
+		name: "Nosotros",
+		link: "#about",
+	},
+	{
+		name: "Servicios",
+		link: "#services",
+	},
+	{
+		name: "Contacto",
+		link: "#contact",
+	},
+];
 export const prerender = true;
 ---
 
 <Layout title="SnapMenu">
-	<nav class="bg-slate-50 fixed w-screen z-10">
-		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-			<div class="flex items-center justify-between h-16">
-				<div class="flex w-full items-center justify-between">
-					<div class="flex">
-						<h1
-							class="text-xl font-bold pacifico-regular flex items-center gap-2"
-						>
-							<span
-								><img
-									src="/favicon.svg"
-									alt=""
-									srcset=""
-									width="30px"
-								/></span
-							> SnapMenu
-						</h1>
-					</div>
-					<div class="hidden md:block">
-						<div class="ml-10 flex items-baseline space-x-4">
-							<a
-								href="#home"
-								class="hover:bg-orange-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
-								>Home</a
-							>
-							<a
-								href="#about"
-								class="hover:bg-orange-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
-								>About</a
-							>
-							<a
-								href="#services"
-								class="hover:bg-orange-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
-								>Services</a
-							>
-							<a
-								href="#contact"
-								class="hover:bg-orange-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
-								>Contact</a
-							>
-							<a
-								href="/login"
-								class="bg-orange-500 text-white px-2 py-1 rounded-md text-sm font-medium hover:bg-white hover:text-orange-500 hover:border-orange-500 border-2"
-								>Login</a
-							>
-							<a
-								href="/register"
-								class="bg-orange-500 text-white px-2 py-1 rounded-md text-sm font-medium hover:bg-white hover:text-orange-500 hover:border-orange-500 border-2"
-								>Get Started</a
-							>
-						</div>
-					</div>
-				</div>
+	<header
+		id="header-main"
+		class="flex px-8 py-2 max-md:h-14 max-md:flex-col overflow-hidden transition-all duration-300 ease-in fixed bg-slate-50 w-screen z-10 md:flex md:justify-between md:h-16 md:items-center"
+	>
+		<div class="flex justify-between">
+			<div class="flex">
+				<h1
+					class="text-xl font-bold pacifico-regular flex items-center gap-2"
+				>
+					<span
+						><img
+							src="/favicon.svg"
+							alt=""
+							srcset=""
+							width="30px"
+						/></span
+					> SnapMenu
+				</h1>
 			</div>
+			<button
+				id="btn-dropdown"
+				class="text-3xl text-orange-500 md:hidden"
+			>
+				<i class="bi bi-list"></i>
+			</button>
 		</div>
-	</nav>
+		<nav
+			class="flex max-md:flex-col max-md:mt-5 text-center gap-2 items-center"
+		>
+			{
+				NAVBAR.map((item) => (
+					<a
+						href={item.link}
+						class="hover:bg-orange-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+					>
+						{item.name}
+					</a>
+				))
+			}
+			<a
+				href="/signin"
+				class="bg-orange-500 text-white px-2 py-1 rounded-md text-sm font-medium hover:bg-white hover:text-orange-500 hover:border-orange-500 border-2"
+				>iniciar Sesión</a
+			>
+			<a
+				href="/register"
+				class="bg-orange-500 text-white px-2 py-1 rounded-md text-sm font-medium hover:bg-white hover:text-orange-500 hover:border-orange-500 border-2"
+				>Empezar!</a
+			>
+		</nav>
+	</header>
 	<main class="w-full bg-slate-100">
 		<Home />
 		<About />
@@ -89,3 +102,20 @@ export const prerender = true;
 		</div>
 	</footer>
 </Layout>
+<script>
+	const btnDropdown = document.getElementById(
+		"btn-dropdown",
+	) as HTMLButtonElement;
+	const headerMain = document.getElementById("header-main") as HTMLElement;
+	btnDropdown.addEventListener("click", () => {
+		if (headerMain.classList.contains("h-screen")) {
+			headerMain.classList.remove("h-screen");
+			headerMain.classList.add("max-md:h-14");
+			return;
+		} else if (headerMain.classList.contains("max-md:h-14")) {
+			headerMain.classList.remove("max-md:h-14");
+			headerMain.classList.add("h-screen");
+			return;
+		}
+	});
+</script>

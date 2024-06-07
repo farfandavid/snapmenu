@@ -1,8 +1,9 @@
 ---
-import MenuLayout from "../../layouts/MenuLayout.astro";
-import type { IMenu } from "../../types/Menu";
-import { PRIVATE_ROUTES } from "../../utils/constant";
+import MenuLayout from "../layouts/MenuLayout.astro";
+import type { IMenu } from "../types/Menu";
+import { PRIVATE_ROUTES } from "../utils/constant";
 
+console.log(Astro.url);
 if (PRIVATE_ROUTES.includes(Astro.url.pathname)) {
     return Astro.redirect("/dashboard");
 }

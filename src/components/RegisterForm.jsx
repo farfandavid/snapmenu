@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { PUBLIC_ROUTES } from "../utils/constant";
 
 export default function RegisterForm() {
   //const [username, setusername] = useState("");
@@ -48,51 +49,11 @@ export default function RegisterForm() {
       return;
     }
 
-    /* try {
-      const response = await fetch("http://localhost:4321/api/users", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      }).then((response) => {
-        response.redirected ? window.location.href = response.url : console.log("error");
-        return response.json();
-      });
-      document.cookie = `register=${response.user._id}; path=/login; max-age=3600`;
-      window.location.href = `/login`;
-      
-    } catch (error) {
-      setError({ error: error.message });
-    } */
-
     setIsLoading(false); // Ocultar animación de espera
   };
 
   return (
     <form action="#" className="mx-auto mb-0 mt-8 max-w-md space-y-4" onSubmit={handleRegister}>
-      {/*<div>
-        <label htmlFor="username" className="sr-only">userName</label>
-        <div className="relative">
-          <input
-            name="username"
-            type="text"
-            className="w-full rounded-lg border-gray-200 p-4 pe-12 text-sm shadow-sm"
-            placeholder="Enter username"
-            value={username}
-            onChange={(e) => setusername(e.target.value)}
-            id="username"
-          />
-
-          <span
-            className="absolute inset-y-0 end-0 grid place-content-center px-4 text-gray-500"
-          >
-            <i className="bi bi-person-fill"></i>
-          </span>
-        </div>
-        {error.usernameError && <p className="text-red-500 text-xs mt-1 ml-2">{error.usernameError}</p>}
-  </div>*/}
-
       <div>
         <label htmlFor="email" className="sr-only">Email</label>
 
@@ -163,7 +124,7 @@ export default function RegisterForm() {
       <div className="flex items-center justify-between">
         <p className="text-sm text-gray-500">
           Already have an account?
-          <a className="underline" href="login">Sign in</a>
+          <a className="underline" href={PUBLIC_ROUTES.SIGN_IN}>Sign in</a>
         </p>
 
         <button
