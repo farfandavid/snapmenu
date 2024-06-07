@@ -5,4 +5,6 @@ export const PUBLIC_ROUTES = {
     SIGN_UP: '/signup',
     HOME: '/',
     REGISTER: '/register',
+    TERMS: '/terms-of-service',
+    PRIVACY: '/privacy-policy',
 }

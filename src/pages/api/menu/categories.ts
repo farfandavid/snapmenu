@@ -29,6 +29,10 @@ export const POST: APIRoute = async ({ request, locals }) => {
 export const GET: APIRoute = async ({ request, locals }) => {
     const user = await getUserByEmail(locals.user.email || "") as IUser;
     const menu = await getMenuByUserEmail(user.email || "");
+    if (!menu) {
+        return new Response(JSON.stringify
+            ({ error: "No se encontraron menús" }), { status: 404, headers: { "Content-Type": "application/json" } });
+    }
     const menuRes = menu.map(({ _id, name, categories }: { _id: any, name: string, categories: [] }) => ({ _id, name, categories }));
     return new Response(JSON.stringify(menuRes), { status: 200, headers: { "Content-Type": "application/json" } });
 }

@@ -2,7 +2,7 @@ import type { APIRoute } from "astro";
 import { createMenu } from "../../../controller/menuController";
 import { getUserByEmail } from "../../../controller/userController";
 
-export const POST: APIRoute = async ({ request, cookies, locals }) => {
+export const POST: APIRoute = async ({ request, locals }) => {
     try {
         const user = await getUserByEmail(locals.user.email || "");
         if (!user) {
@@ -14,6 +14,10 @@ export const POST: APIRoute = async ({ request, cookies, locals }) => {
         const { name, description } = await request.json();
         if (!name || !description) {
             return new Response(JSON.stringify({ error: "Name and description are required" }), { headers: { 'content-type': 'application/json' }, status: 400 });
+        }
+        const regexName = /^[a-zA-Z0-9]+$/;
+        if (!regexName.test(name)) {
+            return new Response(JSON.stringify({ error: "Name should be alphanumeric" }), { headers: { 'content-type': 'application/json' }, status: 400 });
         }
         const trimmedName = name.replace(/\s+/g, '');
         const menu = await createMenu({ name: trimmedName, description, userEmail: user.email || "", active: true })

@@ -14,14 +14,19 @@ import Button from "./Button.astro";
         <p>This will also be the name of your menu page</p>
         <form action="api/menu/create" method="POST" id="form-menu">
             <input
+                id="menuName"
                 type="text"
                 name="menuName"
                 placeholder="Menu Name"
                 autocomplete="off"
                 required
-                class="rounded-lg p-2 border border-gray-300 w-full mt-2 mb-2"
+                class="rounded-lg p-2 border border-gray-300 w-full mt-2 mb-1"
             />
+            <p id="name-error" class="text-red-500 text-xs hidden w-full">
+                Nombre del Menu: Error
+            </p>
             <input
+                id="description"
                 type="text"
                 name="description"
                 placeholder="Description"
@@ -36,12 +41,20 @@ import Button from "./Button.astro";
 </div>
 <script is:inline>
     const form = document.getElementById("form-menu");
+    const nameError = document.getElementById("name-error");
 
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
         const formData = new FormData(form);
         const menuName = formData.get("menuName");
         const description = formData.get("description");
+        const regex = /^[a-zA-Z0-9_]+$/;
+        if (!regex.test(menuName)) {
+            nameError.classList.remove("hidden");
+            nameError.textContent =
+                "Nombre del Menu: Solo se permite letras y números";
+            return;
+        }
         const response = await fetch("/api/menu/create", {
             method: "POST",
             body: JSON.stringify({ name: menuName, description }),
@@ -52,7 +65,8 @@ import Button from "./Button.astro";
         const data = await response.json();
         console.log(data);
         if (data.error) {
-            alert(data.error);
+            nameError.classList.remove("hidden");
+            nameError.textContent = data.error;
         }
         if (data.name) {
             alert(`Menu ${data.name} created successfully`);

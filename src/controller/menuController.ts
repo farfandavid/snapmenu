@@ -32,7 +32,8 @@ export const getMenuByUserEmail = async (userEmail: string) => {
         const menu = await Menu.find({ userEmail: userEmail });
         return menu;
     } catch (error) {
-        throw new Error('Error al obtener el menú');
+        console.error(error);
+        return null;
     }
 }
 
@@ -43,7 +44,7 @@ export const getMenuByName = async (name: string) => {
         return menu;
     } catch (error: any) {
         console.log(error);
-        return { errorCode: error.code } as any;
+        return null;
     }
 }
 
