@@ -90,7 +90,7 @@ if (Astro.cookies.has("session")) {
                         <a class="underline" href="register">Sign up</a>
                     </p>
                     <button
-                        type="submit"
+                        id="btn-submit"
                         class="flex rounded-lg bg-orange-500 px-5 py-3 text-sm font-medium text-white"
                         >Login</button
                     >
@@ -135,7 +135,6 @@ if (Astro.cookies.has("session")) {
         signInWithPopup,
     } from "firebase/auth";
     import { app } from "../firebase/client";
-
     const auth = getAuth(app);
     auth.setPersistence(inMemoryPersistence);
 
@@ -180,6 +179,8 @@ if (Astro.cookies.has("session")) {
 
         if (res.redirected) {
             window.location.assign(res.url);
+        } else {
+            alert("Error al iniciar sesión con Google");
         }
     });
 </script>

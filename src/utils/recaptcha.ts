@@ -21,7 +21,9 @@ export const verifyRecaptcha = async (recaptchaResponse: string) => {
         headers: requestHeaders,
         body: requestBody.toString()
     });
-    const responseData = await response.json() as RecaptchaResponse;
-
+    const responseData = await response.json()
+        .catch((err) => {
+            return { success: false }
+        });
     return responseData.success;
 }

@@ -11,7 +11,10 @@ export const POST: APIRoute = async ({ request, locals }) => {
         if (user.menuList.length >= user.menuLimit) {
             return new Response(JSON.stringify({ error: "Menu limit exceeded" }), { headers: { 'content-type': 'application/json' }, status: 403 });
         }
-        const { name, description } = await request.json();
+        const { name, description } = await request.json()
+            .catch((err) => {
+                return { name: null, description: null }
+            });
         if (!name || !description) {
             return new Response(JSON.stringify({ error: "Name and description are required" }), { headers: { 'content-type': 'application/json' }, status: 400 });
         }

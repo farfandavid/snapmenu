@@ -3,7 +3,6 @@ import MenuLayout from "../layouts/MenuLayout.astro";
 import type { IMenu } from "../types/Menu";
 import { PRIVATE_ROUTES } from "../utils/constant";
 
-console.log(Astro.url);
 if (PRIVATE_ROUTES.includes(Astro.url.pathname)) {
     return Astro.redirect("/dashboard");
 }
@@ -19,10 +18,78 @@ if (menuData.error) {
 ---
 
 <MenuLayout title={menuData.name}>
-    <h1>{menuData.name}</h1>
-    <h1>{menuData._id}</h1>
-    <h1>{menuData.categories}</h1>
-    <h1>{menuData.description}</h1>
-    <h1>{menuData.active}</h1>
-    <h1>{menuData.userEmail}</h1>
+    <header
+        class="bg-blue-300 w-full h-[calc(33vh)] relative rounded-b-xl overflow-hidden shadow-md"
+    >
+        <h1>{menuData.name}</h1>
+        <div class="bg-slate-100 w-full absolute bottom-0 py-2 px-2">
+            ubicacion
+        </div>
+    </header>
+    <section class="w-full">
+        <ul id="tabs" class="flex py-4 overflow-x-auto">
+            {
+                menuData.categories?.map((category) => (
+                    <li class="px-2">
+                        <button id={category._id} class="">
+                            {category.name}
+                        </button>
+                    </li>
+                ))
+            }
+        </ul>
+        <div class="w-full px-2">
+            <hr class="h-0.5 bg-slate-400" />
+        </div>
+        <div id="tabs-content" class="px-2">
+            {
+                menuData.categories?.map((category) => (
+                    <div class="py-2 category" data-category={category._id}>
+                        {category.products?.map((product) => (
+                            <div class="grid grid-cols-5 grid-rows-2 border-b-2 border-slate-400">
+                                <div class="col-span-4 bg-red-200 py-3 px-2">
+                                    {product.name}
+                                </div>
+                                <div class="row-start-2 col-span-4 bg-green-200 py-3 px-2">
+                                    {product.description}
+                                </div>
+                                <div class="col-start-5 bg-blue-200 py-3 px-2 text-end">
+                                    ${product.price}
+                                </div>
+                                <div class="col-start-5 bg-yellow-200 py-3 px-2 text-end">
+                                    <button class="">Agregar</button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                ))
+            }
+        </div>
+    </section>
 </MenuLayout>
+<script>
+    //const tabs = document.getElementById("tabs") as HTMLUListElement;
+    const buttons = document
+        .getElementById("tabs")
+        ?.getElementsByTagName("button") as HTMLCollectionOf<HTMLButtonElement>;
+    const categories = document.getElementById("tabs-content")
+        ?.children as HTMLCollectionOf<HTMLElement>;
+    for (let i = 1; i < categories.length; i++) {
+        categories[i].classList.add("hidden");
+    }
+    for (let i = 1; i < buttons.length; i++) {
+        buttons[i].classList.add("text-slate-400");
+    }
+    for (let i = 0; i < buttons.length; i++) {
+        buttons[i].addEventListener("click", () => {
+            for (let j = 0; j < buttons.length; j++) {
+                buttons[j].classList.add("text-slate-400");
+                buttons[j].classList.remove("text-black");
+                categories[j].classList.add("hidden");
+            }
+            buttons[i].classList.remove("text-slate-400");
+            buttons[i].classList.add("text-black");
+            categories[i].classList.remove("hidden");
+        });
+    }
+</script>

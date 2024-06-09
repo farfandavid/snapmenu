@@ -3,9 +3,9 @@ const CONTACT_CONTENT = {
     title: "Contacto",
     description:
         "Estamos aquí para ayudarte. Puedes contactarnos a través de los siguientes medios:",
-    email: "info@example.com",
+    email: "farfetchdev@hotmail.com",
     whatsapp: "+543886455301",
-    facebook: "https://www.facebook.com",
+    facebook: "https://www.facebook.com/SnapMenuOnline/",
     instagram: "https://www.instagram.com",
 };
 ---
@@ -215,20 +215,4 @@ const CONTACT_CONTENT = {
             ? navigator.clipboard.writeText(copyText.href.slice(7))
             : navigator.clipboard.writeText(copyText.href);
     }
-
-    // Send email
-    /* formContact.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const formData = new FormData(formContact);
-        const response = await fetch(formContact.action, {
-            method: "POST",
-            body: formData,
-        });
-        if (response.ok) {
-            alert("Mensaje enviado correctamente");
-            formContact.reset();
-        } else {
-            alert("Ocurrió un error al enviar el mensaje");
-        }
-    }); */
 </script>

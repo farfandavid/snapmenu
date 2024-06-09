@@ -36,7 +36,6 @@ export const getUserByEmail = async (email: string) => {
 }
 
 export const registerUser = async (user: IUser) => {
-  console.log("User register Mongodb")
   try {
     db.connectDB();
     const newUser = new User(
