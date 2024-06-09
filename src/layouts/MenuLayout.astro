@@ -8,13 +8,22 @@ const { title } = Astro.props;
         <meta name="viewport" content="width=device-width" />
         <meta name="description" content="Astro description" />
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+            type="text/css"
+        />
         <title>{title}</title>
     </head>
-    <body class="h-screen w-screen bg-slate-400 overflow-hidden">
+    <body class="h-screen w-screen bg-black overflow-hidden">
         <div
-            class="h-screen bg-slate-200 max-md:w-full md:w-3/5 mx-auto overflow-y-auto"
+            class="h-screen bg-slate-200 max-md:w-full md:w-3/5 mx-auto overflow-y-auto drop-shadow-2xl"
         >
             <slot />
+        </div>
+        <div
+            class="w-screen h-screen absolute top-0 -z-10 bg-[url('https://th.bing.com/th/id/R.c697adb39de642e86dc2a0e8a4a24982?rik=xLE6dqFrzXwocg&pid=ImgRaw&r=0')] bg-cover bg-no-repeat bg-center filter blur-md"
+        >
         </div>
     </body>
 </html>
