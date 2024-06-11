@@ -19,11 +19,11 @@ if (menuData.error) {
 
 <MenuLayout title={menuData.name}>
     <header
-        class="bg-blue-300 w-full min-h-80 relative rounded-b-xl overflow-hidden shadow-md bg-[url('https://th.bing.com/th/id/R.c697adb39de642e86dc2a0e8a4a24982?rik=xLE6dqFrzXwocg&pid=ImgRaw&r=0')] bg-cover bg-center bg-no-repeat content-center"
+        class="w-full min-h-64 relative rounded overflow-hidden shadow-md bg-[url('https://th.bing.com/th/id/R.c697adb39de642e86dc2a0e8a4a24982?rik=xLE6dqFrzXwocg&pid=ImgRaw&r=0')] bg-cover bg-center bg-no-repeat content-center"
     >
         <div
             id="menuImage"
-            class="mx-auto max-sm:w-32 w-44 aspect-square bg-white bg-cover bg-center bg-no-repeat rounded-full z-20"
+            class="mx-auto max-sm:w-32 w-44 aspect-square bg-[url('https://logolook.net/wp-content/uploads/2023/09/Pringles-Logo-2020.png')] bg-cover bg-center bg-no-repeat z-20 drop-shadow-2xl"
         >
         </div>
         <h1 class="font-bold text-3xl hidden">
@@ -34,7 +34,7 @@ if (menuData.error) {
         >
             <div class="flex gap-1">
                 <i class="bi bi-geo-alt-fill text-red-500"></i>
-                <p>L.G.S.M</p>
+                <p class="text-slate-800">L.G.S.M</p>
             </div>
 
             <div class="flex gap-1 text-green-500">
@@ -43,12 +43,12 @@ if (menuData.error) {
             </div>
         </div>
     </header>
-    <section class="w-full h-screen">
+    <section class="w-full">
         <div class="mt-2 px-2 relative">
             <input
                 id="searchMenu"
                 name="data-products"
-                class="w-full rounded-lg border-gray-200 p-2 pe-12 text-sm shadow-sm"
+                class="w-full rounded-lg border-gray-200 p-2 pe-12 text-sm shadow-sm bg-slate-50 placeholder:text-slate-500"
                 placeholder="Buscar en el menu"
                 list="data-products"
             />
@@ -62,12 +62,12 @@ if (menuData.error) {
                 }
             </datalist>
             <span
-                class="absolute inset-y-0 end-0 grid place-content-center px-4 text-gray-500"
+                class="absolute inset-y-0 end-0 grid place-content-center px-4 text-slate-500"
             >
                 <i class="bi bi-search"></i>
             </span>
         </div>
-        <ul id="tabs" class="flex py-4 overflow-x-auto">
+        <ul id="tabs" class="flex py-4 overflow-x-auto font-bold">
             {
                 menuData.categories?.map((category) => (
                     <li class="px-2">
@@ -86,7 +86,10 @@ if (menuData.error) {
                 menuData.categories?.map((category) => (
                     <div class="py-2 category" data-category={category._id}>
                         {category.products?.map((product) => (
-                            <div class="grid grid-cols-5 grid-rows-2 border-b-2 border-slate-400 bg-slate-50 rounded mb-2 shadow-md">
+                            <div
+                                class="grid grid-cols-5 grid-rows-2 bg-slate-50 backdrop-blur-md rounded mb-2 shadow-md"
+                                data-product={product.name}
+                            >
                                 <div class="col-span-4  py-2 px-2 font-medium">
                                     {product.name}
                                 </div>
@@ -114,6 +117,10 @@ if (menuData.error) {
         ?.getElementsByTagName("button") as HTMLCollectionOf<HTMLButtonElement>;
     const categories = document.getElementById("tabs-content")
         ?.children as HTMLCollectionOf<HTMLElement>;
+    const searchMenu = document.getElementById(
+        "searchMenu",
+    ) as HTMLInputElement;
+
     for (let i = 1; i < categories.length; i++) {
         categories[i].classList.add("hidden");
     }
@@ -124,12 +131,29 @@ if (menuData.error) {
         buttons[i].addEventListener("click", () => {
             for (let j = 0; j < buttons.length; j++) {
                 buttons[j].classList.add("text-slate-400");
-                buttons[j].classList.remove("text-black");
+                buttons[j].classList.remove("text-slate-800");
                 categories[j].classList.add("hidden");
             }
             buttons[i].classList.remove("text-slate-400");
-            buttons[i].classList.add("text-black");
+            buttons[i].classList.add("text-slate-800");
             categories[i].classList.remove("hidden");
         });
     }
+
+    searchMenu.addEventListener("input", () => {
+        const searchValue = searchMenu.value.toLowerCase();
+        for (let i = 0; i < categories.length; i++) {
+            categories[i].classList.remove("hidden");
+            for (let j = 0; j < categories[i].children.length; j++) {
+                const product = categories[i].children[j] as HTMLElement;
+                if (
+                    product.dataset.product?.toLowerCase().includes(searchValue)
+                ) {
+                    product.classList.remove("hidden");
+                } else {
+                    product.classList.add("hidden");
+                }
+            }
+        }
+    });
 </script>

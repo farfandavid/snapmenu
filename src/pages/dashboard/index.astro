@@ -6,7 +6,7 @@ import CreateMenu from "../../components/CreateMenu.astro";
 import { getUserByEmail } from "../../controller/userController";
 import type { IUser } from "../../types/User";
 
-const user = (await getUserByEmail(Astro.locals.user.email || "")) as IUser;
+const user = await getUserByEmail(Astro.locals.user.email || "");
 const menu = (await getMenuByUserEmail(user.email || "")) as IMenu[];
 ---
 

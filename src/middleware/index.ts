@@ -37,6 +37,10 @@ export const onRequest = defineMiddleware(async (context, next) => {
         }
 
         context.locals = { user: userDB };
+        if (!context.locals.user) {
+            console.log("User found", context.locals.user);
+            return new Response("User found", { status: 200 });
+        }
     }
     return next();
 });
