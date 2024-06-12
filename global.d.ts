@@ -10,6 +10,8 @@ declare namespace App {
             uid?: string;
             email?: string;
             emailVerified?: boolean;
+            menuList: string[];
+            menuLimit: number;
             disabled?: boolean;
         }
     }

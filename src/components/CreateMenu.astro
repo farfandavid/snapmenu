@@ -3,45 +3,48 @@ import Button from "./Button.astro";
 ---
 
 <div class="flex flex-col items-center">
-    <h1 class="font-bold text-2xl">Welcome to SnapMenu</h1>
-    <p class="text-xl">Let's start by creating a Menu</p>
+    <h1 class="font-bold text-2xl">Bienvenido a SnapMenu</h1>
+    <p class="text-xl">Empecemos por crear un Menú</p>
     <div
         class="flex roundedflex flex-col justify-between bg-white rounded-lg shadow-lg p-6 fade-in-right"
     >
-        <h1 class="font-bold text-lg">
-            Let's choose the name of your restaurant or business.
-        </h1>
-        <p>This will also be the name of your menu page</p>
+        <h1 class="font-bold text-lg">Elijamos un nombre para tu menú</h1>
+        <p>Este también será el nombre de tu página de menú</p>
         <form action="api/menu/create" method="POST" id="form-menu">
             <input
                 id="menuName"
                 type="text"
                 name="menuName"
-                placeholder="Menu Name"
+                placeholder="Nombre del Menú: Solo letras y números sin espacios y caracteres especiales"
                 autocomplete="off"
                 required
                 class="rounded-lg p-2 border border-gray-300 w-full mt-2 mb-1"
             />
             <p id="name-error" class="text-red-500 text-xs hidden w-full">
-                Nombre del Menu: Error
+                Nombre del Menú: Error
             </p>
             <input
                 id="description"
                 type="text"
                 name="description"
-                placeholder="Description"
+                placeholder="Descripcion del Menú"
                 autocomplete="off"
                 required
                 class="rounded-lg p-2 border border-gray-300 w-full mt-2 mb-2"
                 maxlength="60"
             />
-            <Button type="submit" className=""> Create Menu </Button>
+            <Button type="submit" className=""> Crear Menú </Button>
         </form>
     </div>
 </div>
 <script is:inline>
     const form = document.getElementById("form-menu");
     const nameError = document.getElementById("name-error");
+    const menuName = document.getElementById("menuName");
+
+    menuName.addEventListener("input", (e) => {
+        e.target.value = e.target.value.replace(/[^a-zA-Z0-9_]/g, "");
+    });
 
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -52,7 +55,7 @@ import Button from "./Button.astro";
         if (!regex.test(menuName)) {
             nameError.classList.remove("hidden");
             nameError.textContent =
-                "Nombre del Menu: Solo se permite letras y números";
+                "Nombre del Menu: Solo se permite letras y números sin caracteres especiales ni espacios";
             return;
         }
         const response = await fetch("/api/menu/create", {
@@ -69,7 +72,7 @@ import Button from "./Button.astro";
             nameError.textContent = data.error;
         }
         if (data.name) {
-            alert(`Menu ${data.name} created successfully`);
+            alert(`Menu ${data.name} fue creado con éxito`);
             window.location.reload();
         }
     });
