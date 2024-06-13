@@ -19,27 +19,27 @@ if (menuData.error) {
 
 <MenuLayout title={menuData.name}>
     <header
-        class="w-full min-h-64 relative rounded overflow-hidden shadow-md bg-[url('https://th.bing.com/th/id/R.c697adb39de642e86dc2a0e8a4a24982?rik=xLE6dqFrzXwocg&pid=ImgRaw&r=0')] bg-cover bg-center bg-no-repeat content-center"
+        class="flex w-full min-h-64 max-h-64 overflow-hidden shadow-md bg-[url('https://th.bing.com/th/id/R.c697adb39de642e86dc2a0e8a4a24982?rik=xLE6dqFrzXwocg&pid=ImgRaw&r=0')] bg-cover bg-center bg-no-repeat"
     >
-        <div
-            id="menuImage"
-            class="mx-auto max-sm:w-32 w-44 aspect-square bg-[url('https://logolook.net/wp-content/uploads/2023/09/Pringles-Logo-2020.png')] bg-cover bg-center bg-no-repeat z-20 drop-shadow-2xl"
-        >
-        </div>
-        <h1 class="font-bold text-3xl hidden">
-            {menuData.name}
-        </h1>
-        <div
-            class="bg-slate-50 w-full absolute bottom-0 py-2 px-2 flex justify-between"
-        >
-            <div class="flex gap-1">
-                <i class="bi bi-geo-alt-fill text-red-500"></i>
-                <p class="text-slate-800">L.G.S.M</p>
-            </div>
-
-            <div class="flex gap-1 text-green-500">
-                <i class="bi bi-clock-fill"></i>
-                <p>Abierto</p>
+        <div class="w-full bg-black/35 relative">
+            <img
+                src="https://th.bing.com/th/id/R.d068789347fe0ba3393433d9d6f65a9e?rik=40O2Zkx0Tl4LTw&riu=http%3a%2f%2fprojets.lf-consultinginformatique.fr%2fRestaurant%2fimg%2frestaurant_name.png&ehk=daTmSU8NhLv5BHD%2bKNq6Vkx44%2buE6QZNAV0931zW%2bmU%3d&risl=&pid=ImgRaw&r=0"
+                alt={menuData.description}
+                width="150"
+                height="150"
+                class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded"
+            />
+            <div class="flex justify-between w-full p-3 absolute bottom-0">
+                <div class="flex gap-2 bg-black/50 rounded-xl px-3 py-1">
+                    <i class="bi bi-geo-alt-fill text-red-500"></i>
+                    <p class="text-white font-bold">LGSM</p>
+                </div>
+                <div
+                    class="flex gap-2 bg-green-500 text-white font-bold rounded-xl px-3 py-1"
+                >
+                    <i class="bi bi-clock-fill"></i>
+                    <p>Abierto</p>
+                </div>
             </div>
         </div>
     </header>
@@ -47,12 +47,12 @@ if (menuData.error) {
         <div class="mt-2 px-2 relative">
             <input
                 id="searchMenu"
-                name="data-products"
-                class="w-full rounded-lg border-gray-200 p-2 pe-12 text-sm shadow-sm bg-slate-50 placeholder:text-slate-500"
+                name="datalist-products"
+                class="w-full rounded-lg p-2 pe-12 text-sm shadow-md bg-slate-50 placeholder:text-slate-500 ring-1 ring-slate-400"
                 placeholder="Buscar en el menu"
-                list="data-products"
+                list="datalist-products"
             />
-            <datalist id="data-products">
+            <datalist id="datalist-products">
                 {
                     menuData.categories?.map((category) =>
                         category.products?.map((product) => (
@@ -67,28 +67,34 @@ if (menuData.error) {
                 <i class="bi bi-search"></i>
             </span>
         </div>
-        <ul id="tabs" class="flex py-4 overflow-x-auto font-bold">
-            {
-                menuData.categories?.map((category) => (
-                    <li class="px-2">
-                        <button id={category._id} class="">
-                            {category.name}
-                        </button>
-                    </li>
-                ))
-            }
-        </ul>
-        <div class="w-full px-2">
-            <hr class="h-0.5 bg-slate-400" />
+
+        <div class="px-2 mt-2">
+            <ul
+                id="tabs"
+                class="flex items-center py-4 px-4 overflow-x-auto font-bold bg-slate-50 rounded-md ring-1 ring-slate-400 shadow-md"
+            >
+                {
+                    menuData.categories?.map((category) => (
+                        <li class="px-2">
+                            <button id={category._id} class="active">
+                                {category.name}
+                            </button>
+                        </li>
+                    ))
+                }
+            </ul>
         </div>
+
         <div id="tabs-content" class="px-2">
             {
                 menuData.categories?.map((category) => (
                     <div class="py-2 category" data-category={category._id}>
                         {category.products?.map((product) => (
                             <div
-                                class="grid grid-cols-5 grid-rows-2 bg-slate-50 backdrop-blur-md rounded mb-2 shadow-md"
+                                class="grid grid-cols-5 grid-rows-2 bg-slate-50 backdrop-blur-md rounded mb-3 shadow-md ring-1 ring-slate-400"
                                 data-product={product.name}
+                                data-idproduct={product._id}
+                                data-price={product.price}
                             >
                                 <div class="col-span-4  py-2 px-2 font-medium">
                                     {product.name}
@@ -99,8 +105,22 @@ if (menuData.error) {
                                 <div class="col-start-5 py-2 px-2 text-end font-bold">
                                     ${product.price}
                                 </div>
-                                <div class="col-start-5  py-2 px-2 text-end">
-                                    <button class="">Agregar</button>
+                                <div class="col-start-5  py-2 px-2 text-end flex justify-end gap-1">
+                                    <button
+                                        class="bg-green-400 rounded-full aspect-square h-6 min-h-6 w-6 text-white font-extrabold flex items-center justify-center shadow-md"
+                                        data-minus
+                                    >
+                                        <i class="bi bi-dash" />
+                                    </button>
+                                    <span class="px-2 flex bg-slate-50 ring-1 ring-slate-400 rounded shadow-md h-6 w-6">
+                                        0
+                                    </span>
+                                    <button
+                                        class="bg-green-400 rounded-full aspect-square h-6 min-h-6 w-6 text-white font-extrabold flex items-center justify-center shadow-md"
+                                        data-plus
+                                    >
+                                        <i class="bi bi-plus" />
+                                    </button>
                                 </div>
                             </div>
                         ))}
@@ -120,22 +140,74 @@ if (menuData.error) {
     const searchMenu = document.getElementById(
         "searchMenu",
     ) as HTMLInputElement;
+    const products = document.querySelectorAll(
+        "[data-product]",
+    ) as NodeListOf<HTMLElement>;
+    console.log(products[0].getElementsByTagName("button"));
+    let cart: any[] = [];
+    for (let i = 0; i < products.length; i++) {
+        const product = products[i];
+        const plus = product.querySelector("[data-plus]") as HTMLButtonElement;
+        const minus = product.querySelector(
+            "[data-minus]",
+        ) as HTMLButtonElement;
+        const quantity = product.querySelector("span") as HTMLSpanElement;
+        let count = 0;
+        plus.addEventListener("click", () => {
+            count++;
+            quantity.textContent = count.toString();
+            if (cart.some((item) => item.id === product.dataset.idproduct)) {
+                cart = cart.map((item) => {
+                    if (item.id === product.dataset.idproduct) {
+                        item.quantity = count;
+                    }
+                    return item;
+                });
+            } else {
+                cart.push({
+                    id: product.dataset.idproduct,
+                    name: product.dataset.product,
+                    price: product.dataset.price,
+                    quantity: count,
+                });
+            }
+            console.log(cart);
+        });
+        minus.addEventListener("click", () => {
+            count--;
+            if (count < 0) {
+                count = 0;
+            } else {
+                cart = cart.filter((item) => {
+                    if (item.id === product.dataset.idproduct) {
+                        item.quantity = count;
+                    }
+                    return item.quantity > 0;
+                });
+                console.log(cart);
+            }
+            quantity.textContent = count.toString();
+        });
+    }
 
     for (let i = 1; i < categories.length; i++) {
         categories[i].classList.add("hidden");
     }
     for (let i = 1; i < buttons.length; i++) {
         buttons[i].classList.add("text-slate-400");
+        buttons[i].classList.remove("active");
     }
     for (let i = 0; i < buttons.length; i++) {
         buttons[i].addEventListener("click", () => {
             for (let j = 0; j < buttons.length; j++) {
                 buttons[j].classList.add("text-slate-400");
+                buttons[j].classList.remove("active");
                 buttons[j].classList.remove("text-slate-800");
                 categories[j].classList.add("hidden");
             }
             buttons[i].classList.remove("text-slate-400");
             buttons[i].classList.add("text-slate-800");
+            buttons[i].classList.add("active");
             categories[i].classList.remove("hidden");
         });
     }
@@ -157,3 +229,12 @@ if (menuData.error) {
         }
     });
 </script>
+<style>
+    .active {
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+        padding: 0 0.5rem;
+    }
+</style>
