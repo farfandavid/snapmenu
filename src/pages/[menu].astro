@@ -18,223 +18,321 @@ if (menuData.error) {
 ---
 
 <MenuLayout title={menuData.name}>
-    <header
-        class="flex w-full min-h-64 max-h-64 overflow-hidden shadow-md bg-[url('https://th.bing.com/th/id/R.c697adb39de642e86dc2a0e8a4a24982?rik=xLE6dqFrzXwocg&pid=ImgRaw&r=0')] bg-cover bg-center bg-no-repeat"
-    >
-        <div class="w-full bg-black/35 relative">
-            <img
-                src="https://th.bing.com/th/id/R.d068789347fe0ba3393433d9d6f65a9e?rik=40O2Zkx0Tl4LTw&riu=http%3a%2f%2fprojets.lf-consultinginformatique.fr%2fRestaurant%2fimg%2frestaurant_name.png&ehk=daTmSU8NhLv5BHD%2bKNq6Vkx44%2buE6QZNAV0931zW%2bmU%3d&risl=&pid=ImgRaw&r=0"
-                alt={menuData.description}
-                width="150"
-                height="150"
-                class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded"
-            />
-            <div class="flex justify-between w-full p-3 absolute bottom-0">
-                <div class="flex gap-2 bg-black/50 rounded-xl px-3 py-1">
-                    <i class="bi bi-geo-alt-fill text-red-500"></i>
-                    <p class="text-white font-bold">LGSM</p>
-                </div>
-                <div
-                    class="flex gap-2 bg-green-500 text-white font-bold rounded-xl px-3 py-1"
-                >
-                    <i class="bi bi-clock-fill"></i>
-                    <p>Abierto</p>
+    <div class="bg-slate-200 h-screen w-screen overflow-auto relative">
+        <header
+            class="flex w-full min-h-64 max-h-64 overflow-hidden shadow-md bg-[url('https://th.bing.com/th/id/R.c697adb39de642e86dc2a0e8a4a24982?rik=xLE6dqFrzXwocg&pid=ImgRaw&r=0')] bg-cover bg-center bg-no-repeat"
+        >
+            <div class="w-full bg-black/35 relative">
+                <img
+                    src="https://th.bing.com/th/id/R.d068789347fe0ba3393433d9d6f65a9e?rik=40O2Zkx0Tl4LTw&riu=http%3a%2f%2fprojets.lf-consultinginformatique.fr%2fRestaurant%2fimg%2frestaurant_name.png&ehk=daTmSU8NhLv5BHD%2bKNq6Vkx44%2buE6QZNAV0931zW%2bmU%3d&risl=&pid=ImgRaw&r=0"
+                    alt={menuData.description}
+                    width="150"
+                    height="150"
+                    class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded"
+                />
+                <div class="flex justify-between w-full p-3 absolute bottom-0">
+                    <div class="flex gap-2 bg-black/50 rounded-xl px-3 py-1">
+                        <i class="bi bi-geo-alt-fill text-red-500"></i>
+                        <p class="text-white font-bold">LGSM</p>
+                    </div>
+                    <div
+                        class="flex gap-2 bg-green-500 text-white font-bold rounded-xl px-3 py-1"
+                    >
+                        <i class="bi bi-clock-fill"></i>
+                        <p>Abierto</p>
+                    </div>
                 </div>
             </div>
-        </div>
-    </header>
-    <section class="w-full">
-        <div class="mt-2 px-2 relative">
-            <input
-                id="searchMenu"
-                name="datalist-products"
-                class="w-full rounded-lg p-2 pe-12 text-sm shadow-md bg-slate-50 placeholder:text-slate-500 ring-1 ring-slate-400"
-                placeholder="Buscar en el menu"
-                list="datalist-products"
-            />
-            <datalist id="datalist-products">
-                {
-                    menuData.categories?.map((category) =>
-                        category.products?.map((product) => (
-                            <option value={product.name} />
-                        )),
-                    )
-                }
-            </datalist>
-            <span
-                class="absolute inset-y-0 end-0 grid place-content-center px-4 text-slate-500"
-            >
-                <i class="bi bi-search"></i>
-            </span>
-        </div>
+        </header>
+        <section class="w-full">
+            <div class="mt-2 px-2 relative">
+                <input
+                    id="searchMenu"
+                    name="datalist-products"
+                    class="w-full rounded-lg p-2 pe-12 text-sm shadow-md bg-slate-50 placeholder:text-slate-500 ring-1 ring-slate-400"
+                    placeholder="Buscar en el menu"
+                    list="datalist-products"
+                />
+                <datalist id="datalist-products">
+                    {
+                        menuData.categories?.map((category) =>
+                            category.products?.map((product) => (
+                                <option value={product.name} />
+                            )),
+                        )
+                    }
+                </datalist>
+                <span
+                    class="absolute inset-y-0 end-0 grid place-content-center px-4 text-slate-500"
+                >
+                    <i class="bi bi-search"></i>
+                </span>
+            </div>
 
-        <div class="px-2 mt-2">
-            <ul
-                id="tabs"
-                class="flex items-center py-4 px-4 overflow-x-auto font-bold bg-slate-50 rounded-md ring-1 ring-slate-400 shadow-md"
-            >
+            <div class="px-2 mt-2">
+                <ul
+                    id="tabs"
+                    class="flex items-center py-4 px-4 overflow-x-auto font-bold bg-slate-50 rounded-md ring-1 ring-slate-400 shadow-md"
+                >
+                    {
+                        menuData.categories?.map((category) => (
+                            <li class="px-2">
+                                <button id={category._id} class="active">
+                                    {category.name}
+                                </button>
+                            </li>
+                        ))
+                    }
+                </ul>
+            </div>
+
+            <div id="tabs-content" class="px-2">
                 {
                     menuData.categories?.map((category) => (
-                        <li class="px-2">
-                            <button id={category._id} class="active">
-                                {category.name}
-                            </button>
-                        </li>
+                        <div class="py-2 category" data-category={category._id}>
+                            {category.products?.map((product) => (
+                                <div
+                                    class="grid grid-cols-5 grid-rows-2 bg-slate-50 backdrop-blur-md rounded mb-3 shadow-md ring-1 ring-slate-400"
+                                    data-product={product.name}
+                                    data-idproduct={product._id}
+                                    data-price={product.price}
+                                >
+                                    <div class="col-span-4  py-2 px-2 font-medium">
+                                        {product.name}
+                                    </div>
+                                    <div class="row-start-2 col-span-4  py-0 px-2">
+                                        {product.description}
+                                    </div>
+                                    <div class="col-start-5 py-2 px-2 text-end font-bold">
+                                        ${product.price}
+                                    </div>
+                                    <div class="col-start-5  py-2 px-2 text-end flex justify-end gap-1">
+                                        <button
+                                            class="bg-green-400 rounded-full aspect-square h-6 min-h-6 w-6 text-white font-extrabold flex items-center justify-center shadow-md"
+                                            data-minus
+                                        >
+                                            <i class="bi bi-dash" />
+                                        </button>
+                                        <span class="px-2 flex bg-slate-50 ring-1 ring-slate-400 rounded shadow-md h-6 w-6">
+                                            0
+                                        </span>
+                                        <button
+                                            class="bg-green-400 rounded-full aspect-square h-6 min-h-6 w-6 text-white font-extrabold flex items-center justify-center shadow-md"
+                                            data-plus
+                                        >
+                                            <i class="bi bi-plus" />
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     ))
                 }
-            </ul>
-        </div>
-
-        <div id="tabs-content" class="px-2">
-            {
-                menuData.categories?.map((category) => (
-                    <div class="py-2 category" data-category={category._id}>
-                        {category.products?.map((product) => (
-                            <div
-                                class="grid grid-cols-5 grid-rows-2 bg-slate-50 backdrop-blur-md rounded mb-3 shadow-md ring-1 ring-slate-400"
-                                data-product={product.name}
-                                data-idproduct={product._id}
-                                data-price={product.price}
-                            >
-                                <div class="col-span-4  py-2 px-2 font-medium">
-                                    {product.name}
-                                </div>
-                                <div class="row-start-2 col-span-4  py-0 px-2">
-                                    {product.description}
-                                </div>
-                                <div class="col-start-5 py-2 px-2 text-end font-bold">
-                                    ${product.price}
-                                </div>
-                                <div class="col-start-5  py-2 px-2 text-end flex justify-end gap-1">
-                                    <button
-                                        class="bg-green-400 rounded-full aspect-square h-6 min-h-6 w-6 text-white font-extrabold flex items-center justify-center shadow-md"
-                                        data-minus
-                                    >
-                                        <i class="bi bi-dash" />
-                                    </button>
-                                    <span class="px-2 flex bg-slate-50 ring-1 ring-slate-400 rounded shadow-md h-6 w-6">
-                                        0
-                                    </span>
-                                    <button
-                                        class="bg-green-400 rounded-full aspect-square h-6 min-h-6 w-6 text-white font-extrabold flex items-center justify-center shadow-md"
-                                        data-plus
-                                    >
-                                        <i class="bi bi-plus" />
-                                    </button>
-                                </div>
-                            </div>
-                        ))}
+            </div>
+        </section>
+        <button
+            id="btn-cart"
+            class="absolute top-3 right-3 bg-blue-400 text-white w-8 h-8 rounded-md content-center text-center"
+            ><i class="bi bi-cart-fill"></i>
+        </button>
+        <div
+            id="sidebar-menu"
+            class="absolute top-0 -left-full w-screen h-screen transition-all duration-300 z-50 overflow-auto grid grid-cols-3"
+        >
+            <div class="bg-slate-200 col-span-2 w-full h-full">
+                <div
+                    class="flex flex-col items-center justify-center p-2 w-full"
+                >
+                    <h1 class="text-black
+                        font-bold">
+                        Mi Orden
+                    </h1>
+                    <div id="order-list" class="flex flex-col w-full px-3">
                     </div>
-                ))
-            }
+                    <a
+                        id="walink"
+                        href="https://wa.me/543886411114"
+                        data-phone="543886411114"
+                        ><i class="bi bi-whatsapp"></i>Pedir</a
+                    >
+                </div>
+            </div>
+            <div id="sidebar-exit-menu" class="col-span-1 w-full"></div>
         </div>
-    </section>
-</MenuLayout>
-<script>
-    //const tabs = document.getElementById("tabs") as HTMLUListElement;
-    const buttons = document
-        .getElementById("tabs")
-        ?.getElementsByTagName("button") as HTMLCollectionOf<HTMLButtonElement>;
-    const categories = document.getElementById("tabs-content")
-        ?.children as HTMLCollectionOf<HTMLElement>;
-    const searchMenu = document.getElementById(
-        "searchMenu",
-    ) as HTMLInputElement;
-    const products = document.querySelectorAll(
-        "[data-product]",
-    ) as NodeListOf<HTMLElement>;
-    console.log(products[0].getElementsByTagName("button"));
-    let cart: any[] = [];
-    for (let i = 0; i < products.length; i++) {
-        const product = products[i];
-        const plus = product.querySelector("[data-plus]") as HTMLButtonElement;
-        const minus = product.querySelector(
-            "[data-minus]",
+    </div>
+    <script>
+        const buttons = document
+            .getElementById("tabs")
+            ?.getElementsByTagName(
+                "button",
+            ) as HTMLCollectionOf<HTMLButtonElement>;
+        const categories = document.getElementById("tabs-content")
+            ?.children as HTMLCollectionOf<HTMLElement>;
+        const searchMenu = document.getElementById(
+            "searchMenu",
+        ) as HTMLInputElement;
+        const products = document.querySelectorAll(
+            "[data-product]",
+        ) as NodeListOf<HTMLElement>;
+        const cartButton = document.getElementById(
+            "btn-cart",
         ) as HTMLButtonElement;
-        const quantity = product.querySelector("span") as HTMLSpanElement;
-        let count = 0;
-        plus.addEventListener("click", () => {
-            count++;
-            quantity.textContent = count.toString();
-            if (cart.some((item) => item.id === product.dataset.idproduct)) {
-                cart = cart.map((item) => {
-                    if (item.id === product.dataset.idproduct) {
-                        item.quantity = count;
-                    }
-                    return item;
-                });
-            } else {
-                cart.push({
-                    id: product.dataset.idproduct,
-                    name: product.dataset.product,
-                    price: product.dataset.price,
-                    quantity: count,
-                });
+        const sidebarMenu = document.getElementById(
+            "sidebar-menu",
+        ) as HTMLElement;
+        const sidebarExitMenu = document.getElementById(
+            "sidebar-exit-menu",
+        ) as HTMLElement;
+        const orderList = document.getElementById("order-list") as HTMLElement;
+        const walink = document.getElementById("walink") as HTMLAnchorElement;
+        const message = () => {
+            let message =
+                "Hola, me gustaría hacer un pedido con los siguientes productos:\n";
+            for (let i = 0; i < cart.length; i++) {
+                const item = cart[i];
+                message += `${item.quantity}x ${item.name}......$${item.price * item.quantity}\n`;
             }
-            console.log(cart);
-        });
-        minus.addEventListener("click", () => {
-            count--;
-            if (count < 0) {
-                count = 0;
-            } else {
-                cart = cart.filter((item) => {
-                    if (item.id === product.dataset.idproduct) {
-                        item.quantity = count;
-                    }
-                    return item.quantity > 0;
-                });
-                console.log(cart);
-            }
-            quantity.textContent = count.toString();
-        });
-    }
+            message += `por un total de $${cart.reduce(
+                (acc, item) => acc + parseFloat(item.price) * item.quantity,
+                0,
+            )}.`;
 
-    for (let i = 1; i < categories.length; i++) {
-        categories[i].classList.add("hidden");
-    }
-    for (let i = 1; i < buttons.length; i++) {
-        buttons[i].classList.add("text-slate-400");
-        buttons[i].classList.remove("active");
-    }
-    for (let i = 0; i < buttons.length; i++) {
-        buttons[i].addEventListener("click", () => {
-            for (let j = 0; j < buttons.length; j++) {
-                buttons[j].classList.add("text-slate-400");
-                buttons[j].classList.remove("active");
-                buttons[j].classList.remove("text-slate-800");
-                categories[j].classList.add("hidden");
+            return encodeURIComponent(message);
+        };
+        function updateOrder() {
+            orderList.innerHTML = "";
+            let total = 0;
+            for (let i = 0; i < cart.length; i++) {
+                const item = cart[i];
+                total += parseFloat(item.price) * item.quantity;
+                orderList.innerHTML += `
+                    <div class="grid grid-cols-5 w-full">
+                        <p class="col-span-1 flex justify-center">${item.quantity}x</p>
+                        <p class="col-span-2">${item.name}</p>
+                        <p class="col-span-2 flex justify-end">$${item.price * item.quantity}</p>
+                    </div>
+                `;
             }
-            buttons[i].classList.remove("text-slate-400");
-            buttons[i].classList.add("text-slate-800");
-            buttons[i].classList.add("active");
-            categories[i].classList.remove("hidden");
-        });
-    }
+            orderList.innerHTML += `
+                <div class="grid grid-cols-5 w-full border-t-2 border-t-slate-400">
+                    <p class="col-span-3 flex justify-start">Total</p>
+                    <p class="col-span-2 flex justify-end">$${total}</p>
+                </div>
+            `;
+            walink.href = `https://wa.me/${walink.dataset.phone}?text=${message()}`;
+        }
 
-    searchMenu.addEventListener("input", () => {
-        const searchValue = searchMenu.value.toLowerCase();
-        for (let i = 0; i < categories.length; i++) {
-            categories[i].classList.remove("hidden");
-            for (let j = 0; j < categories[i].children.length; j++) {
-                const product = categories[i].children[j] as HTMLElement;
+        sidebarExitMenu.addEventListener("click", () => {
+            sidebarMenu.classList.toggle("left-0");
+            sidebarMenu.classList.toggle("-left-full");
+        });
+
+        cartButton.addEventListener("click", () => {
+            sidebarMenu.classList.toggle("left-0");
+            sidebarMenu.classList.toggle("-left-full");
+        });
+        let cart: any[] = [];
+
+        // Add and remove products from cart
+        for (let i = 0; i < products.length; i++) {
+            const product = products[i];
+            const plus = product.querySelector(
+                "[data-plus]",
+            ) as HTMLButtonElement;
+            const minus = product.querySelector(
+                "[data-minus]",
+            ) as HTMLButtonElement;
+            const quantity = product.querySelector("span") as HTMLSpanElement;
+            let count = 0;
+            plus.addEventListener("click", () => {
+                count++;
+                quantity.textContent = count.toString();
                 if (
-                    product.dataset.product?.toLowerCase().includes(searchValue)
+                    cart.some((item) => item.id === product.dataset.idproduct)
                 ) {
-                    product.classList.remove("hidden");
+                    cart = cart.map((item) => {
+                        if (item.id === product.dataset.idproduct) {
+                            item.quantity = count;
+                        }
+                        return item;
+                    });
                 } else {
-                    product.classList.add("hidden");
+                    cart.push({
+                        id: product.dataset.idproduct,
+                        name: product.dataset.product,
+                        price: product.dataset.price,
+                        quantity: count,
+                    });
+                }
+                console.log(cart);
+                updateOrder();
+            });
+            minus.addEventListener("click", () => {
+                count--;
+                if (count < 0) {
+                    count = 0;
+                } else {
+                    cart = cart.filter((item) => {
+                        if (item.id === product.dataset.idproduct) {
+                            item.quantity = count;
+                        }
+                        return item.quantity > 0;
+                    });
+                    console.log(cart);
+                }
+                quantity.textContent = count.toString();
+                updateOrder();
+            });
+        }
+
+        for (let i = 1; i < categories.length; i++) {
+            categories[i].classList.add("hidden");
+        }
+        for (let i = 1; i < buttons.length; i++) {
+            buttons[i].classList.add("text-slate-400");
+            buttons[i].classList.remove("active");
+        }
+        for (let i = 0; i < buttons.length; i++) {
+            buttons[i].addEventListener("click", () => {
+                for (let j = 0; j < buttons.length; j++) {
+                    buttons[j].classList.add("text-slate-400");
+                    buttons[j].classList.remove("active");
+                    buttons[j].classList.remove("text-slate-800");
+                    categories[j].classList.add("hidden");
+                }
+                buttons[i].classList.remove("text-slate-400");
+                buttons[i].classList.add("text-slate-800");
+                buttons[i].classList.add("active");
+                categories[i].classList.remove("hidden");
+            });
+        }
+
+        searchMenu.addEventListener("input", () => {
+            const searchValue = searchMenu.value.toLowerCase();
+            for (let i = 0; i < categories.length; i++) {
+                categories[i].classList.remove("hidden");
+                for (let j = 0; j < categories[i].children.length; j++) {
+                    const product = categories[i].children[j] as HTMLElement;
+                    if (
+                        product.dataset.product
+                            ?.toLowerCase()
+                            .includes(searchValue)
+                    ) {
+                        product.classList.remove("hidden");
+                    } else {
+                        product.classList.add("hidden");
+                    }
                 }
             }
+        });
+    </script>
+    <style>
+        .active {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+            padding: 0 0.5rem;
         }
-    });
-</script>
-<style>
-    .active {
-        background-color: #fff;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
-        padding: 0 0.5rem;
-    }
-</style>
+    </style>
+</MenuLayout>
