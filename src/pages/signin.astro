@@ -10,7 +10,6 @@ if (Astro.cookies.has("session")) {
     const decodedCookie = await auth
         .verifySessionCookie(sessionCookie || "")
         .then((decodedClaims) => {
-            console.log(decodedClaims);
             return decodedClaims;
         })
         .catch((error) => {

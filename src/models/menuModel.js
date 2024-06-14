@@ -77,6 +77,26 @@ const menuSchema = new mongoose.Schema(
     active: {
       type: Boolean,
       required: true
+    },
+    logoUrl: {
+      type: String,
+      required: false
+    },
+    bannerUrl: {
+      type: String,
+      required: false
+    },
+    phone: {
+      type: String,
+      required: false
+    },
+    address: {
+      type: String,
+      required: false
+    },
+    social: {
+      type: Object,
+      required: false
     }
   },
   {

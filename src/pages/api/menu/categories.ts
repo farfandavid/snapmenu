@@ -1,6 +1,5 @@
 import type { APIRoute } from "astro";
 import { getMenuById, getMenuByUserEmail, updateCategories } from "../../../controller/menuController";
-import mongoose from 'mongoose';
 import { getUserByEmail } from "../../../controller/userController";
 import type { IUser } from "../../../types/User";
 
@@ -21,8 +20,10 @@ export const PUT: APIRoute = async ({ request, locals }) => {
     return new Response(JSON.stringify({ categories: menuUpdated.categories, _id: menuUpdated._id }), { status: 200, headers: { "Content-Type": "application/json" } });
 }
 
+// POST: Obtiene las categorías de un menú 
+// TODO: FIX
 export const POST: APIRoute = async ({ request, locals }) => {
-    const user = await getUserByEmail(locals.user.email || "") as IUser;
+
     const { menuId } = await request.json()
         .catch((err) => {
             console.error(err);
@@ -34,11 +35,10 @@ export const POST: APIRoute = async ({ request, locals }) => {
     if (!menu) {
         return new Response(JSON.stringify({ error: "El menú no existe" }), { status: 404, headers: { "Content-Type": "application/json" } });
     }
-    /* const menuRes = menu.map(({ _id, name, categories }: { _id: any, name: string, categories: [] }) => ({ _id, name, categories })); */
     return new Response(JSON.stringify({ _id: menu._id, name: menu.name, categories: menu.categories }), { status: 200, headers: { "Content-Type": "application/json" } });
 }
 
-export const GET: APIRoute = async ({ request, locals }) => {
+export const GET: APIRoute = async ({ locals }) => {
     const user = await getUserByEmail(locals.user.email || "") as IUser;
     const menu = await getMenuByUserEmail(user.email || "");
     if (!menu) {

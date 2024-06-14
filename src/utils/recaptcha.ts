@@ -23,6 +23,7 @@ export const verifyRecaptcha = async (recaptchaResponse: string) => {
     });
     const responseData = await response.json()
         .catch((err) => {
+            console.error(err);
             return { success: false }
         });
     return responseData.success;

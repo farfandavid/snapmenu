@@ -15,6 +15,7 @@ const menuData: IMenu = await currentMenu.json();
 if (menuData.error) {
     return Astro.redirect("/404");
 }
+//TODO: Add phone, address, logo img,openings hours and social media to the menu data
 ---
 
 <MenuLayout title={menuData.name}>
@@ -141,7 +142,9 @@ if (menuData.error) {
             id="sidebar-menu"
             class="absolute top-0 -left-full w-screen h-screen transition-all duration-300 z-50 overflow-auto grid grid-cols-3"
         >
-            <div class="bg-slate-200 col-span-2 md:col-span-1 w-full h-full">
+            <div
+                class="bg-slate-200 col-span-2 md:col-span-1 w-full h-full relative"
+            >
                 <div
                     class="flex flex-col items-center justify-center p-2 w-full"
                 >
@@ -160,6 +163,21 @@ if (menuData.error) {
                         ><i class="bi bi-whatsapp mx-2"></i>Pedir</a
                     >
                 </div>
+                <footer
+                    class="text-sm bg-slate-300 px-1 py-2 absolute bottom-0 w-full flex items-center justify-center"
+                >
+                    <p class="text-center">
+                        &copy;2024 <a
+                            href="https://www.snapmenu.online"
+                            target="_blank"
+                            class="text-orange-500 font-bold">SnapMenu</a
+                        > Created by <a
+                            href="https://farfetchdev.web.app/"
+                            class="text-blue-400 font-bold"
+                            ><strong>FarfetchDev</strong></a
+                        >
+                    </p>
+                </footer>
             </div>
             <div id="sidebar-exit-menu" class="col-span-1 md:col-span-2 w-full">
             </div>

@@ -1,5 +1,18 @@
 import type { ObjectId } from "mongoose";
 
+interface ISocial {
+    facebook?: string;
+    instagram?: string;
+    twitter?: string;
+}
+
+interface IHorario {
+    dia: number;
+    apertura: string;
+    cierre: string;
+    timezone: string;
+}
+
 interface IProduct {
     _id?: string;
     name: string;
@@ -25,6 +38,12 @@ interface IMenu {
     active: boolean;
     categories?: ICategories[];
     error?: string;
+    horarios?: IHorario[];
+    address?: string;
+    phone?: string;
+    logoUrl?: string;
+    bannerUrl?: string;
+    social?: ISocial;
 }
 
 export type { IMenu, ICategories, IProduct };

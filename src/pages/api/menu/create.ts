@@ -13,6 +13,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
         }
         const { name, description } = await request.json()
             .catch((err) => {
+                console.error(err);
                 return { name: null, description: null }
             });
         if (!name || !description) {
@@ -33,7 +34,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     //return new Response("Hello, world!", { status: 200 });
 }
 
-export const GET: APIRoute = async ({ request, locals }) => {
+export const GET: APIRoute = async ({ locals }) => {
     console.log(locals);
     return new Response(JSON.stringify("health check"), { status: 200, headers: { 'content-type': 'application/json' } });
 }

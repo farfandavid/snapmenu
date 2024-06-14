@@ -3,11 +3,12 @@ import DashboardLayout from "../../layouts/DashboardLayout.astro";
 import { getMenuByUserEmail } from "../../controller/menuController";
 import type { IMenu } from "../../types/Menu";
 import CreateMenu from "../../components/CreateMenu.astro";
-import { getUserByEmail } from "../../controller/userController";
 import type { IUser } from "../../types/User";
 
-const user = (await getUserByEmail(Astro.locals.user.email || "")) as IUser;
-const menu = (await getMenuByUserEmail(user.email || "")) as IMenu[];
+const user = Astro.locals.user as IUser;
+const menu = (await getMenuByUserEmail(
+    Astro.locals.user.email || "",
+)) as IMenu[];
 ---
 
 <DashboardLayout>
