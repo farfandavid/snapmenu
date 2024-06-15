@@ -1,6 +1,7 @@
 import express from 'express';
 import { handler } from './dist/server/entry.mjs'; // Ruta de tu archivo de entrada de Astro
 import rateLimit from 'express-rate-limit';
+import cors from 'cors';
 
 const app = express();
 
@@ -17,7 +18,7 @@ const limiter = rateLimit({
 const corsOptions = {
   origin: function (origin, callback) {
     // Lista blanca de dominios permitidos
-    const whitelist = ['http://example1.com', 'http://example2.com'];
+    const whitelist = ['http://localhost:3000'];
     if (whitelist.indexOf(origin) !== -1 || !origin) {
       callback(null, true);
     } else {
@@ -31,6 +32,13 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+app.use((err, req, res, next) => {
+  if (err.message === 'Not allowed by CORS') {
+    res.status(403).json({ error: 'Access denied due to CORS policy' });
+  } else {
+    next(err);
+  }
+});
 
 // Aplicar el middleware de rate limit a todas las rutas
 app.use(limiter);

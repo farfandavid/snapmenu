@@ -1,7 +1,5 @@
 import type { APIRoute } from "astro";
-import { getMenuById, getMenuByUserEmail, updateCategories } from "../../../controller/menuController";
-import { getUserByEmail } from "../../../controller/userController";
-import type { IUser } from "../../../types/User";
+import { getMenuByIdAndUserEmail, getMenusByUserEmail, updateCategories } from "../../../controller/menuController";
 
 // UPDATE: Actualiza las categorías de un menú
 export const PUT: APIRoute = async ({ request, locals }) => {
@@ -30,7 +28,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
             return { menuId: null }
         }
         );
-    const menu = await getMenuById(menuId);
+    console.log(menuId, locals.user.email);
+    const menu = await getMenuByIdAndUserEmail(menuId, locals.user.email || "");
     console.log(menu);
     if (!menu) {
         return new Response(JSON.stringify({ error: "El menú no existe" }), { status: 404, headers: { "Content-Type": "application/json" } });
@@ -39,8 +38,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 }
 
 export const GET: APIRoute = async ({ locals }) => {
-    const user = await getUserByEmail(locals.user.email || "") as IUser;
-    const menu = await getMenuByUserEmail(user.email || "");
+    const menu = await getMenusByUserEmail(locals.user.email || "");
     if (!menu) {
         return new Response(JSON.stringify
             ({ error: "No se encontraron menús" }), { status: 404, headers: { "Content-Type": "application/json" } });

@@ -1,12 +1,12 @@
 ---
 import DashboardLayout from "../../layouts/DashboardLayout.astro";
-import { getMenuByUserEmail } from "../../controller/menuController";
+import { getMenusByUserEmail } from "../../controller/menuController";
 import type { IMenu } from "../../types/Menu";
 import CreateMenu from "../../components/CreateMenu.astro";
 import type { IUser } from "../../types/User";
 
 const user = Astro.locals.user as IUser;
-const menu = (await getMenuByUserEmail(
+const menu = (await getMenusByUserEmail(
     Astro.locals.user.email || "",
 )) as IMenu[];
 ---

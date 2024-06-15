@@ -15,10 +15,10 @@ export const createMenu = async (menuData: IMenu) => {
     }
 };
 
-export const getMenuById = async (id: string) => {
+export const getMenuByIdAndUserEmail = async (id: string, email: string) => {
     try {
         db.connectDB();
-        const menu = await Menu.findById(id);
+        const menu = await Menu.findOne({ _id: id, userEmail: email });
         return menu;
     } catch (error) {
         console.error(error);
@@ -26,11 +26,11 @@ export const getMenuById = async (id: string) => {
     }
 }
 
-export const getMenuByUserEmail = async (userEmail: string) => {
+export const getMenusByUserEmail = async (userEmail: string) => {
     try {
         db.connectDB();
-        const menu = await Menu.find({ userEmail: userEmail });
-        return menu;
+        const menus = await Menu.find({ userEmail: userEmail });
+        return menus;
     } catch (error) {
         console.error(error);
         return null;

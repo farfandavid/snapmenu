@@ -53,7 +53,7 @@ export const registerUser = async (user: IUser) => {
     console.log("User registered", newUser)
     return true;
   } catch (err: any) {
-    console.log({ error: err })
+    console.log("registerUser", { error: err })
     return {
       error: {
         code: err.code,
@@ -82,6 +82,7 @@ export const updateUser = async (email: string, user: IUser) => {
   try {
     db.connectDB();
     const updatedUser = await User.findOneAndUpdate({ email: email }, user, { new: true });
+    console.log("User updated", updatedUser);
     return updatedUser;
   } catch (err: any) {
     throw new Error(err.message);

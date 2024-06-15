@@ -1,6 +1,6 @@
 
 import { defineMiddleware } from "astro/middleware";
-import { PRIVATE_ROUTES } from "../utils/constant";
+import { PRIVATE_ROUTES, PUBLIC_ROUTES } from "../utils/constant";
 import { verifyAuth } from "../utils/verifyAuth";
 import { getUserByEmail, registerUser, updateUser } from "../controller/userController";
 
@@ -13,6 +13,9 @@ export const onRequest = defineMiddleware(async (context, next) => {
         if (!user) {
             return new Response("Unauthorized", { status: 401 });
         }
+        if (user.emailVerified === false) {
+            return context.redirect(PUBLIC_ROUTES.VERIFY_EMAIL);
+        }
         const userDB = await getUserByEmail(user.email as string);
         if (!userDB) {
             await registerUser({
@@ -24,7 +27,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
                 menuLimit: 0,
                 disabled: user.disabled,
             });
-        } else if (userDB && userDB.uid !== user.uid) {
+        } else if (userDB && userDB.uid !== user.uid && userDB.emailVerified !== user.emailVerified) {
             await updateUser(user.email || "", {
                 displayName: user.displayName,
                 uid: user.uid,
@@ -35,7 +38,6 @@ export const onRequest = defineMiddleware(async (context, next) => {
                 disabled: user.disabled,
             });
         }
-
         context.locals = { user: userDB };
         if (!context.locals.user) {
             console.log("User found", context.locals.user);

@@ -7,4 +7,5 @@ export const PUBLIC_ROUTES = {
     REGISTER: '/register',
     TERMS: '/terms-of-service',
     PRIVACY: '/privacy-policy',
+    VERIFY_EMAIL: '/auth/verify-email',
 }

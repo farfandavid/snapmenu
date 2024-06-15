@@ -4,6 +4,7 @@ import { app } from "../../../firebase/server";
 import { registerUser } from "../../../controller/userController";
 import { PUBLIC_ROUTES } from "../../../utils/constant";
 import { verifyRecaptcha } from "../../../utils/recaptcha";
+import { Resend } from "resend";
 
 export const POST: APIRoute = async ({ request, redirect }) => {
     const auth = getAuth(app);
@@ -37,16 +38,31 @@ export const POST: APIRoute = async ({ request, redirect }) => {
             email,
             password,
             displayName: name,
-            disabled: true,
+            disabled: false,
             emailVerified: false,
         }).then((user) => {
             registerUser({
                 displayName: user.displayName, email: user.email, uid: user.uid,
                 menuList: [],
-                menuLimit: 0
+                menuLimit: 0,
+                emailVerified: user.emailVerified,
+                disabled: user.disabled
             })
+        })
+        const link = await auth.generateEmailVerificationLink(email).then((link) => {
+            return link
         });
-
+        const resend = new Resend(import.meta.env.RESEND_API_KEY);
+        const { error } = await resend.emails.send({
+            from: "SnapMenu <verify@snapmenu.online>",
+            to: [email],
+            subject: "Verifica tu correo electrónico",
+            text: `Si no has solicitado la verificación de tu correo electrónico, ignora este mensaje. Para verificar tu correo electrónico, haz clic en el siguiente enlace: ${link}`,
+        })
+        if (error) {
+            console.error("Error al enviar el correo electrónico:", error);
+            return new Response("Error al enviar el correo de verificacion", { status: 403 });
+        }
     } catch (error: any) {
         console.error("Error al crear el usuario: ", error);
         return new Response(

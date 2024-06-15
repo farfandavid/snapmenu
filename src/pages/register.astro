@@ -13,16 +13,14 @@ import { PUBLIC_ROUTES } from "../utils/constant";
                 class="absolute top-1 left-1 text-gray-500 flex justify-center items-center text-sm hover:underline"
             >
                 <i class="bi bi-arrow-left-square-fill text-orange-500 text-xl"
-                ></i>Home
+                ></i>Inicio
             </a>
         </span>
         <div
             class="w-full px-4 py-12 sm:px-6 sm:py-16 lg:w-1/2 lg:px-8 lg:py-24"
         >
             <div class="mx-auto max-w-lg text-center">
-                <h1 class="text-2xl font-bold sm:text-3xl">
-                    Create an account!
-                </h1>
+                <h1 class="text-2xl font-bold sm:text-3xl">Crea una Cuenta!</h1>
             </div>
             <form
                 action="#"
@@ -39,7 +37,7 @@ import { PUBLIC_ROUTES } from "../utils/constant";
                             id="name"
                             class="w-full rounded-lg border-gray-200 p-4 pe-12 text-sm shadow-sm"
                             required
-                            placeholder="Username: exampleuser"
+                            placeholder="Nombre de Usuario: John Doe"
                         />
                         <span
                             class="absolute inset-y-0 end-0 grid place-content-center px-4 text-gray-500"
@@ -75,7 +73,7 @@ import { PUBLIC_ROUTES } from "../utils/constant";
                             id="password"
                             class="w-full rounded-lg border-gray-200 p-4 pe-12 text-sm shadow-sm"
                             required
-                            placeholder="Password"
+                            placeholder="Contraseña"
                             autocomplete="new-password"
                         />
                         <span
@@ -94,7 +92,7 @@ import { PUBLIC_ROUTES } from "../utils/constant";
                             id="r-password"
                             class="w-full rounded-lg border-gray-200 p-4 pe-12 text-sm shadow-sm"
                             required
-                            placeholder="Repeat password"
+                            placeholder="Repite la contraseña"
                             autocomplete="current-password"
                         />
                         <span
@@ -108,7 +106,7 @@ import { PUBLIC_ROUTES } from "../utils/constant";
                     <p class="mt-4 text-gray-500">
                         ¿Ya tienes una cuenta? <a
                             href={PUBLIC_ROUTES.SIGN_IN}
-                            class="underline">Login</a
+                            class="underline">Iniciar Sesión</a
                         >
                     </p>
                     <button
@@ -116,7 +114,7 @@ import { PUBLIC_ROUTES } from "../utils/constant";
                         class="g-recaptcha flex rounded-lg bg-orange-500 px-5 py-3 text-sm font-medium text-white"
                         data-sitekey="6Lf9VuQpAAAAAAR2Ub93R7uxzF0NNS6UsrtrDjgl"
                         data-callback="onSubmit"
-                        data-action="submit">Register</button
+                        data-action="submit">Registrarse</button
                     >
                 </div>
             </form>
