@@ -58,10 +58,10 @@ export const getAllMenus = async () => {
     }
 }
 
-export const updateMenuById = async (id: string, menuData: any) => {
+export const updateMenuById = async (id: string, menuData: any, userEmail: string) => {
     try {
         db.connectDB();
-        const menu = await Menu.findByIdAndUpdate(id, menuData, { new: true });
+        const menu = await Menu.findOneAndUpdate({ _id: id, userEmail: userEmail }, menuData, { new: true });
         return menu;
     } catch (error) {
         throw new Error('Error al actualizar el menú');

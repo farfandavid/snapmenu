@@ -64,7 +64,7 @@ const menuSchema = new mongoose.Schema(
     userEmail: {
       type: String,
       ref: "User",
-      required: true
+      required: true,
     },
     description: {
       type: String,
