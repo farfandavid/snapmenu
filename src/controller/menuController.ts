@@ -7,7 +7,7 @@ import db from '../db/db';
 export const createMenu = async (menuData: IMenu) => {
     try {
         db.connectDB();
-        const menu = await Menu.create({ _id: new mongoose.Types.ObjectId(), ...menuData });
+        const menu = await Menu.create({ _id: new mongoose.Types.ObjectId(), description: menuData.description, name: menuData.name, userEmail: menuData.userEmail, active: menuData.active, social: ["", "", "", ""] });
         await menu.save();
         return menu;
     } catch (error: any) {
