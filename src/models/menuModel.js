@@ -94,6 +94,10 @@ const menuSchema = new mongoose.Schema(
       type: String,
       required: false
     },
+    mapUrl: {
+      type: String,
+      required: false
+    },
     social: {
       type: Object,
       required: false

@@ -58,6 +58,29 @@ export const getAllMenus = async () => {
     }
 }
 
+export const updateMenuInfo = async (id: string, userEmail: string, menuData: any) => {
+    try {
+        db.connectDB();
+        //const menu = await Menu.findByIdAndUpdate(id, menuData, { new: true });
+        const menu = await Menu.findOneAndUpdate({ _id: id, userEmail: userEmail }, { $set: menuData }, { new: true, runValidators: true });
+        return menu;
+    } catch (error) {
+        console.error('Error al actualizar el menú');
+        return null;
+    }
+}
+
+export const updateMenuLogo = async (id: string, userEmail: string, logoUrl: string) => {
+    try {
+        db.connectDB();
+        const menu = await Menu.findOneAndUpdate({ _id: id, userEmail: userEmail }, { logoUrl: logoUrl }, { new: true });
+        return menu;
+    } catch (error) {
+        console.error('Error al actualizar el logo del menú');
+        return null;
+    }
+}
+
 export const updateMenuById = async (id: string, menuData: any, userEmail: string) => {
     try {
         db.connectDB();

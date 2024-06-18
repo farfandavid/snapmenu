@@ -40,6 +40,7 @@ interface IMenu {
     error?: string;
     horarios?: IHorario[];
     address?: string;
+    mapUrl?: string;
     phone?: string;
     logoUrl?: string;
     bannerUrl?: string;

@@ -43,6 +43,8 @@ export const GET: APIRoute = async ({ locals }) => {
         return new Response(JSON.stringify
             ({ error: "No se encontraron menús" }), { status: 404, headers: { "Content-Type": "application/json" } });
     }
-    const menuRes = menu.map(({ _id, name, categories }: { _id: any, name: string, categories: [] }) => ({ _id, name, categories }));
+
+
+    const menuRes = menu.map(({ _id, name, description, logoUrl, bannerUrl, address, phone, categories, mapUrl, social }: { _id: any, name: string, categories: [], description: string, logoUrl: string, bannerUrl: string, address: string, phone: number, mapUrl: string, social: [] }) => ({ _id, name, description, logoUrl, bannerUrl, address, phone, categories, mapUrl, social }));
     return new Response(JSON.stringify(menuRes), { status: 200, headers: { "Content-Type": "application/json" } });
 }

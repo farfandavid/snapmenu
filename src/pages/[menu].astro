@@ -39,7 +39,7 @@ if (menuData.error) {
                         class="flex gap-2 bg-black/50 rounded-xl px-3 py-1"
                     >
                         <i class="bi bi-geo-alt-fill text-red-500"></i>
-                        <p class="text-white font-bold">LGSM</p>
+                        <p class="text-white font-bold">{menuData.address}</p>
                     </button>
 
                     <div
@@ -54,7 +54,7 @@ if (menuData.error) {
         <iframe
             id="map-address"
             class="absolute z-10 ring-4 ring-white rounded-md shadow-md hidden transition-all duration-300 ease-in-out"
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1290.5090454202445!2d-64.79739550458955!3d-23.8146591202778!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x941ac19b2499c531%3A0x303397e60c5c4620!2sLa%20Loma!5e0!3m2!1ses!2sar!4v1718508817059!5m2!1ses!2sar"
+            src={menuData.mapUrl}
             width="250"
             height="250"
             style="border:0;"

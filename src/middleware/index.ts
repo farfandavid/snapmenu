@@ -7,6 +7,7 @@ import { getUserByEmail, registerUser, updateUser } from "../controller/userCont
 
 export const onRequest = defineMiddleware(async (context, next) => {
     console.log("onRequest middleware");
+    console.log(context.url.pathname);
     if (PRIVATE_ROUTES.includes(context.url.pathname) || context.url.pathname.startsWith(PRIVATE_ROUTES[1])) {
         console.log("Private route: ", context.url.pathname);
         const user = await verifyAuth(context.cookies);

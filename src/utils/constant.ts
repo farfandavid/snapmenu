@@ -1,4 +1,4 @@
-export const PRIVATE_ROUTES = ['/admin', '/dashboard', '/api/menu/create', '/api/menu/categories', '/api/menu/menuUser', '/api/image', '/api/image/']
+export const PRIVATE_ROUTES = ['/admin', '/dashboard', '/api/menu/create', '/api/menu/categories', '/api/menu/menuUser', '/api/image', '/api/image/', '/api/menu/update/', '/api/menu/update']
 
 export const PUBLIC_ROUTES = {
     SIGN_IN: '/signin',
@@ -9,3 +9,5 @@ export const PUBLIC_ROUTES = {
     PRIVACY: '/privacy-policy',
     VERIFY_EMAIL: '/auth/verify-email',
 }
+
+export const CDN_URL = "https://cdn.snapmenu.online/";
