@@ -24,8 +24,8 @@ if (menuData.error) {
         class="bg-slate-200 h-screen w-screen overflow-auto relative md:flex md:flex-col md:items-center"
     >
         <header
-            style=`background: url(${menuData.bannerUrl});`
-            class={`flex w-full md:w-3/5 min-h-64 max-h-64 overflow-hidden shadow-md  bg-cover bg-center bg-no-repeat`}
+            style=`background: url(${menuData.bannerUrl}); background-size: cover; background-position: center; background-repeat: no-repeat;`
+            class={`flex w-full md:w-3/5 min-h-64 max-h-64 overflow-hidden shadow-md`}
         >
             <div class="w-full bg-black/35 relative">
                 <img

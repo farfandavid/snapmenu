@@ -13,9 +13,9 @@ export default defineConfig({
   }),
   server: {
     headers: {
-      "access-control-allow-origin": "http://localhost:4321/"
+      "access-control-allow-origin": "http://localhost:4321/",
     },
-    port: 4321,
+    port: 3000,
     host: "localhost"
   },
   image: {
