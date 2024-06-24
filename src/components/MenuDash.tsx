@@ -14,258 +14,178 @@ interface Menu {
 }
 
 export default function MenuDash() {
-    const [menuSelected, setMenuSelected] = useState({ social: ["", "", "", ""] } as Menu);
-    const [menu, setMenu] = useState([]);
-    const [id, setId] = useState("");
+    const [menus, setMenus] = useState<Menu[]>([]);
+    const [menuSelected, setMenuSelected] = useState<Menu>();
     const [image, setImage] = useState("");
-    const [save, setSave] = useState(true);
+    const [toolTip, setToolTip] = useState({ show: false, message: "" });
 
     useEffect(() => {
-        const fetchMenus = async () => {
-            const response = await fetch("/api/menu/categories");
-            const data = await response.json();
-            console.log(data);
-            setMenu(data.map(({ _id, name, description, logoUrl, bannerUrl, address, phone, mapUrl, social }: { _id: any, name: string, categories: [], description: string, logoUrl: string, bannerUrl: string, address: string, phone: number, mapUrl: string, social: string[] }) => ({ _id, name, description, logoUrl, bannerUrl, address, phone, mapUrl, social })));
-            setImage(data[0].logoUrl);
-            setMenuSelected(data[0]);
-        };
-        fetchMenus();
+        fetch("/api/menu/categories")
+            .then((response) => response.json())
+            .then((data) => {
+                setMenus(data)
+                setMenuSelected(data[0])
+                setImage(data[0].logoUrl)
+            })
     }, []);
 
-    const handleSubmitForm = async (e: any) => {
-        e.preventDefault();
-        const formData = new FormData(e.target);
-        formData.append("menu", menuSelected._id);
-        const data = await fetch("/api/menu/update", {
-            method: "PUT",
-            body: formData
-        });
-        const response = await data.json();
-        console.log(response);
-        if (response.error) {
-            alert("Error al guardar");
+    const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        console.log(e.target.value);
+        setMenuSelected(menus.filter((menu) => menu._id === e.target.value)[0]);
+        setImage(menus.filter((menu) => menu._id === e.target.value)[0].logoUrl);
+    }
+
+    const showToolTip = (message: string) => {
+        setToolTip({ show: true, message });
+        setTimeout(() => {
+            setToolTip({ show: false, message: "" });
+        }, 3000);
+    }
+
+    const handleImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        if (!file.type.startsWith("image/")) {
+            showToolTip("El archivo no es una imagen");
             return;
         }
-        if (response.success) {
-            setSave(true);
-            alert("Guardado correctamente");
+        if (file.size > 1024 * 1024 * 3) {
+            showToolTip("El Logo debe ser menor a 3MB");
+            e.target.value = "";
+            return;
         }
-    }
 
-    const handleImageUpload = (e: any) => {
-        const file = e.target.files[0];
-        // Max 2MB
-        const maxAllowedSize = 1024 * 1024 * 2;
-
-        if (file) {
-            console.log(file.size > maxAllowedSize);
-            if (file.size > maxAllowedSize) {
-
-                alert("La imagen es muy pesada");
-                return;
-            }
-            const reader = new FileReader();
-            reader.onload = (event: any) => {
-                setImage(event.target.result);
-            };
-            reader.readAsDataURL(file);
+        const reader = new FileReader();
+        reader.onload = () => {
+            setImage(reader.result as string);
         }
+        reader.readAsDataURL(file);
     }
 
-    const handleImageRemove = () => {
-        setImage("");
-    }
-
-    const getSrcFromIFrame = (iframe: string) => {
-        if (!iframe.startsWith("<iframe")) return "";
-        let tempDiv = document.createElement("div");
-        tempDiv.innerHTML = iframe;
-        let iframeElement = tempDiv.firstChild as HTMLIFrameElement;
-        if (!iframeElement) return "";
-        if (!iframeElement.src) return "";
-        if (!iframeElement.src.startsWith("https://www.google.com/maps/embed")) return "";
-        return iframeElement.src;
-    }
-
-    const handleSubmitImage = async (e: any) => {
+    const handleSaveImage = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const formData = new FormData(e.target);
-        formData.append("menu", menuSelected._id);
-        formData.append("image", e.target[0].files[0]);
-        const data = await fetch("/api/image", {
+        const imageFile = e.currentTarget.image.files?.[0] as File;
+        if (!imageFile) {
+            showToolTip("No se ha proporcionado una imagen");
+            return;
+        }
+        const formData = new FormData();
+        formData.append("menu", menuSelected?._id || "");
+        formData.append("image", e.currentTarget.image.files?.[0] || "");
+        console.log(formData.getAll("menu"), formData.getAll("image"));
+        setToolTip({ show: true, message: "Subiendo imagen..." });
+        const response = await fetch("/api/image", {
             method: "POST",
             body: formData
         });
-        const response = await data.json();
-        console.log(response);
-        if (response.success) {
-            setSave(true);
-            alert("Imagen subida correctamente");
+        const data = await response.json();
+        console.log(data);
+        if (data.error) {
+            showToolTip(data.error);
+            return;
         }
-        setImage(response.logoUrl);
+        if (data.success) {
+            showToolTip("Imagen subida correctamente");
+            //setImage(data.logoUrl);
+        }
     }
+
     return (
-        <div className="flex flex-col h-full px-4 py-1" >
-            <div className="flex gap-1 items-center">
-                <h1 className="text-xl font-bold text-center">Menu</h1>
-                <select name="menu" id="menu-select" onChange={(e) => setId(e.target.value)} defaultValue={menuSelected._id}
-                    className="px-2 py-1 ring-1 ring-slate-600 rounded">
-                    {menu.map((menu: any) => (
-                        <option key={menu._id} value={menu._id}
-                            className="rounded-none">{menu.name}</option>
+        <div className="flex flex-col gap-1 p-2 relative overflow-x-hidden">
+            <div className="flex">
+                <h1>Selecciona un Menu:</h1>
+                <select name="menus" id="slt-menu" onChange={handleChange}>
+                    {menus.map((menu) => (
+                        <option key={menu._id} value={menu._id}>{menu.name}</option>
                     ))}
                 </select>
             </div>
-            <form id="form-uploadImage" className="relative w-2/3 mx-auto mt-5" action="/api/image" method="post" onSubmit={handleSubmitImage}>
-
-                <div className="relative min-w-64 h-64 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer flex items-center justify-center bg-white">
-                    <input
-                        type="file"
-                        accept="image/png, image/jpg, image/jpeg, image/webp"
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                        size={60}
-                        onChange={handleImageUpload}
-                    />
-                    {image ? (
-                        <img
-                            src={image}
-                            alt="Uploaded"
-                            className="absolute inset-0 max-h-full mx-auto object-cover rounded-lg"
-                            height="100%"
-                        />
-                    ) : (
-                        <div className="text-gray-500 flex flex-col items-center justify-center">
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-12 w-12"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    d="M12 4v16m8-8H4"
-                                />
-                            </svg>
-                            <span>Click to upload image</span>
-                        </div>
-                    )}
+            <form id="form-image" className="flex flex-col justify-center border-dotted border-2 relative" onSubmit={handleSaveImage}>
+                <img src={image === "" ? "https://imageplaceholder.net/600x400/eeeeee/131313?text=Logo" : image} alt="" className="h-32 object-contain" />
+                <label className="mx-auto my-1">
+                    <input type="file" hidden accept="image/jpg, image/jpeg, image/png, iamge/webp" onChange={handleImage} name="image" />
+                    <div className="flex w-28 h-9 px-2 flex-col bg-orange-500 rounded-full shadow text-white text-xs font-semibold leading-4 items-center justify-center cursor-pointer focus:outline-none hover:ring-1 hover:ring-orange-500 hover:bg-white hover:text-orange-500">Elegir Imagen</div>
+                </label>
+                <div className="flex flex-col gap-1 absolute top-0 right-0">
+                    <button className="h-10 bg-green-500 text-white rounded shadow-md cursor-pointer flex items-center px-2 gap-1 font-bold" type="submit">
+                        <p>Subir</p>
+                        <i className="bi bi-floppy-fill"></i>
+                    </button>
                 </div>
-                <button type="submit" className="px-4 py-2 bg-green-500 text-white rounded-lg">Guardar</button>
-                <button id="btn-delete-image" type="button" className="px-4 py-2 bg-red-500 text-white rounded-lg" onClick={handleImageRemove}>Delete</button>
             </form>
-            {/* <form action="/api/image/" method="post">
-                <input id="inp-imglogo" type="file" title="Elije una image" accept="image/png, image/jpg, image/jpeg, image/webp" />
-                <button type="submit">Upload</button>
-            </form> */}
-            <form id="form-info" action="/api/menu/update" method="put" className="mx-auto mb-0 mt-8 space-y-4 w-full md:w-2/3 py-5" onSubmit={handleSubmitForm}>
-                <div>
-                    <label htmlFor="bannerUrl" className="">Portada</label>
-                    <div className="relative">
-                        <input id="url-banner" type="text" name="bannerUrl" className="w-full rounded-lg border-gray-200 p-4 pe-12 text-sm shadow-sm"
-                            required
-                            placeholder="URL de la imagen de portada"
-                            defaultValue={menuSelected.bannerUrl}
-                        />
-                        <span
-                            className="absolute inset-y-0 end-0 grid place-content-center px-4 text-gray-500"
-                        >
-                            <i className="bi bi-card-image"></i>
-                        </span>
-                    </div>
+            <div id="timetable" className="flex flex-col items-center">
+                <h1>Horarios de Apertura y Cierre</h1>
+                <div className="grid grid-cols-2 gap-1">
+                    <fieldset className="col-span-1 space-x-1 border border-solid border-slate-400 px-1 py-2 rounded">
+                        <legend>Lunes</legend>
+                        <input type="time" className="px-1 rounded shadow-md" />
+                        <input type="time" className="px-1 rounded shadow-md" />
+                    </fieldset>
+                    <fieldset className="col-span-1 space-x-1 border border-solid border-slate-400 px-1 py-2 rounded">
+                        <legend>Martes</legend>
+                        <input type="time" className="px-1 rounded shadow-md" />
+                        <input type="time" className="px-1 rounded shadow-md" />
+                    </fieldset>
+                    <fieldset className="col-span-1 space-x-1 border border-solid border-slate-400 px-1 py-2 rounded">
+                        <legend>Miercoles</legend>
+                        <input type="time" className="px-1 rounded shadow-md" />
+                        <input type="time" className="px-1 rounded shadow-md" />
+                    </fieldset>
+                    <fieldset className="col-span-1 space-x-1 border border-solid border-slate-400 px-1 py-2 rounded">
+                        <legend>Jueves</legend>
+                        <input type="time" className="px-1 rounded shadow-md" />
+                        <input type="time" className="px-1 rounded shadow-md" />
+                    </fieldset>
+                    <fieldset className="col-span-1 space-x-1 border border-solid border-slate-400 px-1 py-2 rounded">
+                        <legend>Viernes</legend>
+                        <input type="time" className="px-1 rounded shadow-md" />
+                        <input type="time" className="px-1 rounded shadow-md" />
+                    </fieldset>
+                    <fieldset className="col-span-1 space-x-1 border border-solid border-slate-400 px-1 py-2 rounded">
+                        <legend>Sabado</legend>
+                        <input type="time" className="px-1 rounded shadow-md" />
+                        <input type="time" className="px-1 rounded shadow-md" />
+                    </fieldset>
+                    <fieldset className="col-span-2 space-x-1 border border-solid border-slate-400 px-1 py-2 rounded flex justify-center">
+                        <legend className="mx-auto">Domingo</legend>
+                        <input type="time" className="px-1 rounded shadow-md" />
+                        <input type="time" className="px-1 rounded shadow-md" />
+                    </fieldset>
                 </div>
-                <div>
-                    <label htmlFor="phone" className="block">Whatsapp</label>
-                    <span className="text-xs px-4">(Cód País) 54 (Cód Area) 3886 (Número sin el 15) 455301</span>
-                    <div className="flex items-center relative">
-                        <p className="text-xl">+</p>
-                        <input name="phone" className="w-full rounded-lg border-gray-200 py-3 px-1  text-sm shadow-sm" id="num-state" type="number" placeholder="Ej: 543886455301"
-                            defaultValue={menuSelected.phone} />
-
-                    </div>
-
-                </div>
-                <div>
-                    <label htmlFor="address" className="">Dirección</label>
-                    <div className="flex flex-col gap-2">
-                        <input name="address" id="menu-address-acr" type="text" className="w-full rounded-lg border-gray-200 p-4 pe-12 text-sm shadow-sm flex-1"
-                            required
-                            placeholder="Dirección corta (ej. Av. 1 de Mayo)"
-                            defaultValue={menuSelected.address}
-                        />
-                        <div className="relative">
-                            <input id="menu-address" name="mapUrl" type="url" className="w-full rounded-lg border-gray-200 p-4 pe-12 text-sm shadow-sm"
-                                required
-                                placeholder="Url de Google Maps"
-                                onChange={(e) => e.target.value = getSrcFromIFrame(e.target.value)}
-                                defaultValue={menuSelected.mapUrl}
-                            />
-                            <span
-                                className="absolute inset-y-0 end-0 grid place-content-center px-4 text-gray-500"
-                            >
-                                <i className="bi bi-geo-alt"></i>
-                            </span>
-                        </div>
-                    </div>
-
-                </div>
-                <div>
-                    <label htmlFor="social-x" className="">X</label>
-                    <div className="relative">
-                        <input id="social-x" name="social-x" type="text" className="w-full rounded-lg border-gray-200 p-4 pe-12 text-sm shadow-sm"
-                            defaultValue={menuSelected.social[0] || ''} />
-                        <span
-                            className="absolute inset-y-0 end-0 grid place-content-center px-4 text-gray-500"
-                        >
-                            <i className="bi bi-twitter-x"></i>
-                        </span>
-                    </div>
-                </div>
-                <div>
-                    <label htmlFor="social-facebook" className="">Facebook</label>
-                    <div className="relative">
-                        <input name="social-facebook" id="social-facebook" type="text" className="w-full rounded-lg border-gray-200 p-4 pe-12 text-sm shadow-sm"
-                            defaultValue={menuSelected.social[1] || ''} />
-                        <span
-                            className="absolute inset-y-0 end-0 grid place-content-center px-4 text-gray-500"
-                        >
-                            <i className="bi bi-facebook"></i>
-                        </span>
-                    </div>
-                </div>
-                <div>
-                    <label htmlFor="social-instagram" className="">Instagram</label>
-                    <div className="relative">
-                        <input name="social-instagram" id="social-instagram" type="text" className="w-full rounded-lg border-gray-200 p-4 pe-12 text-sm shadow-sm"
-                            defaultValue={menuSelected.social[2] || ''} />
-                        <span
-                            className="absolute inset-y-0 end-0 grid place-content-center px-4 text-gray-500"
-                        >
-                            <i className="bi bi-instagram"></i>
-                        </span>
-                    </div>
-                </div>
-                <div>
-                    <label htmlFor="social-youtube" className="">Youtube</label>
-                    <div className="relative">
-                        <input name="social-youtube" id="social-youtube" type="text" className="w-full rounded-lg border-gray-200 p-4 pe-12 text-sm shadow-sm"
-                            defaultValue={menuSelected.social[3] || ''} />
-                        <span
-                            className="absolute inset-y-0 end-0 grid place-content-center px-4 text-gray-500"
-                        >
-                            <i className="bi bi-youtube"></i>
-                        </span>
-                    </div>
-                </div>
-                <button type="submit" className="p-4 bg-orange-500 text-white rounded-lg w-full font-bold">Guardar</button>
-            </form>
-            <div id="tooltip" className={`absolute bg-blue-500 text-white px-3 py-2 gap-2 flex font-bold rounded-lg right-3 ${save ? "hidden" : ""}`}>
-                <i id="tooltip-icon" className="bi bi-arrow-clockwise animate-spin"></i>
-                Guardando
             </div>
-
-        </div>
+            <label htmlFor="">Descripcion</label>
+            <input type="text" defaultValue={menuSelected?.description} />
+            <label htmlFor="">Imagen Portada</label>
+            <input type="text" defaultValue={menuSelected?.bannerUrl} />
+            <label htmlFor="">Direccion Corta</label>
+            <input type="text" defaultValue={menuSelected?.address} />
+            <label htmlFor="">Mapa</label>
+            <input type="text" defaultValue={menuSelected?.mapUrl} />
+            <label htmlFor="">Whatsapp</label>
+            <input type="number" defaultValue={menuSelected?.phone} />
+            <div className="grid grid-cols-2 gap-1">
+                <div className="col-span-1">
+                    <h1>Facebook</h1>
+                    <input className="w-full" type="text" defaultValue={menuSelected?.social[0]} />
+                </div>
+                <div className="col-span-1">
+                    <h1>Instagram</h1>
+                    <input className="w-full" type="text" defaultValue={menuSelected?.social[1]} />
+                </div>
+                <div className="col-span-1">
+                    <h1>Twitter</h1>
+                    <input className="w-full" type="text" defaultValue={menuSelected?.social[2]} />
+                </div>
+                <div className="col-span-1">
+                    <h1>Youtube</h1>
+                    <input className="w-full" type="text" defaultValue={menuSelected?.social[3]} />
+                </div>
+            </div>
+            <input type="button" value="Guardar" className="bg-orange-500 rounded p-2 text-white font-bold cursor-pointer hover:ring-1 hover:ring-orange-500 hover:bg-white hover:text-orange-500" />
+            <div id="tool-tip" className={`bg-blue-500 p-2 absolute text-white rounded transition-all duration-300 ease-in-out flex gap-1 ${toolTip.show ? "right-3" : "-right-full"}`}>
+                <p>{toolTip.message}</p>
+                <i className="bi bi-info-circle-fill"></i>
+            </div>
+        </div >
     )
 }

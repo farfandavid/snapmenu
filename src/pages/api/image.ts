@@ -12,7 +12,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
         return new Response(JSON.stringify({ error: "No se ha proporcionado una imagen" }), { status: 400 });
     }
     // Si la imagen es mayor a 2MB
-    if (image.size > 1024 * 1024 * 2) {
+    if (image.size > 1024 * 1024 * 3) {
         return new Response(JSON.stringify({ error: "La imagen es muy pesada" }), { status: 400 });
     }
     if (typeof menu !== "string") {
