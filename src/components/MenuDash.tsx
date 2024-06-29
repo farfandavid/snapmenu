@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-
 interface Menu {
     _id: string;
     name: string;
@@ -72,7 +71,6 @@ export default function MenuDash() {
         const formData = new FormData();
         formData.append("menu", menuSelected?._id || "");
         formData.append("image", e.currentTarget.image.files?.[0] || "");
-        console.log(formData.getAll("menu"), formData.getAll("image"));
         setToolTip({ show: true, message: "Subiendo imagen..." });
         const response = await fetch("/api/image", {
             method: "POST",
@@ -90,6 +88,38 @@ export default function MenuDash() {
         }
     }
 
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const form = e.currentTarget;
+        const formData = new FormData();
+        formData.append("menu", menuSelected?._id || "");
+        formData.append("description", form.description.value);
+        formData.append("bannerUrl", form.bannerUrl.value);
+        formData.append("address", form.address.value);
+        formData.append("mapUrl", form.mapUrl.value);
+        formData.append("phone", form.phone.value);
+        (form.social as RadioNodeList).forEach((input: Node, index: number) => {
+            if (input instanceof HTMLInputElement) {
+                formData.append("social", input.value);
+            }
+        });
+        await fetch("/api/menu/update", {
+            method: "PUT",
+            body: formData
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+                    showToolTip("Datos guardados correctamente");
+                } else {
+                    showToolTip("Error al guardar los datos");
+                }
+            }
+            )
+            .catch((error) => {
+                showToolTip("Error al guardar los datos");
+            });
+    }
     return (
         <div className="flex flex-col gap-1 p-2 relative overflow-x-hidden">
             <div className="flex">
@@ -113,75 +143,38 @@ export default function MenuDash() {
                     </button>
                 </div>
             </form>
-            <div id="timetable" className="flex flex-col items-center">
-                <h1>Horarios de Apertura y Cierre</h1>
+            <form className="flex flex-col gap-1" action="/api/menu/update" method="put" onSubmit={handleSubmit}>
+                <label htmlFor="">Descripcion</label>
+                <input type="text" defaultValue={menuSelected?.description} name="description" required maxLength={150} autoComplete="off" />
+                <label htmlFor="">Imagen Portada</label>
+                <input type="text" defaultValue={menuSelected?.bannerUrl} name="bannerUrl" required autoComplete="off" />
+                <label htmlFor="">Direccion Corta</label>
+                <input type="text" defaultValue={menuSelected?.address} name="address" required maxLength={10} />
+                <label htmlFor="">Mapa</label>
+                <input type="text" defaultValue={menuSelected?.mapUrl} name="mapUrl" required autoComplete="off" />
+                <label htmlFor="">Whatsapp</label>
+                <input type="number" defaultValue={menuSelected?.phone} name="phone" required />
                 <div className="grid grid-cols-2 gap-1">
-                    <fieldset className="col-span-1 space-x-1 border border-solid border-slate-400 px-1 py-2 rounded">
-                        <legend>Lunes</legend>
-                        <input type="time" className="px-1 rounded shadow-md" />
-                        <input type="time" className="px-1 rounded shadow-md" />
-                    </fieldset>
-                    <fieldset className="col-span-1 space-x-1 border border-solid border-slate-400 px-1 py-2 rounded">
-                        <legend>Martes</legend>
-                        <input type="time" className="px-1 rounded shadow-md" />
-                        <input type="time" className="px-1 rounded shadow-md" />
-                    </fieldset>
-                    <fieldset className="col-span-1 space-x-1 border border-solid border-slate-400 px-1 py-2 rounded">
-                        <legend>Miercoles</legend>
-                        <input type="time" className="px-1 rounded shadow-md" />
-                        <input type="time" className="px-1 rounded shadow-md" />
-                    </fieldset>
-                    <fieldset className="col-span-1 space-x-1 border border-solid border-slate-400 px-1 py-2 rounded">
-                        <legend>Jueves</legend>
-                        <input type="time" className="px-1 rounded shadow-md" />
-                        <input type="time" className="px-1 rounded shadow-md" />
-                    </fieldset>
-                    <fieldset className="col-span-1 space-x-1 border border-solid border-slate-400 px-1 py-2 rounded">
-                        <legend>Viernes</legend>
-                        <input type="time" className="px-1 rounded shadow-md" />
-                        <input type="time" className="px-1 rounded shadow-md" />
-                    </fieldset>
-                    <fieldset className="col-span-1 space-x-1 border border-solid border-slate-400 px-1 py-2 rounded">
-                        <legend>Sabado</legend>
-                        <input type="time" className="px-1 rounded shadow-md" />
-                        <input type="time" className="px-1 rounded shadow-md" />
-                    </fieldset>
-                    <fieldset className="col-span-2 space-x-1 border border-solid border-slate-400 px-1 py-2 rounded flex justify-center">
-                        <legend className="mx-auto">Domingo</legend>
-                        <input type="time" className="px-1 rounded shadow-md" />
-                        <input type="time" className="px-1 rounded shadow-md" />
-                    </fieldset>
+                    <div className="col-span-1">
+                        <h1>Facebook</h1>
+                        <input className="w-full" type="text" defaultValue={menuSelected?.social[0]} name="social" maxLength={50} autoComplete="off" />
+                    </div>
+                    <div className="col-span-1">
+                        <h1>Instagram</h1>
+                        <input className="w-full" type="text" defaultValue={menuSelected?.social[1]} name="social" maxLength={50} autoComplete="off" />
+                    </div>
+                    <div className="col-span-1">
+                        <h1>Twitter</h1>
+                        <input className="w-full" type="text" defaultValue={menuSelected?.social[2]} name="social" maxLength={50} autoComplete="off" />
+                    </div>
+                    <div className="col-span-1">
+                        <h1>Youtube</h1>
+                        <input className="w-full" type="text" defaultValue={menuSelected?.social[3]} name="social" maxLength={50} autoComplete="off" />
+                    </div>
                 </div>
-            </div>
-            <label htmlFor="">Descripcion</label>
-            <input type="text" defaultValue={menuSelected?.description} />
-            <label htmlFor="">Imagen Portada</label>
-            <input type="text" defaultValue={menuSelected?.bannerUrl} />
-            <label htmlFor="">Direccion Corta</label>
-            <input type="text" defaultValue={menuSelected?.address} />
-            <label htmlFor="">Mapa</label>
-            <input type="text" defaultValue={menuSelected?.mapUrl} />
-            <label htmlFor="">Whatsapp</label>
-            <input type="number" defaultValue={menuSelected?.phone} />
-            <div className="grid grid-cols-2 gap-1">
-                <div className="col-span-1">
-                    <h1>Facebook</h1>
-                    <input className="w-full" type="text" defaultValue={menuSelected?.social[0]} />
-                </div>
-                <div className="col-span-1">
-                    <h1>Instagram</h1>
-                    <input className="w-full" type="text" defaultValue={menuSelected?.social[1]} />
-                </div>
-                <div className="col-span-1">
-                    <h1>Twitter</h1>
-                    <input className="w-full" type="text" defaultValue={menuSelected?.social[2]} />
-                </div>
-                <div className="col-span-1">
-                    <h1>Youtube</h1>
-                    <input className="w-full" type="text" defaultValue={menuSelected?.social[3]} />
-                </div>
-            </div>
-            <input type="button" value="Guardar" className="bg-orange-500 rounded p-2 text-white font-bold cursor-pointer hover:ring-1 hover:ring-orange-500 hover:bg-white hover:text-orange-500" />
+                <input type="submit" value="Guardar" className="bg-orange-500 rounded p-2 text-white font-bold cursor-pointer hover:ring-1 hover:ring-orange-500 hover:bg-white hover:text-orange-500" />
+
+            </form>
             <div id="tool-tip" className={`bg-blue-500 p-2 absolute text-white rounded transition-all duration-300 ease-in-out flex gap-1 ${toolTip.show ? "right-3" : "-right-full"}`}>
                 <p>{toolTip.message}</p>
                 <i className="bi bi-info-circle-fill"></i>

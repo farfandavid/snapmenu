@@ -46,6 +46,7 @@ export default function ProductsMain() {
     useEffect(() => {
         if (!trigger) return;
         setSave(true);
+
         const savePost = async () => {
             const res = await fetch("/api/menu/categories", {
                 method: "PUT",
@@ -60,7 +61,12 @@ export default function ProductsMain() {
             setCategories(data.categories);
             alert("Saved");
         };
-        setTimeout(savePost, 750);
+        try {
+            setTimeout(savePost, 750);
+        } catch (error) {
+            console.error(error);
+        }
+
     }, [trigger]);
     // Change Menu
     useEffect(() => {

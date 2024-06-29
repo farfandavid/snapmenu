@@ -30,7 +30,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
         );
     console.log(menuId, locals.user.email);
     const menu = await getMenuByIdAndUserEmail(menuId, locals.user.email || "");
-    console.log(menu);
     if (!menu) {
         return new Response(JSON.stringify({ error: "El menú no existe" }), { status: 404, headers: { "Content-Type": "application/json" } });
     }

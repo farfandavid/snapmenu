@@ -101,7 +101,11 @@ const menuSchema = new mongoose.Schema(
     social: {
       type: Object,
       required: false
-    }
+    },
+    openingHours: {
+      type: [Object],
+      required: false
+    },
   },
   {
     timestamps: true
