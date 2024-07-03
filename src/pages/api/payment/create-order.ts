@@ -11,13 +11,6 @@ export const POST: APIRoute = async ({ request, redirect }) => {
                     currency_id: "ARS", // Argentinian Peso
                     quantity: 1,
                     id: "1234",
-                },
-                {
-                    title: "Test 100",
-                    unit_price: 2000,
-                    currency_id: "PEN", // Argentinian Peso
-                    quantity: 1,
-                    id: "1234",
                 }
             ],
             expires: true,
