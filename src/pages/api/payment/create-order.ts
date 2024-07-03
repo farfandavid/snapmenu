@@ -23,6 +23,9 @@ export const POST: APIRoute = async ({ request, redirect }) => {
             },
             // URLS Servidor
             notification_url: "https://snapmenu.onrender.com/api/payment/webhook?source_news=webhooks",
+            payer: {
+                email: "example@example.com",
+            }
 
         },
         requestOptions: {
