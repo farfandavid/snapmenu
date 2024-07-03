@@ -1,7 +1,8 @@
 ---
 import DashboardLayout from "../../layouts/DashboardLayout.astro";
+import ConfigDash from "../../components/ConfigDash.tsx";
 ---
 
 <DashboardLayout>
-    <h1>Config</h1>
+    <ConfigDash client:load />
 </DashboardLayout>

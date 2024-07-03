@@ -4,6 +4,7 @@ import Home from "../components/Home.astro";
 import Service from "../components/Service.astro";
 import Contact from "../components/Contact.astro";
 import Layout from "../layouts/Layout.astro";
+import { Image } from "astro:assets";
 
 const NAVBAR = [
 	{
@@ -37,11 +38,11 @@ export const prerender = true;
 					class="text-xl font-bold pacifico-regular flex items-center gap-2"
 				>
 					<span
-						><img
+						><Image
 							src="/favicon.svg"
-							alt=""
-							srcset=""
-							width="30px"
+							alt="icono de SnapMenu"
+							width={30}
+							height={30}
 						/></span
 					> SnapMenu
 				</h1>

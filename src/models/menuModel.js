@@ -76,7 +76,11 @@ const menuSchema = new mongoose.Schema(
     },
     active: {
       type: Boolean,
-      required: true
+      required: false
+    },
+    expDate: {
+      type: Date,
+      required: false
     },
     logoUrl: {
       type: String,
@@ -111,5 +115,11 @@ const menuSchema = new mongoose.Schema(
     timestamps: true
   });
 
+menuSchema.pre("save", function (next) {
+  console.log("Pre save");
+  const currentDate = new Date();
+  this.active = this.expDate > currentDate;
+  next();
+});
 
 export default mongoose.model("Menu", menuSchema)

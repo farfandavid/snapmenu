@@ -6,9 +6,8 @@ import type { IMenu } from "../types/Menu";
 const { menu } = Astro.params;
 const menuData: IMenu = await getMenuByName(menu as string);
 if (!menuData) {
-    return Astro.redirect("/404");
+    return new Response("Menu not found", { status: 404 });
 }
-
 //TODO: add openings hours to the menu data
 ---
 
@@ -17,12 +16,13 @@ if (!menuData) {
         class="bg-slate-200 h-screen w-screen overflow-auto relative md:flex md:flex-col md:items-center"
     >
         <header
-            style=`background: url(${menuData.bannerUrl}); background-size: cover; background-position: center; background-repeat: no-repeat;`
+            style=`background: url(${menuData.bannerUrl ?? "https://placehold.co/640x480/white/white"}); background-size: cover; background-position: center; background-repeat: no-repeat;`
             class={`flex w-full md:w-3/5 min-h-64 max-h-64 overflow-hidden shadow-md`}
         >
             <div class="w-full bg-black/35 relative">
                 <img
-                    src={menuData.logoUrl}
+                    src={menuData.logoUrl ??
+                        `https://placehold.co/250x250?text=${menuData.name.at(0)}`}
                     alt={menuData.description}
                     class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded max-h-[150px]"
                 />
@@ -37,10 +37,21 @@ if (!menuData) {
                     </button>
 
                     <div
-                        class="flex gap-2 bg-green-500 text-white font-bold rounded-xl px-3 py-1"
+                        class="flex gap-2 text-white font-bold rounded-xl px-3 py-1"
                     >
                         <i class="bi bi-clock-fill"></i>
-                        <p>Abierto</p>
+                        <span id="open-close"></span>
+                        <datalist id="datalist-hours">
+                            {
+                                menuData.openingHours?.map((hours, index) => (
+                                    <option
+                                        value={index}
+                                        data-open={hours.open}
+                                        data-close={hours.close}
+                                    />
+                                ))
+                            }
+                        </datalist>
                     </div>
                 </div>
             </div>
@@ -198,203 +209,229 @@ if (!menuData) {
             </div>
         </div>
     </div>
-    <script>
-        const buttons = document
-            .getElementById("tabs")
-            ?.getElementsByTagName(
-                "button",
-            ) as HTMLCollectionOf<HTMLButtonElement>;
-        const categories = document.getElementById("tabs-content")
-            ?.children as HTMLCollectionOf<HTMLElement>;
-        const searchMenu = document.getElementById(
-            "searchMenu",
-        ) as HTMLInputElement;
-        const products = document.querySelectorAll(
-            "[data-product]",
-        ) as NodeListOf<HTMLElement>;
-        const cartButton = document.getElementById(
-            "btn-cart",
-        ) as HTMLButtonElement;
-        const sidebarMenu = document.getElementById(
-            "sidebar-menu",
-        ) as HTMLElement;
-        const sidebarExitMenu = document.getElementById(
-            "sidebar-exit-menu",
-        ) as HTMLElement;
+</MenuLayout>
+<script>
+    const buttons = document
+        .getElementById("tabs")
+        ?.getElementsByTagName("button") as HTMLCollectionOf<HTMLButtonElement>;
+    const categories = document.getElementById("tabs-content")
+        ?.children as HTMLCollectionOf<HTMLElement>;
+    const searchMenu = document.getElementById(
+        "searchMenu",
+    ) as HTMLInputElement;
+    const products = document.querySelectorAll(
+        "[data-product]",
+    ) as NodeListOf<HTMLElement>;
+    const cartButton = document.getElementById("btn-cart") as HTMLButtonElement;
+    const sidebarMenu = document.getElementById("sidebar-menu") as HTMLElement;
+    const sidebarExitMenu = document.getElementById(
+        "sidebar-exit-menu",
+    ) as HTMLElement;
 
-        const mapAddress = document.getElementById(
-            "map-address",
-        ) as HTMLIFrameElement;
-        const btnMap = document.getElementById("btn-map") as HTMLButtonElement;
+    const mapAddress = document.getElementById(
+        "map-address",
+    ) as HTMLIFrameElement;
+    const btnMap = document.getElementById("btn-map") as HTMLButtonElement;
 
-        btnMap.addEventListener("click", () => {
-            if (btnMap.classList.contains("bg-black/50")) {
-                btnMap.classList.replace("bg-black/50", "bg-green-600/75");
-            } else {
-                btnMap.classList.replace("bg-green-600/75", "bg-black/50");
-            }
-            mapAddress.classList.toggle("hidden");
-            mapAddress.style.top = `${btnMap.getBoundingClientRect().top + btnMap.getBoundingClientRect().height}px`;
-            mapAddress.style.left = `${btnMap.getBoundingClientRect().left}px`;
-        });
+    btnMap.addEventListener("click", () => {
+        if (btnMap.classList.contains("bg-black/50")) {
+            btnMap.classList.replace("bg-black/50", "bg-green-600/75");
+        } else {
+            btnMap.classList.replace("bg-green-600/75", "bg-black/50");
+        }
+        mapAddress.classList.toggle("hidden");
+        mapAddress.style.top = `${btnMap.getBoundingClientRect().top + btnMap.getBoundingClientRect().height}px`;
+        mapAddress.style.left = `${btnMap.getBoundingClientRect().left}px`;
+    });
 
-        document.addEventListener("click", (e: any) => {
-            if (!btnMap.contains(e.target)) {
-                btnMap.classList.replace("bg-green-600/75", "bg-black/50");
-                mapAddress.classList.add("hidden");
-            }
-        });
+    document.addEventListener("click", (e: any) => {
+        if (!btnMap.contains(e.target)) {
+            btnMap.classList.replace("bg-green-600/75", "bg-black/50");
+            mapAddress.classList.add("hidden");
+        }
+    });
 
-        const orderList = document.getElementById("order-list") as HTMLElement;
-        const walink = document.getElementById("walink") as HTMLAnchorElement;
-        const message = () => {
-            let message =
-                "Hola, me gustaría hacer un pedido con los siguientes productos:\n";
-            for (let i = 0; i < cart.length; i++) {
-                const item = cart[i];
-                message += `${item.quantity}x ${item.name}......$${item.price * item.quantity}\n`;
-            }
-            message += `por un total de $${cart.reduce(
-                (acc, item) => acc + parseFloat(item.price) * item.quantity,
-                0,
-            )}.`;
+    const orderList = document.getElementById("order-list") as HTMLElement;
+    const walink = document.getElementById("walink") as HTMLAnchorElement;
+    const message = () => {
+        let message =
+            "Hola, me gustaría hacer un pedido con los siguientes productos:\n";
+        for (let i = 0; i < cart.length; i++) {
+            const item = cart[i];
+            message += `${item.quantity}x ${item.name}......$${item.price * item.quantity}\n`;
+        }
+        message += `por un total de $${cart.reduce(
+            (acc, item) => acc + parseFloat(item.price) * item.quantity,
+            0,
+        )}.`;
 
-            return encodeURIComponent(message);
-        };
-        function updateOrder() {
-            orderList.innerHTML = "";
-            let total = 0;
-            for (let i = 0; i < cart.length; i++) {
-                const item = cart[i];
-                total += parseFloat(item.price) * item.quantity;
-                orderList.innerHTML += `
-                    <div class="grid grid-cols-5 w-full">
-                        <p class="col-span-1 flex justify-center">${item.quantity}x</p>
-                        <p class="col-span-2">${item.name}</p>
-                        <p class="col-span-2 flex justify-end">$${item.price * item.quantity}</p>
-                    </div>
-                `;
-            }
+        return encodeURIComponent(message);
+    };
+    function updateOrder() {
+        orderList.innerHTML = "";
+        let total = 0;
+        for (let i = 0; i < cart.length; i++) {
+            const item = cart[i];
+            total += parseFloat(item.price) * item.quantity;
             orderList.innerHTML += `
-                <div class="grid grid-cols-5 w-full border-t-2 border-t-slate-400">
-                    <p class="col-span-3 flex justify-start">Total</p>
-                    <p class="col-span-2 flex justify-end">$${total}</p>
+                <div class="grid grid-cols-5 w-full">
+                    <p class="col-span-1 flex justify-center">${item.quantity}x</p>
+                    <p class="col-span-2">${item.name}</p>
+                    <p class="col-span-2 flex justify-end">$${item.price * item.quantity}</p>
                 </div>
             `;
-            walink.href = `https://wa.me/${walink.dataset.phone}?text=${message()}`;
         }
+        orderList.innerHTML += `
+            <div class="grid grid-cols-5 w-full border-t-2 border-t-slate-400">
+                <p class="col-span-3 flex justify-start">Total</p>
+                <p class="col-span-2 flex justify-end">$${total}</p>
+            </div>
+        `;
+        walink.href = `https://wa.me/${walink.dataset.phone}?text=${message()}`;
+    }
 
-        sidebarExitMenu.addEventListener("click", () => {
-            sidebarMenu.classList.toggle("left-0");
-            sidebarMenu.classList.toggle("-left-full");
-        });
+    sidebarExitMenu.addEventListener("click", () => {
+        sidebarMenu.classList.toggle("left-0");
+        sidebarMenu.classList.toggle("-left-full");
+    });
 
-        cartButton.addEventListener("click", () => {
-            sidebarMenu.classList.toggle("left-0");
-            sidebarMenu.classList.toggle("-left-full");
-        });
-        let cart: any[] = [];
+    cartButton.addEventListener("click", () => {
+        sidebarMenu.classList.toggle("left-0");
+        sidebarMenu.classList.toggle("-left-full");
+    });
+    let cart: any[] = [];
 
-        // Add and remove products from cart
-        for (let i = 0; i < products.length; i++) {
-            const product = products[i];
-            const plus = product.querySelector(
-                "[data-plus]",
-            ) as HTMLButtonElement;
-            const minus = product.querySelector(
-                "[data-minus]",
-            ) as HTMLButtonElement;
-            const quantity = product.querySelector("span") as HTMLSpanElement;
-            let count = 0;
-            plus.addEventListener("click", () => {
-                count++;
-                quantity.textContent = count.toString();
-                if (
-                    cart.some((item) => item.id === product.dataset.idproduct)
-                ) {
-                    cart = cart.map((item) => {
-                        if (item.id === product.dataset.idproduct) {
-                            item.quantity = count;
-                        }
-                        return item;
-                    });
-                } else {
-                    cart.push({
-                        id: product.dataset.idproduct,
-                        name: product.dataset.product,
-                        price: product.dataset.price,
-                        quantity: count,
-                    });
-                }
-                console.log(cart);
-                updateOrder();
-            });
-            minus.addEventListener("click", () => {
-                count--;
-                if (count < 0) {
-                    count = 0;
-                } else {
-                    cart = cart.filter((item) => {
-                        if (item.id === product.dataset.idproduct) {
-                            item.quantity = count;
-                        }
-                        return item.quantity > 0;
-                    });
-                    console.log(cart);
-                }
-                quantity.textContent = count.toString();
-                updateOrder();
-            });
-        }
-
-        for (let i = 1; i < categories.length; i++) {
-            categories[i].classList.add("hidden");
-        }
-        for (let i = 1; i < buttons.length; i++) {
-            buttons[i].classList.add("text-slate-400");
-            buttons[i].classList.remove("active");
-        }
-        for (let i = 0; i < buttons.length; i++) {
-            buttons[i].addEventListener("click", () => {
-                for (let j = 0; j < buttons.length; j++) {
-                    buttons[j].classList.add("text-slate-400");
-                    buttons[j].classList.remove("active");
-                    buttons[j].classList.remove("text-slate-800");
-                    categories[j].classList.add("hidden");
-                }
-                buttons[i].classList.remove("text-slate-400");
-                buttons[i].classList.add("text-slate-800");
-                buttons[i].classList.add("active");
-                categories[i].classList.remove("hidden");
-            });
-        }
-
-        searchMenu.addEventListener("input", () => {
-            const searchValue = searchMenu.value.toLowerCase();
-            for (let i = 0; i < categories.length; i++) {
-                categories[i].classList.remove("hidden");
-                for (let j = 0; j < categories[i].children.length; j++) {
-                    const product = categories[i].children[j] as HTMLElement;
-                    if (
-                        product.dataset.product
-                            ?.toLowerCase()
-                            .includes(searchValue)
-                    ) {
-                        product.classList.remove("hidden");
-                    } else {
-                        product.classList.add("hidden");
+    // Add and remove products from cart
+    for (let i = 0; i < products.length; i++) {
+        const product = products[i];
+        const plus = product.querySelector("[data-plus]") as HTMLButtonElement;
+        const minus = product.querySelector(
+            "[data-minus]",
+        ) as HTMLButtonElement;
+        const quantity = product.querySelector("span") as HTMLSpanElement;
+        let count = 0;
+        plus.addEventListener("click", () => {
+            count++;
+            quantity.textContent = count.toString();
+            if (cart.some((item) => item.id === product.dataset.idproduct)) {
+                cart = cart.map((item) => {
+                    if (item.id === product.dataset.idproduct) {
+                        item.quantity = count;
                     }
+                    return item;
+                });
+            } else {
+                cart.push({
+                    id: product.dataset.idproduct,
+                    name: product.dataset.product,
+                    price: product.dataset.price,
+                    quantity: count,
+                });
+            }
+            console.log(cart);
+            updateOrder();
+        });
+        minus.addEventListener("click", () => {
+            count--;
+            if (count < 0) {
+                count = 0;
+            } else {
+                cart = cart.filter((item) => {
+                    if (item.id === product.dataset.idproduct) {
+                        item.quantity = count;
+                    }
+                    return item.quantity > 0;
+                });
+                console.log(cart);
+            }
+            quantity.textContent = count.toString();
+            updateOrder();
+        });
+    }
+
+    for (let i = 1; i < categories.length; i++) {
+        categories[i].classList.add("hidden");
+    }
+    for (let i = 1; i < buttons.length; i++) {
+        buttons[i].classList.add("text-slate-400");
+        buttons[i].classList.remove("active");
+    }
+    for (let i = 0; i < buttons.length; i++) {
+        buttons[i].addEventListener("click", () => {
+            for (let j = 0; j < buttons.length; j++) {
+                buttons[j].classList.add("text-slate-400");
+                buttons[j].classList.remove("active");
+                buttons[j].classList.remove("text-slate-800");
+                categories[j].classList.add("hidden");
+            }
+            buttons[i].classList.remove("text-slate-400");
+            buttons[i].classList.add("text-slate-800");
+            buttons[i].classList.add("active");
+            categories[i].classList.remove("hidden");
+        });
+    }
+
+    searchMenu.addEventListener("input", () => {
+        const searchValue = searchMenu.value.toLowerCase();
+        for (let i = 0; i < categories.length; i++) {
+            categories[i].classList.remove("hidden");
+            for (let j = 0; j < categories[i].children.length; j++) {
+                const product = categories[i].children[j] as HTMLElement;
+                if (
+                    product.dataset.product?.toLowerCase().includes(searchValue)
+                ) {
+                    product.classList.remove("hidden");
+                } else {
+                    product.classList.add("hidden");
                 }
             }
-        });
-    </script>
-    <style>
-        .active {
-            background-color: #fff;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
-            padding: 0 0.5rem;
         }
-    </style>
-</MenuLayout>
+    });
+    //** Openings Hours */
+    const openClose = document.getElementById("open-close") as HTMLElement;
+    const dataHours = document.getElementById("datalist-hours") as HTMLElement;
+    const hours = dataHours.querySelectorAll(
+        "option",
+    ) as NodeListOf<HTMLOptionElement>;
+    const currentDay = new Date().getDay();
+    const now = new Date();
+
+    if (hours[currentDay].dataset.open && hours[currentDay].dataset.close) {
+        const [openH, openM] = hours[currentDay].dataset.open
+            ?.split(":")
+            .map(Number) || [null, null];
+        const [closeH, closeM] = hours[currentDay].dataset.close
+            ?.split(":")
+            .map(Number) || [null, null];
+        if (
+            openH !== null &&
+            openM !== null &&
+            closeH !== null &&
+            closeM !== null
+        ) {
+            const openTime = new Date();
+            openTime.setHours(openH, openM, 0, 0);
+            const closeTime = new Date();
+            closeTime.setHours(closeH, closeM, 0, 0);
+            if (now >= openTime && now <= closeTime) {
+                openClose.textContent = `Abierto hasta las ${hours[currentDay].dataset.close}`;
+                openClose.parentElement?.classList.add("bg-green-500");
+            } else {
+                openClose.textContent = `Abre a las ${hours[currentDay].dataset.open}`;
+                openClose.parentElement?.classList.add("bg-red-500");
+            }
+        }
+    } else {
+        openClose.textContent = ``;
+        openClose.parentElement?.classList.add("hidden");
+    }
+</script>
+<style>
+    .active {
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+        padding: 0 0.5rem;
+    }
+</style>

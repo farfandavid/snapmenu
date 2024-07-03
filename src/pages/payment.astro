@@ -1,0 +1,15 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="Mp">
+    <div class="container">
+        <h1>Payment</h1>
+        <p>Payment page</p>
+        <form action="/api/payment/create-order" method="post">
+            <button type="submit" class="bg-orange-500 text-white rounded"
+                >Pagar</button
+            >
+        </form>
+    </div>
+</Layout>

@@ -23,8 +23,12 @@ export const POST: APIRoute = async ({ request, locals }) => {
         if (!regexName.test(name)) {
             return new Response(JSON.stringify({ error: "Name should be alphanumeric" }), { headers: { 'content-type': 'application/json' }, status: 400 });
         }
-        const trimmedName = name.replace(/\s+/g, '');
-        const menu = await createMenu({ name: trimmedName, description, userEmail: user.email || "", active: true })
+        const trimmedName = name.replace(/\s+/g, '') as string;
+        const menu = await createMenu({
+            name: trimmedName,
+            description,
+            userEmail: user.email
+        })
         user.menuList.push(menu._id);
         await user.save();
         return new Response(JSON.stringify(menu), { status: 200, headers: { 'content-type': 'application/json' } });

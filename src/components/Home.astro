@@ -1,17 +1,16 @@
 ---
-import SvgLogo from "../assets/SvgQr.astro";
+import { Picture } from "astro:assets";
 
 const CONTENT = {
     title: "SnapMenu",
     description: "Crea tu SnapMenu y Compártelo con tus clientes.",
     button: "Demo",
-    image: "https://cdn.pixabay.com/photo/2017/10/22/21/02/food-2879265_1280.jpg",
 };
 ---
 
 <section
     id="home"
-    class="flex items-center justify-center h-screen bg-[url(/assets/bgmain.webp)] bg-cover"
+    class="flex items-center justify-center h-screen bg-[url(https://cdn.snapmenu.online/bgmain.webp)] bg-cover"
 >
     <div
         class="flex flex-col text-center bg-slate-50 p-2 rounded xl:h-3/5 xl:w-1/4 justify-center items-center space-y-10 border-8 border-orange-200 border-double"
@@ -20,10 +19,11 @@ const CONTENT = {
             {CONTENT.title}
         </h1>
         <span class="flex w-1/2">
-            <SvgLogo />
-            <img
-                src="/assets/qr-code.png"
-                alt=""
+            <Picture
+                src="https://cdn.snapmenu.online/qr-code.webp"
+                alt="qr-code"
+                formats={["avif", "webp"]}
+                inferSize={true}
                 class="rounded-md border border-slate-400"
             />
         </span>

@@ -122,9 +122,9 @@ export default function MenuDash() {
     }
     return (
         <div className="flex flex-col gap-1 p-2 relative overflow-x-hidden">
-            <div className="flex">
+            <div className="flex items-center gap-1">
                 <h1>Selecciona un Menu:</h1>
-                <select name="menus" id="slt-menu" onChange={handleChange}>
+                <select name="menus" id="slt-menu" onChange={handleChange} className="px-2 py-1 rounded shadow border">
                     {menus.map((menu) => (
                         <option key={menu._id} value={menu._id}>{menu.name}</option>
                     ))}
@@ -145,31 +145,35 @@ export default function MenuDash() {
             </form>
             <form className="flex flex-col gap-1" action="/api/menu/update" method="put" onSubmit={handleSubmit}>
                 <label htmlFor="">Descripcion</label>
-                <input type="text" defaultValue={menuSelected?.description} name="description" required maxLength={150} autoComplete="off" />
+                <input type="text" defaultValue={menuSelected?.description} name="description" required maxLength={150} autoComplete="off" className="px-2 py-1 rounded shadow border" />
                 <label htmlFor="">Imagen Portada</label>
-                <input type="text" defaultValue={menuSelected?.bannerUrl} name="bannerUrl" required autoComplete="off" />
+                <input type="text" defaultValue={menuSelected?.bannerUrl} name="bannerUrl" required autoComplete="off" className="px-2 py-1 rounded shadow border" />
                 <label htmlFor="">Direccion Corta</label>
-                <input type="text" defaultValue={menuSelected?.address} name="address" required maxLength={10} />
+                <input type="text" defaultValue={menuSelected?.address} name="address" required maxLength={10} className="px-2 py-1 rounded shadow border" />
                 <label htmlFor="">Mapa</label>
-                <input type="text" defaultValue={menuSelected?.mapUrl} name="mapUrl" required autoComplete="off" />
-                <label htmlFor="">Whatsapp</label>
-                <input type="number" defaultValue={menuSelected?.phone} name="phone" required />
+                <input type="text" defaultValue={menuSelected?.mapUrl} name="mapUrl" required autoComplete="off" className="px-2 py-1 rounded shadow border" />
+                <label htmlFor="">Whatsapp <span className="text-xs">ej: (Cod país) 549 (Cod Area) 3886 (Num) 112233</span></label>
+                <div className="w-full flex items-center gap-1 relative">
+                    <span className="font-bold absolute left-1">+</span>
+                    <input type="number" defaultValue={menuSelected?.phone} name="phone" required className="px-2 py-1 rounded shadow border w-full pl-4" />
+                </div>
+
                 <div className="grid grid-cols-2 gap-1">
                     <div className="col-span-1">
                         <h1>Facebook</h1>
-                        <input className="w-full" type="text" defaultValue={menuSelected?.social[0]} name="social" maxLength={50} autoComplete="off" />
+                        <input className="w-full px-2 py-1 rounded shadow border" type="text" defaultValue={menuSelected?.social[0]} name="social" maxLength={50} autoComplete="off" />
                     </div>
                     <div className="col-span-1">
                         <h1>Instagram</h1>
-                        <input className="w-full" type="text" defaultValue={menuSelected?.social[1]} name="social" maxLength={50} autoComplete="off" />
+                        <input className="w-full px-2 py-1 rounded shadow border" type="text" defaultValue={menuSelected?.social[1]} name="social" maxLength={50} autoComplete="off" />
                     </div>
                     <div className="col-span-1">
                         <h1>Twitter</h1>
-                        <input className="w-full" type="text" defaultValue={menuSelected?.social[2]} name="social" maxLength={50} autoComplete="off" />
+                        <input className="w-full px-2 py-1 rounded shadow border" type="text" defaultValue={menuSelected?.social[2]} name="social" maxLength={50} autoComplete="off" />
                     </div>
                     <div className="col-span-1">
                         <h1>Youtube</h1>
-                        <input className="w-full" type="text" defaultValue={menuSelected?.social[3]} name="social" maxLength={50} autoComplete="off" />
+                        <input className="w-full px-2 py-1 rounded shadow border" type="text" defaultValue={menuSelected?.social[3]} name="social" maxLength={50} autoComplete="off" />
                     </div>
                 </div>
                 <input type="submit" value="Guardar" className="bg-orange-500 rounded p-2 text-white font-bold cursor-pointer hover:ring-1 hover:ring-orange-500 hover:bg-white hover:text-orange-500" />

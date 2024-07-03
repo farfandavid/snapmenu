@@ -7,10 +7,8 @@ interface ISocial {
 }
 
 interface IHorario {
-    dia: number;
-    apertura: string;
-    cierre: string;
-    timezone: string;
+    open: string;
+    close: string;
 }
 
 interface IProduct {
@@ -35,16 +33,17 @@ interface IMenu {
     name: string;
     userEmail: string;
     description: string;
-    active: boolean;
+    active?: boolean;
     categories?: ICategories[];
     error?: string;
-    horarios?: IHorario[];
     address?: string;
     mapUrl?: string;
     phone?: string;
     logoUrl?: string;
     bannerUrl?: string;
     social?: ISocial;
+    openingHours?: [IHorario];
+    expDate?: Date;
 }
 
 export type { IMenu, ICategories, IProduct };
