@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import { payment } from "../../../config/mpconfig";
+import { payment, preference } from "../../../config/mpconfig";
 
 export const POST: APIRoute = async ({ request, url }) => {
     const isWebhook = url.searchParams.get("source_news") === "webhooks";
@@ -15,7 +15,14 @@ export const POST: APIRoute = async ({ request, url }) => {
     });
 
     if (res.type === "payment") {
-        const paymentResult = await payment.get(res.data.id);
+        const paymentResult = await payment.get({
+            id: res.data.id,
+            requestOptions: {
+                corporationId: "SnapMenu",
+                plataformId: "www.snapmenu.online",
+            }
+
+        });
         console.log("Payment Result", paymentResult);
         console.log("Payment Status", paymentResult.status);
         console.log("Payment Status Detail", paymentResult.status_detail);
