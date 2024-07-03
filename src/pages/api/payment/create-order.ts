@@ -11,6 +11,7 @@ export const POST: APIRoute = async ({ request, redirect }) => {
                     currency_id: "ARS", // Argentinian Peso
                     quantity: 1,
                     id: "1234",
+                    description: "Dispositivo móvil de Tienda e-commerce",
                 }
             ],
             expires: true,
@@ -22,10 +23,12 @@ export const POST: APIRoute = async ({ request, redirect }) => {
                 pending: "http://localhost:3000/payment/webhook",
             },
             // URLS Servidor
-            notification_url: "https://snapmenu.onrender.com/api/payment/webhook?source_news=webhooks",
+            notification_url: "https://snapmenu.onrender.com/api/payment/webhook?source_news=webhooks&user_id=1234567",
             payer: {
                 email: "example@example.com",
-            }
+            },
+            additional_info: "Información adicional",
+            statement_descriptor: "SNAPMENU"
 
         },
         requestOptions: {
