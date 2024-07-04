@@ -23,10 +23,10 @@ export const POST: APIRoute = async ({ request, url }) => {
             }
 
         });
-        console.log("Payment Result", paymentResult);
+        console.log("Payment Result", paymentResult.additional_info?.items);
         console.log("Payment Status", paymentResult.status);
         console.log("Payment Status Detail", paymentResult.status_detail);
-        console.log("payer", paymentResult.payer);
+        console.log("payer", paymentResult.additional_info?.items);
     }
     return new Response("webhook", { status: 200, headers: { 'content-type': 'application/json' } });
 }

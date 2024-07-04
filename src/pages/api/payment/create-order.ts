@@ -12,6 +12,7 @@ export const POST: APIRoute = async ({ request, redirect }) => {
                     quantity: 1,
                     id: "1234",
                     description: "Dispositivo móvil de Tienda e-commerce",
+                    category_id: "premium"
                 }
             ],
             expires: true,
@@ -28,7 +29,10 @@ export const POST: APIRoute = async ({ request, redirect }) => {
                 email: "example@example.com",
             },
             additional_info: "Información adicional",
-            statement_descriptor: "SNAPMENU"
+            statement_descriptor: "SNAPMENU",
+            metadata: {
+
+            }
 
         },
         requestOptions: {
