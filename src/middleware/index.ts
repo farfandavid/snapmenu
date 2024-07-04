@@ -8,25 +8,7 @@ import { getUserByEmail, registerUser, updateUser } from "../controller/userCont
 export const onRequest = defineMiddleware(async (context, next) => {
     console.log("onRequest middleware");
     console.log(context.url.pathname);
-    if (context.url.pathname === "/api/payment/webhook") {
-        console.log("Webhook route: ", context.url.pathname);
-        console.log("Host: ", context.url.hostname);
-        console.log("Method: ", context.request.method);
-        console.log("Referer: ", context.request.headers.get("Referer"));
-        console.log("Referrer: ", context.request.referrer);
-        console.log("Origin: ", context.url.origin);
-        console.log(context.request.headers.forEach((value, key) => {
-            console.log(key + ":" + value);
-        }));
-        /* if (context.request.method !== "POST") {
-            return new Response("Method not allowed", { status: 405 });
-        }
-        if (context.request.headers.get("Content-Type") !== "application/json") {
-            return new Response("Invalid content type", { status: 400 });
-        }
-        if (context.url.hostname !== "snapmenu.onrender.com") {
-            return new Response("Invalid hostname", { status: 400 });
-        } */
+    if (context.url.pathname === "/api/payment/webhook" && context.request.headers.get("Referer") === "https://mercadopago.com.ar") {
         return next();
     }
     if (PRIVATE_ROUTES.includes(context.url.pathname) || context.url.pathname.startsWith(PRIVATE_ROUTES[1])) {
