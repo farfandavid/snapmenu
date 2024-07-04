@@ -3,6 +3,7 @@ import { payment, preference } from "../../../config/mpconfig";
 
 export const POST: APIRoute = async ({ request, url }) => {
     const isWebhook = url.searchParams.get("source_news") === "webhooks";
+    console.log(url.host, url.hostname, url.protocol)
     if (!isWebhook) {
         console.log("Not a webhook");
         return new Response("webhook", { status: 200, headers: { 'content-type': 'application/json' } });
