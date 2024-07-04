@@ -8,6 +8,22 @@ import { getUserByEmail, registerUser, updateUser } from "../controller/userCont
 export const onRequest = defineMiddleware(async (context, next) => {
     console.log("onRequest middleware");
     console.log(context.url.pathname);
+    if (context.url.pathname === "/api/payment/webhook") {
+        console.log("Webhook route: ", context.url.pathname);
+        console.log(context.request.headers.forEach((value, key) => {
+            console.log(key + ":" + value);
+        }));
+        /* if (context.request.method !== "POST") {
+            return new Response("Method not allowed", { status: 405 });
+        }
+        if (context.request.headers.get("Content-Type") !== "application/json") {
+            return new Response("Invalid content type", { status: 400 });
+        }
+        if (context.url.hostname !== "snapmenu.onrender.com") {
+            return new Response("Invalid hostname", { status: 400 });
+        } */
+        return next();
+    }
     if (PRIVATE_ROUTES.includes(context.url.pathname) || context.url.pathname.startsWith(PRIVATE_ROUTES[1])) {
         console.log("Private route: ", context.url.pathname);
         const user = await verifyAuth(context.cookies);

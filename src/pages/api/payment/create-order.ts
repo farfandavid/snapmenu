@@ -31,7 +31,8 @@ export const POST: APIRoute = async ({ request, redirect }) => {
             additional_info: "Información adicional",
             statement_descriptor: "SNAPMENU",
             metadata: {
-
+                user_id: "1234567",
+                menu_id: "1234567",
             }
 
         },
