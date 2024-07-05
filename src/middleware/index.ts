@@ -10,6 +10,7 @@ export const onRequest = defineMiddleware(async (context, next,) => {
     if (context.url.pathname === "/api/payment/webhook" && context.request.method === "POST" && context.request.headers.get("Referer") === "https://mercadopago.com.ar") {
         const dataID = context.url.searchParams.get("data.id");
         if (verifyMPWebhook(context.request.headers, dataID || "")) {
+            console.log("Webhook verified");
             return next();
         } else {
             console.log("Webhook not verified");
