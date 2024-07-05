@@ -28,6 +28,7 @@ export const onRequest = defineMiddleware(async (context, next,) => {
             }
         });
         const manifest = `id:${dataID};request-id:${xRequestId};ts:${ts};`;
+        console.log("Manifest: ", manifest);
         const hmac = cryp.createHmac('sha256', import.meta.env.MP_TEST_WEBHOOK);
         hmac.update(manifest);
         const sha = hmac.digest('hex');
