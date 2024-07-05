@@ -5,11 +5,18 @@ import { verifyAuth } from "../utils/verifyAuth";
 import { getUserByEmail, registerUser, updateUser } from "../controller/userController";
 
 
-export const onRequest = defineMiddleware(async (context, next) => {
-    console.log("onRequest middleware");
+export const onRequest = defineMiddleware(async (context, next,) => {
     console.log(context.url.pathname);
-    if (context.url.pathname === "/api/payment/webhook" && context.request.headers.get("Referer") === "https://mercadopago.com.ar") {
-        return next();
+    if (context.url.pathname === "/api/payment/webhook" && context.request.method === "POST") {
+        if (context.request.headers.get("Referer") === "https://mercadopago.com.ar") {
+            console.log("Headers:");
+            context.request.headers.forEach((value, key) => {
+                console.log(key + ":" + value);
+            });
+            return next();
+        } else {
+            return new Response("not found", { status: 404 });
+        }
     }
     if (PRIVATE_ROUTES.includes(context.url.pathname) || context.url.pathname.startsWith(PRIVATE_ROUTES[1])) {
         console.log("Private route: ", context.url.pathname);
