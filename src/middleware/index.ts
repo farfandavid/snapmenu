@@ -3,41 +3,17 @@ import { defineMiddleware } from "astro/middleware";
 import { PRIVATE_ROUTES, PUBLIC_ROUTES } from "../utils/constant";
 import { verifyAuth } from "../utils/verifyAuth";
 import { getUserByEmail, registerUser, updateUser } from "../controller/userController";
-import cryp from "crypto";
-
+import { verifyMPWebhook } from "../utils/mercadopagoValidator.ts"
 
 export const onRequest = defineMiddleware(async (context, next,) => {
     console.log(context.url.pathname);
     if (context.url.pathname === "/api/payment/webhook" && context.request.method === "POST" && context.request.headers.get("Referer") === "https://mercadopago.com.ar") {
-        const parts = context.request.headers.get("x-signature")?.split(",");
-        const xRequestId = context.request.headers.get("x-request-id") || "";
         const dataID = context.url.searchParams.get("data.id");
-        let ts = "";
-        let hash = "";
-        parts?.forEach(part => {
-            // Split each part into key and value
-            const [key, value] = part.split('=');
-            if (key && value) {
-                const trimmedKey = key.trim();
-                const trimmedValue = value.trim();
-                if (trimmedKey === 'ts') {
-                    ts = trimmedValue;
-                } else if (trimmedKey === 'v1') {
-                    hash = trimmedValue;
-                }
-            }
-        });
-        const manifest = `id:${dataID};request-id:${xRequestId};ts:${ts};`;
-        console.log("Manifest: ", manifest);
-        const hmac = cryp.createHmac('sha256', import.meta.env.MP_TEST_WEBHOOK);
-        hmac.update(manifest);
-        const sha = hmac.digest('hex');
-        if (sha === hash) {
-            // HMAC verification passed
-            console.log("HMAC verification passed");
+        if (verifyMPWebhook(context.request.headers, dataID || "")) {
+            return next();
         } else {
-            // HMAC verification failed
-            console.log("HMAC verification failed");
+            console.log("Webhook not verified");
+            return new Response("Unauthorized", { status: 401 });
         }
     }
     if (PRIVATE_ROUTES.includes(context.url.pathname) || context.url.pathname.startsWith(PRIVATE_ROUTES[1])) {
