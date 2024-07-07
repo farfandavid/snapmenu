@@ -1,9 +1,9 @@
 ---
 import DashboardLayout from "../../layouts/DashboardLayout.astro";
 import { getMenusByUserEmail } from "../../controller/menuController";
-import type { IMenu } from "../../types/Menu";
-import CreateMenu from "../../components/CreateMenu.astro";
-import type { IUser } from "../../types/User";
+import type { IMenu } from "../../server/interface/Menu";
+import CreateMenu from "../../components/dashboard/CreateMenu.astro";
+import type { IUser } from "../../server/interface/User";
 
 const user = Astro.locals.user as IUser;
 const menu = (await getMenusByUserEmail(
@@ -13,66 +13,7 @@ const menu = (await getMenusByUserEmail(
 
 <DashboardLayout>
     <main class="flex flex-col items-center">
-        {
-            user.menuLimit === 0 && (
-                <div class="flex flex-col items-center w-full">
-                    <div class="flex roundedflex flex-col justify-between bg-white rounded-lg shadow-lg p-6 fade-in-right w-2/3 mt-2">
-                        <h1 class="font-bold text-lg">
-                            Para empezar a crear adquiera un Plan!
-                        </h1>
-                        <div class="mt-4">
-                            <ul class="mt-2">
-                                <li class="flex items-center mb-2">
-                                    <i class="bi bi-credit-card mr-2" />
-                                    <span>Card</span>
-                                </li>
-                                <li class="flex items-center mb-2">
-                                    <i class="bi bi-bank2 mr-2" />
-                                    <span>Bank Transfer</span>
-                                </li>
-                                <li class="flex items-center mb-2">
-                                    <i class="bi bi-wallet2 mr-2" />
-                                    <span>PayPal</span>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            )
-        }
-        {user.menuList.length < user.menuLimit && <CreateMenu user={user} />}
-        {
-            user.menuList.length > 0 && (
-                <div class="flex flex-col items-center w-full">
-                    <div class="flex roundedflex flex-col justify-between bg-white rounded-lg shadow-lg p-6 fade-in-right w-2/3 mt-2">
-                        <h1 class="font-bold text-lg">Your Menus</h1>
-                        <p class="mb-1">
-                            Current menus: {user.menuList.length}/
-                            {user.menuLimit}
-                        </p>
-                        {user.menuList.length === 0 ? (
-                            <p class="text-gray-500">
-                                You don't have any menus yet. Create one now!
-                            </p>
-                        ) : (
-                            menu.map((menu) => (
-                                <a
-                                    href={`/${menu.name}`}
-                                    class="flex flex-col w-full p-4 bg-gray-100 rounded-lg shadow-sm hover:shadow-xl transition duration-300 ease-in-out relative hover:text-orange-500 mb-2"
-                                >
-                                    <span class="absolute right-1 top-1">
-                                        <i class="bi bi-box-arrow-up-right" />
-                                    </span>
-                                    <p class="font-semibold text-xl">
-                                        {menu.name}
-                                    </p>
-                                    <p>{menu.description}</p>
-                                </a>
-                            ))
-                        )}
-                    </div>
-                </div>
-            )
-        }
+        <h1 class="font-bold text-2xl">Bienvenido a SnapMenu</h1>
+        <p class="text-xl">Empecemos por crear un Menú</p>
     </main>
 </DashboardLayout>

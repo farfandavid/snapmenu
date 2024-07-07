@@ -1,7 +1,7 @@
 ---
 import { getMenuByName } from "../controller/menuController";
 import MenuLayout from "../layouts/MenuLayout.astro";
-import type { IMenu } from "../types/Menu";
+import type { IMenu } from "../server/interface/Menu";
 
 const { menu } = Astro.params;
 const menuData: IMenu = await getMenuByName(menu as string);

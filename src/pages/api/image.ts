@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import { putObject } from "../../db/s3";
+import { putObject } from "../../server/config/s3";
 import { getMenuByIdAndUserEmail, updateMenuLogo } from "../../controller/menuController";
 import { CDN_URL } from "../../utils/constant";
 

@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { preference } from '../../../config/mpconfig';
+import { preference } from '../../../server/config/mp';
 
 export const POST: APIRoute = async ({ request, redirect }) => {
     const result = await preference.create({

@@ -6,7 +6,8 @@ import { getUserByEmail, registerUser, updateUser } from "../controller/userCont
 import { verifyMPWebhook } from "../utils/mercadopagoValidator.ts"
 
 export const onRequest = defineMiddleware(async (context, next,) => {
-    console.log(context.url.pathname);
+    /* console.log(context.url.pathname);
+    // Verify MercadoPago Webhook
     if (context.url.pathname === "/api/payment/webhook" && context.request.method === "POST" && context.request.headers.get("Referer") === "https://mercadopago.com.ar") {
         const dataID = context.url.searchParams.get("data.id");
         if (verifyMPWebhook(context.request.headers, dataID || "")) {
@@ -17,6 +18,7 @@ export const onRequest = defineMiddleware(async (context, next,) => {
             return new Response("Unauthorized", { status: 401 });
         }
     }
+    // Verify private routes
     if (PRIVATE_ROUTES.includes(context.url.pathname) || context.url.pathname.startsWith(PRIVATE_ROUTES[1])) {
         console.log("Private route: ", context.url.pathname);
         const user = await verifyAuth(context.cookies);
@@ -54,6 +56,6 @@ export const onRequest = defineMiddleware(async (context, next,) => {
             return new Response("User found", { status: 200 });
         }
     }
-    return next();
+    return next(); */
 });
 

@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
 import { getAuth } from "firebase-admin/auth";
-import { app } from "../../../firebase/server";
+import { app } from "../../../server/config/firebaseServer";
 import { registerUser } from "../../../controller/userController";
 import { PUBLIC_ROUTES } from "../../../utils/constant";
 import { verifyRecaptcha } from "../../../utils/recaptcha";

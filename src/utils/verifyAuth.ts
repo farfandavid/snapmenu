@@ -1,6 +1,6 @@
 
 import type { AstroCookies } from "astro";
-import { app } from "../firebase/server";
+import { app } from "../server/config/firebaseServer";
 import { getAuth } from "firebase-admin/auth";
 
 

@@ -1,8 +1,6 @@
 /// <reference path="../.astro/types.d.ts" />
 /// <reference types="astro/client" />
 
-import type { IUser } from "./types/User";
-
 interface ImportMetaEnv {
     readonly FIREBASE_PRIVATE_KEY_ID: string;
     readonly FIREBASE_PRIVATE_KEY: string;

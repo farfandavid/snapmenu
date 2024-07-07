@@ -19,4 +19,7 @@ export default defineConfig({
     host: true
   },
   site: "https://www.snapmenu.online",
+  vite: {
+    mode: "production"
+  }
 });

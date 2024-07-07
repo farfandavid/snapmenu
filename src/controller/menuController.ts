@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import Menu from '../models/menuModel'; // Importa tus modelos de Mongoose aquí
-import type { IMenu } from '../types/Menu';
-import db from '../db/db';
+import type { IMenu } from '../server/interface/Menu';
+import db from '../server/config/db';
 
 // Funciones CRUD para la colección de menú
 export const createMenu = async (menuData: IMenu) => {
@@ -217,21 +217,6 @@ export const getAllProductsByCategoryId = async (menuId: string, categoryId: str
         throw new Error('Error al obtener los productos');
     }
 }
-
-/* export const getProduct = async (menuId: string, categoryId: string) => {
-    try {
-        const menu = await Menu.findById(menuId);
-        if (!menu) {
-            throw new Error('El menú no existe');
-        }
-        const category = menu.categories.id(categoryId);
-        if (!category) {
-            throw new Error('La categoría no existe');
-        }
-    } catch (error) {
-        throw new Error('Error al obtener los productos');
-    }
-}; */
 
 export const updateProductById = async (menuId: string, categoryId: string, productId: string, productData: any) => {
     try {

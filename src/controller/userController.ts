@@ -1,7 +1,7 @@
-import mongoose from 'mongoose';
+/* import mongoose from 'mongoose';
 import User from '../models/userModel';
-import type { IUser } from '../types/User';
-import db from '../db/db';
+import type { IUser } from '../server/interface/User';
+import db from '../server/config/db';
 
 export const getAllUsers = async () => {
   try {
@@ -19,7 +19,7 @@ export const getUserById = async (uid: string) => {
     return user;
   }
   catch (err: any) {
-    throw new Error(err.message);
+    return null;
   }
 }
 
@@ -35,7 +35,7 @@ export const getUserByEmail = async (email: string) => {
   }
 }
 
-export const registerUser = async (user: IUser) => {
+export const registerUser = async (user: IUser): Promise<boolean> => {
   try {
     db.connectDB();
     const newUser = new User(
@@ -54,11 +54,7 @@ export const registerUser = async (user: IUser) => {
     return true;
   } catch (err: any) {
     console.log("registerUser", { error: err })
-    return {
-      error: {
-        code: err.code,
-      }
-    };
+    return false;
   }
 }
 
@@ -74,7 +70,7 @@ export const addMenuToUser = async (email: string, menuId: string) => {
     return user;
   }
   catch (err: any) {
-    throw new Error(err.message);
+    return null;
   }
 }
 
@@ -85,6 +81,6 @@ export const updateUser = async (email: string, user: IUser) => {
     console.log("User updated", updatedUser);
     return updatedUser;
   } catch (err: any) {
-    throw new Error(err.message);
+    return null;
   }
-}
+} */

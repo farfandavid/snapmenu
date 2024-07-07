@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
-import { payment } from "../../../config/mpconfig";
-import type { IPayment } from "../../../types/Payment";
+import { payment } from "../../../server/config/mp";
+import type { IPayment } from "../../../server/interface/Payment";
 
 export const POST: APIRoute = async ({ request, url }) => {
     const isWebhook = url.searchParams.get("source_news") === "webhooks";
