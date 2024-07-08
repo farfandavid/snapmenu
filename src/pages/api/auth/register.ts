@@ -1,10 +1,10 @@
 import type { APIRoute } from "astro";
 import { getAuth } from "firebase-admin/auth";
 import { app } from "../../../server/config/firebaseServer";
-import { registerUser } from "../../../controller/userController";
 import { PUBLIC_ROUTES } from "../../../utils/constant";
 import { verifyRecaptcha } from "../../../utils/recaptcha";
 import { Resend } from "resend";
+import { User } from "../../../server/class/User";
 
 export const POST: APIRoute = async ({ request, redirect }) => {
     const auth = getAuth(app);
@@ -34,13 +34,13 @@ export const POST: APIRoute = async ({ request, redirect }) => {
 
     /* Crear un usuario */
     try {
-        await auth.createUser({
+        const user = await auth.createUser({
             email,
             password,
             displayName: name,
             disabled: false,
             emailVerified: false,
-        }).then((user) => {
+        })/* .then((user) => {
             registerUser({
                 displayName: user.displayName, email: user.email, uid: user.uid,
                 menuList: [],
@@ -48,10 +48,21 @@ export const POST: APIRoute = async ({ request, redirect }) => {
                 emailVerified: user.emailVerified,
                 disabled: user.disabled
             })
-        })
-        const link = await auth.generateEmailVerificationLink(email).then((link) => {
+        }) */
+        const registerUser = await new User({
+            displayName: user.displayName,
+            email: user.email || "",
+            uid: user.uid,
+            menuList: [],
+            menuLimit: 0,
+            emailVerified: user.emailVerified,
+            disabled: user.disabled
+        }).save();
+
+        const link = await auth.generateEmailVerificationLink(registerUser.email).then((link) => {
             return link
         });
+
         const resend = new Resend(import.meta.env.RESEND_API_KEY);
         const { error } = await resend.emails.send({
             from: "SnapMenu <verify@snapmenu.online>",

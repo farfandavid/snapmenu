@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+/* import mongoose from "mongoose";
 
 const productSchema = new mongoose.Schema(
   {
@@ -123,3 +123,4 @@ menuSchema.pre("save", function (next) {
 });
 
 export default mongoose.model("Menu", menuSchema)
+ */

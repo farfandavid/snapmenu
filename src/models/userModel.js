@@ -1,5 +1,4 @@
-import mongoose from 'mongoose';
-//import bcrypt from 'bcryptjs';
+/* import mongoose from 'mongoose';
 
 const subscriptionSchema = new mongoose.Schema({
   plan: {
@@ -72,7 +71,7 @@ const userSchema = new mongoose.Schema(
   {
     timestamps: true
   });
-
+ */
 /* userSchema.pre('save', async function (next) {
   if (this.isModified('password')) {
     this.password = await bcrypt.hash(this.password, 10);

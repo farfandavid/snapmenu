@@ -19,8 +19,6 @@ if (Astro.cookies.has("session")) {
         return Astro.redirect("/dashboard");
     }
 }
-console.log(import.meta.env.DEV);
-console.log(import.meta.env.PROD);
 ---
 
 <Layout title="Login">

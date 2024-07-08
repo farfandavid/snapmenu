@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+/* import mongoose from 'mongoose';
 import Menu from '../models/menuModel'; // Importa tus modelos de Mongoose aquí
 import type { IMenu } from '../server/interface/Menu';
 import db from '../server/config/db';
@@ -258,4 +258,4 @@ export const deleteProduct = async (menuId: string, categoryId: string, productI
     } catch (error) {
         throw new Error('Error al eliminar el producto');
     }
-};
+}; */

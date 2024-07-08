@@ -1,4 +1,4 @@
-import type { APIRoute } from "astro";
+/* import type { APIRoute } from "astro";
 import { putObject } from "../../server/config/s3";
 import { getMenuByIdAndUserEmail, updateMenuLogo } from "../../controller/menuController";
 import { CDN_URL } from "../../utils/constant";
@@ -47,4 +47,4 @@ export const POST: APIRoute = async ({ request, locals }) => {
 export const GET: APIRoute = async ({ request, locals }) => {
     console.log(locals.user)
     return new Response(JSON.stringify({ error: "Method not allowed" }), { status: 405 });
-}
+} */

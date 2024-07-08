@@ -1,19 +1,23 @@
 ---
 import DashboardLayout from "../../layouts/DashboardLayout.astro";
-import { getMenusByUserEmail } from "../../controller/menuController";
-import type { IMenu } from "../../server/interface/Menu";
-import CreateMenu from "../../components/dashboard/CreateMenu.astro";
+import { Menu } from "../../server/class/Menu";
 import type { IUser } from "../../server/interface/User";
 
 const user = Astro.locals.user as IUser;
-const menu = (await getMenusByUserEmail(
-    Astro.locals.user.email || "",
-)) as IMenu[];
+const menu = await Menu.getMenusByUserEmail(user.email);
 ---
 
 <DashboardLayout>
     <main class="flex flex-col items-center">
         <h1 class="font-bold text-2xl">Bienvenido a SnapMenu</h1>
         <p class="text-xl">Empecemos por crear un Menú</p>
+        {
+            menu.map((m) => (
+                <div class="flex flex-col items-center">
+                    <h2 class="font-bold text-xl">{m.name}</h2>
+                    <p class="text-lg">{m.description}</p>
+                </div>
+            ))
+        }
     </main>
 </DashboardLayout>

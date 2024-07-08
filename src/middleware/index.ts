@@ -1,61 +1,65 @@
 
 import { defineMiddleware } from "astro/middleware";
-import { PRIVATE_ROUTES, PUBLIC_ROUTES } from "../utils/constant";
+import { PRIVATE_ROUTES } from "../server/utils/constants";
 import { verifyAuth } from "../utils/verifyAuth";
-import { getUserByEmail, registerUser, updateUser } from "../controller/userController";
-import { verifyMPWebhook } from "../utils/mercadopagoValidator.ts"
+import { User } from "../server/class/User";
 
 export const onRequest = defineMiddleware(async (context, next,) => {
-    /* console.log(context.url.pathname);
-    // Verify MercadoPago Webhook
-    if (context.url.pathname === "/api/payment/webhook" && context.request.method === "POST" && context.request.headers.get("Referer") === "https://mercadopago.com.ar") {
-        const dataID = context.url.searchParams.get("data.id");
-        if (verifyMPWebhook(context.request.headers, dataID || "")) {
-            console.log("Webhook verified");
-            return next();
-        } else {
-            console.log("Webhook not verified");
-            return new Response("Unauthorized", { status: 401 });
-        }
+    if (import.meta.env.SSR) {
+        console.log(context.clientAddress + ";" + context.url.pathname);
     }
-    // Verify private routes
-    if (PRIVATE_ROUTES.includes(context.url.pathname) || context.url.pathname.startsWith(PRIVATE_ROUTES[1])) {
-        console.log("Private route: ", context.url.pathname);
+    const isPrivateRoute = PRIVATE_ROUTES.some(route => context.url.pathname.startsWith(route));
+    if (isPrivateRoute) {
+
         const user = await verifyAuth(context.cookies);
         if (!user) {
             return new Response("Unauthorized", { status: 401 });
         }
         if (user.emailVerified === false) {
-            return context.redirect(PUBLIC_ROUTES.VERIFY_EMAIL);
+            return context.redirect("/verify-email");
         }
-        const userDB = await getUserByEmail(user.email as string);
-        if (!userDB) {
-            await registerUser({
-                displayName: user.displayName,
-                uid: user.uid,
-                email: user.email,
-                emailVerified: user.emailVerified,
-                menuList: [],
-                menuLimit: 0,
-                disabled: user.disabled,
-            });
-        } else if (userDB && userDB.uid !== user.uid && userDB.emailVerified !== user.emailVerified) {
-            await updateUser(user.email || "", {
-                displayName: user.displayName,
-                uid: user.uid,
-                email: user.email,
-                emailVerified: user.emailVerified,
-                menuList: [],
-                menuLimit: 0,
-                disabled: user.disabled,
-            });
-        }
-        context.locals = { user: userDB };
-        if (!context.locals.user) {
-            console.log("User found", context.locals.user);
-            return new Response("User found", { status: 200 });
+        try {
+            const userDB = await User.getUserByEmail(user.email as string);
+            if (!userDB) {
+                console.log("Registering new user")
+                const newUser = new User({
+                    displayName: user.displayName,
+                    uid: user.uid,
+                    email: user.email || "",
+                    emailVerified: user.emailVerified,
+                    menuList: [],
+                    menuLimit: 0,
+                });
+                await newUser.save();
+                context.locals = { user: newUser };
+                return next();
+            }
+            if (userDB?.uid !== user.uid || userDB?.emailVerified !== user.emailVerified) {
+                console.log("Updating user")
+                const newUser = new User({
+                    _id: userDB._id,
+                    displayName: user.displayName,
+                    uid: user.uid,
+                    email: user.email || "",
+                    emailVerified: user.emailVerified,
+                    menuList: userDB?.menuList || [],
+                    menuLimit: userDB?.menuLimit || 0,
+                    disabled: user.disabled,
+                });
+                const updated = await newUser.update();
+                if (!(updated instanceof User)) {
+                    return new Response("Internal Server Error", { status: 500 });
+                }
+                context.locals = { user: updated };
+                return next();
+            }
+            context.locals = { user: userDB };
+            return next();
+        } catch (err) {
+            console.error(err);
+            return new Response("Internal Server Error", { status: 500 });
         }
     }
-    return next(); */
+    return next();
 });
 
