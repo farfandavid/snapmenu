@@ -1,0 +1,44 @@
+---
+import type { Menu } from "../../server/class/Menu";
+
+interface Props {
+    menu: Menu[];
+    user: {
+        menuLimit: number;
+    };
+}
+
+const { menu, user } = Astro.props;
+---
+
+<div class="px-2 w-full space-y-2 relative">
+    <div class="flex justify-between">
+        <h2 class="font-bold">Mis Menus</h2>
+        <span class="font-semibold text-slate-600"
+            >{menu.length + " / " + user.menuLimit}</span
+        >
+    </div>
+
+    {
+        menu.map((m) => (
+            <div class="flex flex-row gap-2 w-full bg-slate-100 rounded-md border border-slate-300 shadow-md p-4 relative">
+                <img
+                    src="https://placehold.co/400x400"
+                    alt=""
+                    class="h-20 w-auto"
+                />
+                <div>
+                    <h2 class="font-bold text-xl">{m.name}</h2>
+                    <p class="text-lg">{m.description}</p>
+                </div>
+                <a
+                    class="font-bold drop-shadow-sm absolute right-4 transform top-1/2 -translate-y-1/2 text-orange-500 text-2xl"
+                    href={import.meta.env.SITE + "/" + m.name}
+                    target="_blank"
+                >
+                    <i class="bi bi-box-arrow-up-right" />
+                </a>
+            </div>
+        ))
+    }
+</div>

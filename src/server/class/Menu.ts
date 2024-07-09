@@ -235,7 +235,8 @@ export class Menu implements IMenu {
             const menus = await MenuModel.find({
                 userEmail: userEmail
             });
-            return menus;
+            if (!menus) return null;
+            return new Array<Menu>(...menus.map(menu => new Menu(menu)));
         } catch (err) {
             console.log(err);
             throw new Error(ERROR_MESSAGES[500]);

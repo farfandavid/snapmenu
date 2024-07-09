@@ -1,4 +1,4 @@
-import type { APIRoute } from "astro";
+/* import type { APIRoute } from "astro";
 import { updateMenuInfo } from "../../../controller/menuController";
 import { z } from "astro/zod";
 
@@ -44,4 +44,4 @@ export const PUT: APIRoute = async ({ request, locals }) => {
     }
     console.log(menuUpdated);
     return new Response(JSON.stringify({ success: true }), { status: 200, headers: { "Content-Type": "application/json" } });
-}
+} */

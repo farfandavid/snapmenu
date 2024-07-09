@@ -1,4 +1,4 @@
-import type { APIRoute } from "astro";
+/* import type { APIRoute } from "astro";
 import { createMenu } from "../../../controller/menuController";
 import { getUserByEmail } from "../../../controller/userController";
 
@@ -41,4 +41,4 @@ export const POST: APIRoute = async ({ request, locals }) => {
 export const GET: APIRoute = async ({ locals }) => {
     console.log(locals);
     return new Response(JSON.stringify("health check"), { status: 200, headers: { 'content-type': 'application/json' } });
-}
+} */

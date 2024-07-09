@@ -1,47 +1,28 @@
 ---
+import PayementForm from "../../components/dashboard/PayementForm.astro";
+import UserMenus from "../../components/dashboard/UserMenus.astro";
 import DashboardLayout from "../../layouts/DashboardLayout.astro";
 import { Menu } from "../../server/class/Menu";
 import type { IUser } from "../../server/interface/User";
 
 const user = Astro.locals.user as IUser;
-const menu = await Menu.getMenusByUserEmail(user.email);
+const menus = await Menu.getMenusByUserEmail(user.email);
+if (menus === null) {
+    return Astro.redirect("404");
+}
 ---
 
 <DashboardLayout>
-    <main class="flex flex-col items-center">
+    <div class="flex flex-col items-center space-y-2">
         <h1 class="font-bold text-2xl">Bienvenido a SnapMenu</h1>
         <p class="text-xl">Empecemos!</p>
-
-        <div class="px-2 w-full space-y-2 relative">
-            <div class="flex justify-between">
-                <h2 class="font-bold">Mis Menus</h2>
-                <span class="font-semibold text-slate-600"
-                    >{menu.length + " / " + user.menuLimit}</span
-                >
-            </div>
-
-            {
-                menu.map((m) => (
-                    <div class="flex flex-row gap-2 w-full bg-slate-100 rounded-md border border-slate-300 shadow-md p-4 relative">
-                        <img
-                            src="https://placehold.co/400x400"
-                            alt=""
-                            class="h-20 w-auto"
-                        />
-                        <div>
-                            <h2 class="font-bold text-xl">{m.name}</h2>
-                            <p class="text-lg">{m.description}</p>
-                        </div>
-                        <a
-                            class="font-bold drop-shadow-sm absolute right-4 transform top-1/2 -translate-y-1/2 text-orange-500 text-2xl"
-                            href={import.meta.env.SITE + "/" + m.name}
-                            target="_blank"
-                        >
-                            <i class="bi bi-box-arrow-up-right" />
-                        </a>
-                    </div>
-                ))
+        {
+            () => {
+                if (user.menuLimit === 0) {
+                    return <PayementForm />;
+                }
             }
-        </div>
-    </main>
+        }
+        {menus.length > 0 ? <UserMenus menu={menus} user={user} /> : ""}
+    </div>
 </DashboardLayout>

@@ -1,5 +1,4 @@
-import type { APIRoute } from "astro";
-import { getMenuByIdAndUserEmail, getMenusByUserEmail, updateCategories } from "../../../controller/menuController";
+/* import type { APIRoute } from "astro";
 
 // UPDATE: Actualiza las categorías de un menú
 export const PUT: APIRoute = async ({ request, locals }) => {
@@ -46,4 +45,4 @@ export const GET: APIRoute = async ({ locals }) => {
 
     const menuRes = menu.map(({ _id, name, description, logoUrl, bannerUrl, address, phone, categories, mapUrl, social, openingHours }: { _id: any, name: string, categories: [], description: string, logoUrl: string, bannerUrl: string, address: string, phone: number, mapUrl: string, social: [], openingHours: [] }) => ({ _id, name, description, logoUrl, bannerUrl, address, phone, categories, mapUrl, social, openingHours }));
     return new Response(JSON.stringify(menuRes), { status: 200, headers: { "Content-Type": "application/json" } });
-}
+} */
