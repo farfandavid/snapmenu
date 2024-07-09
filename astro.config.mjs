@@ -18,7 +18,7 @@ export default defineConfig({
     port: 3000,
     host: true
   },
-  site: "https://www.snapmenu.online",
+  site: "http://localhost:3000",
   vite: {
     mode: "production"
   }

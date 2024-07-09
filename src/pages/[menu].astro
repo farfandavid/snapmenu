@@ -1,14 +1,19 @@
-<!-- ---
-import { getMenuByName } from "../controller/menuController";
+---
 import MenuLayout from "../layouts/MenuLayout.astro";
-import type { IMenu } from "../server/interface/Menu";
+import { Menu as MenuClass } from "../server/class/Menu";
+export const prerender = false;
 
 const { menu } = Astro.params;
-const menuData: IMenu = await getMenuByName(menu as string);
-if (!menuData) {
-    return new Response("Menu not found", { status: 404 });
+if (!menu) {
+    return Astro.redirect("/404");
 }
-//TODO: add openings hours to the menu data
+const menuData = await MenuClass.getMenuByName(menu).catch((err) => {
+    console.error(err);
+    return null;
+});
+if (!menuData) {
+    return Astro.redirect("/404");
+}
 ---
 
 <MenuLayout title={menuData.name}>
@@ -46,8 +51,8 @@ if (!menuData) {
                                 menuData.openingHours?.map((hours, index) => (
                                     <option
                                         value={index}
-                                        data-open={hours.open}
-                                        data-close={hours.close}
+                                        data-open={hours.openH}
+                                        data-close={hours.closeH}
                                     />
                                 ))
                             }
@@ -435,4 +440,3 @@ if (!menuData) {
         padding: 0 0.5rem;
     }
 </style>
- -->
