@@ -7,9 +7,6 @@ import type { IUser } from "../../server/interface/User";
 
 const user = Astro.locals.user as IUser;
 const menus = await Menu.getMenusByUserEmail(user.email);
-if (menus === null) {
-    return Astro.redirect("404");
-}
 ---
 
 <DashboardLayout>
@@ -23,6 +20,12 @@ if (menus === null) {
                 }
             }
         }
-        {menus.length > 0 ? <UserMenus menu={menus} user={user} /> : ""}
+        {
+            () => {
+                if (menus !== null) {
+                    return <UserMenus menu={menus} user={user} />;
+                }
+            }
+        }
     </div>
 </DashboardLayout>
