@@ -1,17 +1,17 @@
 import { z } from "astro/zod";
 import { Types } from "mongoose";
 
-const SocialSchema = z.object({
+/* const SocialSchema = z.object({
     facebook: z.string().max(100).optional(),
     instagram: z.string().max(100).optional(),
     twitter: z.string().max(100).optional(),
 });
 
-type ISocial = z.infer<typeof SocialSchema>;
+type ISocial = z.infer<typeof SocialSchema>; */
 
 const openingHoursSchema = z.object({
-    openH: z.string().max(10),
-    closeH: z.string().max(10),
+    openH: z.string().max(10).optional(),
+    closeH: z.string().max(10).optional(),
 });
 
 type IHours = z.infer<typeof openingHoursSchema>;
@@ -50,7 +50,11 @@ const MenuSchema = z.object({
     phone: z.string().max(20).optional(),
     logoUrl: z.string().optional(),
     bannerUrl: z.string().optional(),
-    social: SocialSchema.optional(),
+    social: z.object({
+        facebook: z.string().max(100).optional(),
+        instagram: z.string().max(100).optional(),
+        twitter: z.string().max(100).optional(),
+    }).optional(),
     openingHours: z.array(openingHoursSchema).optional(),
     expDate: z.date().optional(),
 });
@@ -109,4 +113,4 @@ export class MenuError implements IMenuErrors {
 }
 
 export { MenuSchema, CategoriesSchema, ProductSchema };
-export type { IMenu, ICategories, IProduct, ISocial, IHours };
+export type { IMenu, ICategories, IProduct, IHours };
