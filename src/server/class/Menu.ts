@@ -22,8 +22,8 @@ export class Menu implements IMenu {
         twitter?: string;
     };
     openingHours?: {
-        openH: string;
-        closeH: string;
+        openH?: string;
+        closeH?: string;
     }[];
     expDate?: Date;
 
