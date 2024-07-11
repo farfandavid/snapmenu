@@ -31,7 +31,17 @@ export const onRequest = defineMiddleware(async (context, next,) => {
                     menuLimit: 0,
                 });
                 await newUser.save();
-                context.locals = { user: newUser };
+                context.locals = {
+                    user: {
+                        id: newUser._id?.toString(),
+                        displayName: newUser.displayName,
+                        uid: newUser.uid,
+                        email: newUser.email,
+                        emailVerified: newUser.emailVerified,
+                        menuLimit: newUser.menuLimit,
+                        disabled: newUser.disabled
+                    }
+                };
                 return next();
             }
             if (userDB?.uid !== user.uid || userDB?.emailVerified !== user.emailVerified) {
@@ -50,10 +60,32 @@ export const onRequest = defineMiddleware(async (context, next,) => {
                 if (!(updated instanceof User)) {
                     return new Response("Internal Server Error", { status: 500 });
                 }
-                context.locals = { user: updated };
+
+                context.locals = {
+                    user: {
+                        id: updated._id?.toString(),
+                        displayName: updated.displayName,
+                        uid: updated.uid,
+                        email: updated.email,
+                        emailVerified: updated.emailVerified,
+                        menuLimit: updated.menuLimit,
+                        disabled: updated.disabled
+                    }
+                };
                 return next();
             }
-            context.locals = { user: userDB };
+            context.locals = {
+                user: {
+                    id: userDB._id?.toString(),
+                    displayName: userDB.displayName,
+                    uid: userDB.uid,
+                    email: userDB.email,
+                    emailVerified: userDB.emailVerified,
+                    menuLimit: userDB.menuLimit,
+                    disabled: userDB.disabled
+                }
+            };
+            console.log(context.locals.user);
             return next();
         } catch (err) {
             console.error(err);

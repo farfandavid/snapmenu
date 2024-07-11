@@ -5,14 +5,13 @@ declare module 'firebase/auth';
 declare namespace App {
     interface Locals {
         user: {
-            id?: ObjectId;
-            displayName?: string;
-            uid?: string;
-            email?: string;
-            emailVerified?: boolean;
-            menuList: string[];
-            menuLimit: number;
-            disabled?: boolean;
+            id?: string | undefined;
+            displayName?: string | undefined;
+            uid?: string | undefined;
+            email?: string | undefined;
+            emailVerified?: boolean | undefined;
+            menuLimit: number | undefined;
+            disabled?: boolean | undefined;
         }
     }
 }
