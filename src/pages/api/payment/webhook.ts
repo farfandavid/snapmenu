@@ -2,6 +2,7 @@ import type { APIRoute } from "astro";
 import { payment } from "../../../server/config/mp";
 import type { IPayment } from "../../../server/interface/Payment";
 import { User } from "../../../server/class/User";
+import { Menu } from "../../../server/class/Menu";
 
 export const POST: APIRoute = async ({ request, url }) => {
     const isWebhook = url.searchParams.get("source_news") === "webhooks";
@@ -27,6 +28,14 @@ export const POST: APIRoute = async ({ request, url }) => {
                 if (user instanceof User) {
                     console.log("User Found", user);
                     user.modifyMenuLimit(1);
+                    const menu = new Menu({
+                        name: paymentResult.metadata.menu,
+                        active: true,
+                        description: paymentResult.metadata.description,
+                        userEmail: user.email,
+                    })
+
+                    await menu.save();
                 }
             }
         }
