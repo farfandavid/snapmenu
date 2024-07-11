@@ -24,10 +24,13 @@ export const POST: APIRoute = async ({ request, url }) => {
         if (paymentResult.status === "approved") {
             console.log("Payment Approved");
             if (paymentResult.metadata?.account_id) {
+                console.log(paymentResult.metadata)
                 const user = await User.getUserById(paymentResult.metadata.account_id);
                 if (user instanceof User) {
                     console.log("User Found", user);
-                    user.modifyMenuLimit(1);
+                    await user.modifyMenuLimit(1).catch((err) => {
+                        console.error(err);
+                    });
                     const menu = new Menu({
                         name: paymentResult.metadata.menu,
                         active: true,
@@ -35,7 +38,9 @@ export const POST: APIRoute = async ({ request, url }) => {
                         userEmail: user.email,
                     })
 
-                    await menu.save();
+                    await menu.save().catch((err) => {
+                        console.error(err);
+                    });
                 }
             }
         }
