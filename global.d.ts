@@ -10,7 +10,7 @@ declare namespace App {
             uid?: string | undefined;
             email?: string | undefined;
             emailVerified?: boolean | undefined;
-            menuList: []
+            menuList: string[]
             menuLimit: number | undefined;
             disabled?: boolean | undefined;
         }

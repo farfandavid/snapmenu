@@ -38,6 +38,7 @@ export const onRequest = defineMiddleware(async (context, next,) => {
                         uid: newUser.uid,
                         email: newUser.email,
                         emailVerified: newUser.emailVerified,
+                        menuList: newUser.menuList,
                         menuLimit: newUser.menuLimit,
                         disabled: newUser.disabled
                     }
@@ -68,6 +69,7 @@ export const onRequest = defineMiddleware(async (context, next,) => {
                         uid: updated.uid,
                         email: updated.email,
                         emailVerified: updated.emailVerified,
+                        menuList: updated.menuList,
                         menuLimit: updated.menuLimit,
                         disabled: updated.disabled
                     }
@@ -82,6 +84,7 @@ export const onRequest = defineMiddleware(async (context, next,) => {
                     email: userDB.email,
                     emailVerified: userDB.emailVerified,
                     menuLimit: userDB.menuLimit,
+                    menuList: userDB.menuList,
                     disabled: userDB.disabled
                 }
             };
