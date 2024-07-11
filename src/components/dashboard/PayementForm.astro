@@ -208,25 +208,25 @@
     });
     const priceValue = 5000;
     select.addEventListener("change", (e) => {
-        const value = parseInt(select.value);
+        const value = select.value;
         switch (value) {
-            case 0:
+            case "1 Mes":
                 offer.style.display = "none";
                 price.textContent = `$${priceValue}`;
                 break;
-            case 1:
+            case "3 Meses":
                 offer.style.display = "flex";
                 offPrice.textContent = `$${priceValue * 3}`;
                 discount.textContent = "5% OFF";
                 price.textContent = `$${priceValue * 3 - priceValue * 3 * 0.05}`;
                 break;
-            case 2:
+            case "6 Meses":
                 offer.style.display = "flex";
                 offPrice.textContent = `$${priceValue * 6}`;
                 discount.textContent = "10% OFF";
                 price.textContent = `$${priceValue * 6 - priceValue * 6 * 0.1}`;
                 break;
-            case 3:
+            case "12 Meses":
                 offer.style.display = "flex";
                 offPrice.textContent = `$${priceValue * 12}`;
                 discount.textContent = "20% OFF";
