@@ -11,6 +11,7 @@ export class Menu implements IMenu {
     description?: string;
     active: boolean;
     categories?: ICategories[];
+    productsLimit?: number;
     address?: string;
     mapUrl?: string;
     phone?: string;
@@ -38,6 +39,7 @@ export class Menu implements IMenu {
         this.description = data.description;
         this.active = data.active;
         this.categories = data.categories;
+        this.productsLimit = data.productsLimit;
         this.address = data.address;
         this.mapUrl = data.mapUrl;
         this.phone = data.phone;

@@ -182,4 +182,18 @@ export class User implements IUser {
             throw err instanceof UserError ? new UserError(err) : new Error(ERROR_MESSAGES[500]);
         }
     }
+
+    static async getUserById(id: string) {
+        try {
+            await db.connectDB();
+            const user = await UserModel.findById(id);
+            if (!user) {
+                return null; // or handle the case when user is null
+            }
+            return new User(user);
+        } catch (err: Error | UserError | any) {
+            console.error(err);
+            throw err instanceof UserError ? new UserError(err) : new Error(ERROR_MESSAGES[500]);
+        }
+    }
 }

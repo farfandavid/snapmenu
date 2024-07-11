@@ -1,13 +1,13 @@
 import type { APIRoute } from "astro";
 import { payment } from "../../../server/config/mp";
 import type { IPayment } from "../../../server/interface/Payment";
+import { User } from "../../../server/class/User";
 
 export const POST: APIRoute = async ({ request, url }) => {
     const isWebhook = url.searchParams.get("source_news") === "webhooks";
 
     if (!isWebhook) {
-        console.log("Not a webhook");
-        return new Response("", { status: 404 });
+        return new Response("not found", { status: 404 });
     }
     const res = await request.json();
 
@@ -20,7 +20,17 @@ export const POST: APIRoute = async ({ request, url }) => {
             }
 
         });
-        console.log(paymentResult.date_created)
+        if (paymentResult.status === "approved") {
+            console.log("Payment Approved");
+            if (paymentResult.metadata?.account_id) {
+                const user = await User.getUserById(paymentResult.metadata.account_id);
+                if (user instanceof User) {
+                    console.log("User Found", user);
+                    user.modifyMenuLimit(1);
+                }
+            }
+        }
+        //console.log(paymentResult.date_created)
         const paymentData: IPayment = {
             id_transaction: paymentResult.id,
             date_created: new Date(paymentResult.date_created || ""),
@@ -53,7 +63,7 @@ export const POST: APIRoute = async ({ request, url }) => {
                 }
             })
         }
-        console.log(paymentData);
+        //console.log(paymentData);
         /* console.log("Payment Result", paymentResult.metadata);
         console.log("Payment Result", paymentResult.additional_info?.items);
         console.log("Payment Status", paymentResult.status);

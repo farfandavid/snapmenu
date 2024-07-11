@@ -39,11 +39,12 @@ type ICategories = z.infer<typeof CategoriesSchema>;
 
 const MenuSchema = z.object({
     _id: z.instanceof(Types.ObjectId).optional(),
-    name: z.string().max(30).regex(/^[a-zA-Z0-9]+$/, { message: "Solo se permiten letras y números" }),
+    name: z.string().min(4).max(30).regex(/^[a-zA-Z0-9]+$/, { message: "Solo se permiten letras y números" }),
     userEmail: z.string().email(),
     description: z.string().max(150).optional(),
     active: z.boolean(),
     categories: z.array(CategoriesSchema).optional(),
+    productsLimit: z.number().optional(),
     //error: z.string().optional(),
     address: z.string().max(10).optional(),
     mapUrl: z.string().optional(),
