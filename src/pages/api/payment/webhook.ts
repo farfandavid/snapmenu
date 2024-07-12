@@ -28,6 +28,9 @@ export const POST: APIRoute = async ({ request, url }) => {
                 const user = await User.getUserById(paymentResult.metadata.account_id);
                 if (user instanceof User) {
                     console.log("User Found", user);
+                    const expDate = new Date();
+                    const month = parseInt(paymentResult.additional_info?.items?.[0]?.id ?? "0");
+                    expDate.setMonth(expDate.getMonth() + month);
                     await user.modifyMenuLimit(1).catch((err) => {
                         console.error(err);
                     });
@@ -36,6 +39,7 @@ export const POST: APIRoute = async ({ request, url }) => {
                         active: true,
                         description: paymentResult.metadata.description,
                         userEmail: user.email,
+                        expDate: expDate,
                     })
 
                     await menu.save().catch((err) => {

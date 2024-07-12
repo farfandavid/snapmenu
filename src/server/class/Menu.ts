@@ -155,7 +155,17 @@ export class Menu implements IMenu {
             throw new Error(ERROR_MESSAGES[500]);
         }
     }
-
+    async updateCategories(categories: ICategories[]) {
+        try {
+            await db.connectDB();
+            const menu = await MenuModel.findByIdAndUpdate(this._id, { categories: categories }, { new: true });
+            if (!menu) return null;
+            return new Menu(menu);
+        } catch (err) {
+            console.log(err);
+            throw new Error(ERROR_MESSAGES[500]);
+        }
+    }
     async updateInfo(menuData: IMenu) {
         try {
             await db.connectDB();

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ProductTable } from "./ProductTable";
-import { Modal } from "../Modal";
+import { Modal } from "./Modal";
 
 interface IProduct {
     _id: string;
@@ -32,14 +32,18 @@ export default function ProductsMain() {
     // Load
     useEffect(() => {
         const fetchCategories = async () => {
-            const response = await fetch("/api/menu/categories");
+            const response = await fetch("/api/dashboard/products", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
             const data = await response.json();
             setMenu(data.map(({ _id, name, categories }: { _id: any, name: string, categories: [] }) => ({ _id, name, categories })));
             setMenuSelected(data[0]._id);
             setCategories(data[0].categories);
         };
         fetchCategories();
-
     }, []);
 
     // Save
@@ -73,33 +77,19 @@ export default function ProductsMain() {
         console.log(menuSelected);
         if (!menuSelected) return;
         const changeMenu = async () => {
-            const response = await fetch("/api/menu/categories", {
-                method: "POST",
+            const response = await fetch("/api/dashboard/products", {
+                method: "GET",
                 headers: {
                     "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ menuId: menuSelected })
+                }
             });
             const data = await response.json();
-            setCategories(data.categories);
+            const menu = data.find((menu: any) => menu._id === menuSelected);
+            setCategories(menu.categories);
         };
         changeMenu();
     }, [menuSelected]);
     // Categories
-    const addCategory = (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        const title = (document.getElementById("titleCategory") as HTMLInputElement).value;
-        if (!title) {
-            return;
-        }
-        setCategories([...categories, {
-            _id: crypto.randomUUID(),
-            name: title,
-            products: [],
-            active: true
-        }]);
-        setShowModal(false);
-    }
 
     const deleteCategory = (index: number) => {
         categories.splice(index, 1);
@@ -190,9 +180,9 @@ export default function ProductsMain() {
                         </select>
                     </div>
                     <div className="flex">
-                        <button className=" bg-orange-500 px-2 py-1 rounded text-white flex justify-center items-center mx-1" onClick={() => setShowModal(!showModal)}><i className="bi bi-plus-circle-fill text-xl mx-1"></i>Add Category</button>
+                        <button className=" bg-orange-500 px-2 py-1 rounded text-white flex justify-center items-center mx-1" onClick={() => setShowModal(!showModal)}><i className="bi bi-plus-circle-fill text-xl mx-1"></i>Categoria</button>
                         <button className="bg-blue-500 text-white px-2 py-1 rounded flex justify-center items-center mx-1 disabled:bg-blue-300" disabled={trigger} onClick={() => setTrigger(!trigger)}>
-                            {save ? <i className="bi bi-hourglass animate-spin text-xl mx-1"></i> : <i className="bi bi-floppy-fill text-xl mx-1"></i>} Save</button>
+                            {save ? <i className="bi bi-hourglass animate-spin text-xl mx-1"></i> : <i className="bi bi-floppy-fill text-xl mx-1"></i>}Guardar</button>
                     </div>
                 </div>
 
