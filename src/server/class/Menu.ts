@@ -1,5 +1,5 @@
 import type { Types } from "mongoose";
-import { MenuError, MenuSchema, type ICategories, type IMenu } from "../interface/Menu";
+import { CategoriesError, CategoriesSchema, MenuError, MenuSchema, type ICategories, type IMenu } from "../interface/Menu";
 import db from "../config/db";
 import { MenuModel } from "../models/menuModel";
 import { ERROR_MESSAGES } from "../utils/constants";
@@ -27,6 +27,7 @@ export class Menu implements IMenu {
         closeH?: string;
     }[];
     expDate?: Date;
+    maxProducts: number = 100;
 
     constructor(data: IMenu) {
         const validate = MenuSchema.safeParse(data);
@@ -48,6 +49,7 @@ export class Menu implements IMenu {
         this.social = data.social;
         this.openingHours = data.openingHours;
         this.expDate = data.expDate;
+        this.maxProducts = data.maxProducts;
     }
 
     validate(): Menu | MenuError {
@@ -158,11 +160,28 @@ export class Menu implements IMenu {
     async updateCategories(categories: ICategories[]) {
         try {
             await db.connectDB();
+            const validate = await MenuSchema.safeParseAsync({
+                ...this,
+                categories: categories
+            });
+            if (!validate.success) {
+                throw new MenuError(validate.error?.flatten().fieldErrors);
+            }
+            const countProducts = categories.reduce((acc, curr) => acc + (curr.products?.length ?? 0), 0);
+            if (countProducts > this.maxProducts) {
+                throw new CategoriesError({ products: ["Exceeded the maximum number of products"] });
+            }
             const menu = await MenuModel.findByIdAndUpdate(this._id, { categories: categories }, { new: true });
             if (!menu) return null;
             return new Menu(menu);
         } catch (err) {
-            console.log(err);
+
+            if (err instanceof MenuError) {
+                throw new MenuError(err);
+            }
+            if (err instanceof CategoriesError) {
+                throw new CategoriesError(err);
+            }
             throw new Error(ERROR_MESSAGES[500]);
         }
     }
@@ -255,11 +274,11 @@ export class Menu implements IMenu {
         }
     }
 
-    static async getMenuByNameAndUserEmail(name: string, userEmail: string) {
+    static async getMenuByIdAndUserEmail(id: string, userEmail: string) {
         try {
             await db.connectDB();
             const menu = await MenuModel.findOne({
-                name: name,
+                _id: id,
                 userEmail: userEmail
             });
             if (!menu) return null;

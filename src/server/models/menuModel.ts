@@ -132,6 +132,10 @@ const MenuSchemaMongoose = new Schema<IMenuModel>({
     expDate: {
         type: Date,
         required: false,
+    },
+    maxProducts: {
+        type: Number,
+        required: true,
     }
 }, {
     timestamps: true,

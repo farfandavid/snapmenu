@@ -40,6 +40,7 @@ export const POST: APIRoute = async ({ request, url }) => {
                         description: paymentResult.metadata.description,
                         userEmail: user.email,
                         expDate: expDate,
+                        maxProducts: 100,
                     })
 
                     await menu.save().catch((err) => {

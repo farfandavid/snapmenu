@@ -37,6 +37,30 @@ const CategoriesSchema = z.object({
 
 type ICategories = z.infer<typeof CategoriesSchema>;
 
+export interface ICategoriesErrors {
+    _id?: string[] | undefined;
+    name?: string[] | undefined;
+    description?: string[] | undefined;
+    active?: string[] | undefined;
+    products?: string[] | undefined;
+}
+
+export class CategoriesError implements ICategoriesErrors {
+    _id?: string[] | undefined;
+    name?: string[] | undefined;
+    description?: string[] | undefined;
+    active?: string[] | undefined;
+    products?: string[] | undefined;
+
+    constructor(error: ICategoriesErrors) {
+        this._id = error._id;
+        this.name = error.name;
+        this.description = error.description;
+        this.active = error.active;
+        this.products = error.products;
+    }
+}
+
 const MenuSchema = z.object({
     _id: z.instanceof(Types.ObjectId).optional(),
     name: z.string().min(4).max(30).regex(/^[a-zA-Z0-9]+$/, { message: "Solo se permiten letras y números" }),
@@ -58,6 +82,7 @@ const MenuSchema = z.object({
     }).optional(),
     openingHours: z.array(openingHoursSchema).optional(),
     expDate: z.date().optional(),
+    maxProducts: z.number(),
 });
 
 type IMenu = z.infer<typeof MenuSchema>;

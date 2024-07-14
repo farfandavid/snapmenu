@@ -26,6 +26,7 @@ export default function ProductsMain() {
     const [save, setSave] = useState(false);
     const [trigger, setTrigger] = useState(false);
 
+    // Count Products
     const countProducts = categories.reduce((acc, table) => {
         return acc + table.products.length;
     }, 0);
@@ -52,7 +53,7 @@ export default function ProductsMain() {
         setSave(true);
 
         const savePost = async () => {
-            const res = await fetch("/api/menu/categories", {
+            const res = await fetch("/api/dashboard/products", {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json"
@@ -188,8 +189,8 @@ export default function ProductsMain() {
 
                 <div className="flex flex-col items-start w-full">
                     <div className="flex gap-2">
-                        <p className="text-center text-slate-500">Categories: {categories.length}</p>
-                        <p className="text-center text-slate-500">Total Products: {countProducts}/100</p>
+                        <p className="text-center text-slate-500">Categorias: {categories.length}</p>
+                        <p className="text-center text-slate-500">Total de Productos: {countProducts}/100</p>
                     </div>
                     <hr className="w-full border-slate-500" />
                 </div>
