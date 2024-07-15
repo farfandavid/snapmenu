@@ -177,7 +177,7 @@
         loader.classList.remove("hidden");
         textCheck.classList.add("hidden");
         setTimeout(async () => {
-            const data = await fetch(`/api/menu/${inputValue}`);
+            const data = await fetch(`/api/dashboard/menu/${inputValue}`);
             loader.classList.add("hidden");
             textCheck.classList.remove("hidden");
             if (data.status === 404 || inputValue.length <= 3) {
