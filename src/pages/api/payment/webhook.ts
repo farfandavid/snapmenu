@@ -52,6 +52,7 @@ export const POST: APIRoute = async ({ request, url }) => {
         }
         //console.log(paymentResult.date_created)
         const paymentData: IPayment = {
+
             id_transaction: paymentResult.id,
             date_created: new Date(paymentResult.date_created || ""),
             date_approved: new Date(paymentResult.date_approved || ""),

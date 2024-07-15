@@ -2,11 +2,12 @@ import type { APIRoute } from "astro";
 import { refund } from "../../server/config/mp";
 
 export const GET: APIRoute = async ({ request }) => {
-    const { paymentId, amount } = await request.json();
+    const res = await request.json();
+    console.log(res)
     const result = await refund.create({
-        payment_id: paymentId,
+        payment_id: res.payment_id,
         body: {
-            amount: parseInt(amount),
+            amount: parseInt(res.amount),
         }
     })
 
