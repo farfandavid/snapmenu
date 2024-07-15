@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro";
 import { refund } from "../../server/config/mp";
 
-export const GET: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request }) => {
     const res = await request.json();
     console.log(res)
     const result = await refund.create({

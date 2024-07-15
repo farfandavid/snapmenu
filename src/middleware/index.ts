@@ -21,7 +21,6 @@ export const onRequest = defineMiddleware(async (context, next,) => {
         try {
             const userDB = await User.getUserByEmail(user.email as string);
             if (!userDB) {
-                console.log("Registering new user")
                 const newUser = new User({
                     displayName: user.displayName,
                     uid: user.uid,
@@ -46,7 +45,6 @@ export const onRequest = defineMiddleware(async (context, next,) => {
                 return next();
             }
             if (userDB?.uid !== user.uid || userDB?.emailVerified !== user.emailVerified) {
-                console.log("Updating user")
                 const newUser = new User({
                     _id: userDB._id,
                     displayName: user.displayName,
@@ -88,7 +86,6 @@ export const onRequest = defineMiddleware(async (context, next,) => {
                     disabled: userDB.disabled
                 }
             };
-            console.log(context.locals.user);
             return next();
         } catch (err) {
             console.error(err);

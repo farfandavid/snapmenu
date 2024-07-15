@@ -11,6 +11,7 @@ export const POST: APIRoute = async ({ request, url }) => {
         return new Response("not found", { status: 404 });
     }
     const res = await request.json();
+    console.log(res);
 
     if (res.type === "payment") {
         const paymentResult = await payment.get({
@@ -21,7 +22,7 @@ export const POST: APIRoute = async ({ request, url }) => {
             }
 
         });
-        console.log(paymentResult);
+        //console.log(paymentResult);
         if (paymentResult.status === "approved") {
             console.log("Payment Approved");
             if (paymentResult.metadata?.account_id) {
@@ -45,6 +46,34 @@ export const POST: APIRoute = async ({ request, url }) => {
                     })
 
                     await menu.save().catch((err) => {
+                        console.error(err);
+                    });
+                }
+            }
+        }
+        if (paymentResult.status === "refunded") {
+            console.log("Payment Refunded");
+            if (paymentResult.metadata?.account_id) {
+                console.log(paymentResult.metadata)
+                const user = await User.getUserById(paymentResult.metadata.account_id);
+                if (user instanceof User) {
+                    console.log("User Found", user);
+                    const expDate = new Date();
+                    const month = parseInt(paymentResult.additional_info?.items?.[0]?.id ?? "0");
+                    expDate.setMonth(expDate.getMonth() + month);
+                    await user.modifyMenuLimit(0).catch((err) => {
+                        console.error(err);
+                    });
+                    const menu = new Menu({
+                        name: paymentResult.metadata.menu,
+                        active: true,
+                        description: paymentResult.metadata.description,
+                        userEmail: user.email,
+                        expDate: expDate,
+                        maxProducts: 100,
+                    })
+
+                    await menu.delete().catch((err) => {
                         console.error(err);
                     });
                 }
@@ -82,7 +111,7 @@ export const POST: APIRoute = async ({ request, url }) => {
                     currency_id: item.currency_id,
 
                 }
-            })
+            }),
         }
         //console.log(paymentData);
         /* console.log("Payment Result", paymentResult.metadata);
