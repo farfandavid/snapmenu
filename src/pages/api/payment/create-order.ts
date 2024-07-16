@@ -45,7 +45,7 @@ export const POST: APIRoute = async ({ request, redirect, locals }) => {
                     quantity: 1,
                     id: validated.data.suscription.at(0) || "0",
                     description: `${validated.data.suscription} de SnapMenu`,
-                    category_id: validated.data.suscription,
+                    category_id: "virtual_goods",
                     picture_url: "https://cdn.snapmenu.online/logos/Demo"
                 }
             ],

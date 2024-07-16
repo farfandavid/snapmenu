@@ -9,7 +9,13 @@ export const POST: APIRoute = async ({ request }) => {
         body: {
             amount: parseInt(res.amount),
         }
-    })
+    }).then((res) => {
+        console.log(res)
+        return res;
+    }).catch((err) => {
+        console.error(err)
+        return
+    });
 
     console.log(result)
     return new Response(JSON.stringify("test"));

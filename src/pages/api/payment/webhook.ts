@@ -24,7 +24,7 @@ export const POST: APIRoute = async ({ request, url }) => {
         });
         console.log(paymentResult);
         if (paymentResult.status === "approved") {
-            if (paymentResult.status_detail === "partially_refunded") {
+            if (paymentResult.status_detail === "partially_refunded" || paymentResult.status_detail === "refunded") {
                 console.log("Payment Refunded");
                 if (paymentResult.metadata?.account_id) {
                     const user = await User.getUserById(paymentResult.metadata.account_id);
@@ -64,9 +64,6 @@ export const POST: APIRoute = async ({ request, url }) => {
                 }
             }
         }
-
-
-
         //console.log(paymentResult.date_created)
         const paymentData: IPayment = {
 
