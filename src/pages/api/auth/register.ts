@@ -53,8 +53,6 @@ export const POST: APIRoute = async ({ request, redirect }) => {
             displayName: user.displayName,
             email: user.email || "",
             uid: user.uid,
-            menuList: [],
-            menuLimit: 0,
             emailVerified: user.emailVerified,
             disabled: user.disabled
         }).save();
