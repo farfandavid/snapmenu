@@ -26,8 +26,6 @@ export const onRequest = defineMiddleware(async (context, next,) => {
                     uid: user.uid,
                     email: user.email || "",
                     emailVerified: user.emailVerified,
-                    menuList: [],
-                    menuLimit: 0,
                 });
                 await newUser.save();
                 context.locals = {
@@ -37,8 +35,6 @@ export const onRequest = defineMiddleware(async (context, next,) => {
                         uid: newUser.uid,
                         email: newUser.email,
                         emailVerified: newUser.emailVerified,
-                        menuList: newUser.menuList,
-                        menuLimit: newUser.menuLimit,
                         disabled: newUser.disabled
                     }
                 };
@@ -51,8 +47,6 @@ export const onRequest = defineMiddleware(async (context, next,) => {
                     uid: user.uid,
                     email: user.email || "",
                     emailVerified: user.emailVerified,
-                    menuList: userDB?.menuList || [],
-                    menuLimit: userDB?.menuLimit || 0,
                     disabled: user.disabled,
                 });
                 const updated = await newUser.update();
@@ -67,8 +61,6 @@ export const onRequest = defineMiddleware(async (context, next,) => {
                         uid: updated.uid,
                         email: updated.email,
                         emailVerified: updated.emailVerified,
-                        menuList: updated.menuList,
-                        menuLimit: updated.menuLimit,
                         disabled: updated.disabled
                     }
                 };
@@ -81,8 +73,6 @@ export const onRequest = defineMiddleware(async (context, next,) => {
                     uid: userDB.uid,
                     email: userDB.email,
                     emailVerified: userDB.emailVerified,
-                    menuLimit: userDB.menuLimit,
-                    menuList: userDB.menuList,
                     disabled: userDB.disabled
                 }
             };

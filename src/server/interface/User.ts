@@ -22,8 +22,6 @@ export const UserSchema = z.object({
     uid: z.string().optional(),
     email: z.string().email(),
     emailVerified: z.boolean().optional(),
-    menuList: z.array(z.string()),
-    menuLimit: z.number(),
     disabled: z.boolean().optional(),
     suscription: z.optional(suscriptionSchema),
 });

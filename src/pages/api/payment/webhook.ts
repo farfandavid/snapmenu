@@ -33,9 +33,6 @@ export const POST: APIRoute = async ({ request, url }) => {
                     const expDate = new Date();
                     const month = parseInt(paymentResult.additional_info?.items?.[0]?.id ?? "0");
                     expDate.setMonth(expDate.getMonth() + month);
-                    await user.modifyMenuLimit(1).catch((err) => {
-                        console.error(err);
-                    });
                     const menu = new Menu({
                         name: paymentResult.metadata.menu,
                         active: true,
@@ -58,9 +55,6 @@ export const POST: APIRoute = async ({ request, url }) => {
                 const user = await User.getUserById(paymentResult.metadata.account_id);
                 if (user instanceof User) {
                     console.log("User Found", user);
-                    await user.modifyMenuLimit(-1).catch((err) => {
-                        console.error(err);
-                    });
                     const menu = await Menu.getMenuByName(paymentResult.metadata.menu);
                     if (menu instanceof Menu) {
                         await menu.delete().catch((err) => {

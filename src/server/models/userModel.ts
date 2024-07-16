@@ -46,8 +46,6 @@ const userSchemaMongoose = new Schema<IUserModel>({
         type: Boolean,
         required: true,
     },
-    menuList: [{ type: String }],
-    menuLimit: { type: Number },
     disabled: {
         type: Boolean,
         required: true,

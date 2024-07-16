@@ -13,17 +13,11 @@ const menus = await Menu.getMenusByUserEmail(user.email);
     <div class="flex flex-col items-center space-y-2">
         <h1 class="font-bold text-2xl">Bienvenido a SnapMenu</h1>
         <p class="text-xl">Empecemos!</p>
-        {
-            () => {
-                if (user.menuLimit === 0) {
-                    return <PayementForm />;
-                }
-            }
-        }
+        <PayementForm />;
         {
             () => {
                 if (menus !== null) {
-                    return <UserMenus menu={menus} user={user} />;
+                    return <UserMenus menu={menus} />;
                 }
             }
         }

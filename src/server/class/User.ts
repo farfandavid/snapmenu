@@ -10,8 +10,6 @@ export class User implements IUser {
     uid?: string;
     email: string;
     emailVerified?: boolean;
-    menuList: string[] = [];
-    menuLimit: number = 0;
     disabled?: boolean;
     suscription?: ISuscription;
 
@@ -25,8 +23,6 @@ export class User implements IUser {
         this.uid = data.uid;
         this.email = data.email;
         this.emailVerified = data.emailVerified;
-        this.menuList = data.menuList;
-        this.menuLimit = data.menuLimit;
         this.disabled = data.disabled;
         this.suscription = data.suscription;
     }
@@ -137,17 +133,6 @@ export class User implements IUser {
         try {
             await db.connectDB();
             const user = await UserModel.findByIdAndUpdate(this._id, { suscription: suscription }, { new: true });
-            return user;
-        } catch (err) {
-            console.log(err);
-            return new Error(ERROR_MESSAGES[500]);
-        }
-    }
-
-    async modifyMenuLimit(menuLimit: number) {
-        try {
-            await db.connectDB();
-            const user = await UserModel.findByIdAndUpdate(this._id, { menuLimit: menuLimit }, { new: true });
             return user;
         } catch (err) {
             console.log(err);
