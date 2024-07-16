@@ -24,46 +24,49 @@ export const POST: APIRoute = async ({ request, url }) => {
         });
         console.log(paymentResult);
         if (paymentResult.status === "approved") {
-            console.log("Payment Approved");
-            if (paymentResult.metadata?.account_id) {
-                console.log(paymentResult.metadata)
-                const user = await User.getUserById(paymentResult.metadata.account_id);
-                if (user instanceof User) {
-                    console.log("User Found", user);
-                    const expDate = new Date();
-                    const month = parseInt(paymentResult.additional_info?.items?.[0]?.id ?? "0");
-                    expDate.setMonth(expDate.getMonth() + month);
-                    const menu = new Menu({
-                        name: paymentResult.metadata.menu,
-                        active: true,
-                        description: paymentResult.metadata.description,
-                        userEmail: user.email,
-                        expDate: expDate,
-                        maxProducts: 100,
-                    })
-
-                    await menu.save().catch((err) => {
-                        console.error(err);
-                    });
+            if (paymentResult.status_detail === "partially_refunded") {
+                console.log("Payment Refunded");
+                if (paymentResult.metadata?.account_id) {
+                    const user = await User.getUserById(paymentResult.metadata.account_id);
+                    if (user instanceof User) {
+                        console.log(user);
+                        const menu = await Menu.getMenuByName(paymentResult.metadata.menu);
+                        if (menu instanceof Menu) {
+                            await menu.delete().catch((err) => {
+                                console.error(err);
+                            });
+                        }
+                    }
                 }
             }
-        }
-        if (paymentResult.status === "refunded") {
-            console.log("Payment Refunded");
-            if (paymentResult.metadata?.account_id) {
-                console.log(paymentResult.metadata)
-                const user = await User.getUserById(paymentResult.metadata.account_id);
-                if (user instanceof User) {
-                    console.log("User Found", user);
-                    const menu = await Menu.getMenuByName(paymentResult.metadata.menu);
-                    if (menu instanceof Menu) {
-                        await menu.delete().catch((err) => {
+            if (paymentResult.status_detail === "accredited") {
+                console.log("Payment Approved");
+                if (paymentResult.metadata?.account_id) {
+                    const user = await User.getUserById(paymentResult.metadata.account_id);
+                    if (user instanceof User) {
+                        console.log(user);
+                        const expDate = new Date();
+                        const month = parseInt(paymentResult.additional_info?.items?.[0]?.id ?? "0");
+                        expDate.setMonth(expDate.getMonth() + month);
+                        const menu = new Menu({
+                            name: paymentResult.metadata.menu,
+                            active: true,
+                            description: paymentResult.metadata.description,
+                            userEmail: user.email,
+                            expDate: expDate,
+                            maxProducts: 100,
+                        })
+
+                        await menu.save().catch((err) => {
                             console.error(err);
                         });
                     }
                 }
             }
         }
+
+
+
         //console.log(paymentResult.date_created)
         const paymentData: IPayment = {
 
