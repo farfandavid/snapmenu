@@ -22,7 +22,7 @@ export const POST: APIRoute = async ({ request, url }) => {
             }
 
         });
-        //console.log(paymentResult);
+        console.log(paymentResult);
         if (paymentResult.status === "approved") {
             console.log("Payment Approved");
             if (paymentResult.metadata?.account_id) {
