@@ -4,6 +4,8 @@ const client = new MercadoPagoConfig({
     accessToken: import.meta.env.MP_TEST_ACCESS_TOKEN,
     options: {
         timeout: 5000,
+        corporationId: "SnapMenu",
+        plataformId: "www.snapmenu.online",
     },
 
 })
