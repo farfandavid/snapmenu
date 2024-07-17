@@ -7,7 +7,7 @@ import { ERROR_MESSAGES } from "../utils/constants";
 export class Menu implements IMenu {
     _id?: Types.ObjectId;
     name: string;
-    userEmail: string;
+    userId: string;
     description?: string;
     active: boolean;
     categories?: ICategories[];
@@ -26,8 +26,8 @@ export class Menu implements IMenu {
         openH?: string;
         closeH?: string;
     }[];
-    expDate?: Date;
-    maxProducts: number = 100;
+    expDate: Date;
+    maxProducts: number;
 
     constructor(data: IMenu) {
         const validate = MenuSchema.safeParse(data);
@@ -36,7 +36,7 @@ export class Menu implements IMenu {
         }
         this._id = data._id;
         this.name = data.name;
-        this.userEmail = data.userEmail;
+        this.userId = data.userId;
         this.description = data.description;
         this.active = data.active;
         this.categories = data.categories;
@@ -223,7 +223,7 @@ export class Menu implements IMenu {
         }
     }
 
-    async addExpDate(expDate: Date) {
+    async setExpDate(expDate: Date) {
         try {
             await db.connectDB();
             const menu = await MenuModel.findByIdAndUpdate(this._id, { expDate: expDate }, { new: true });
@@ -245,7 +245,17 @@ export class Menu implements IMenu {
             throw new Error(ERROR_MESSAGES[500]);
         }
     }
-
+    static async getMenuById(id: string) {
+        try {
+            await db.connectDB();
+            const menu = await MenuModel.findById(id);
+            if (!menu) return null;
+            return new Menu(menu);
+        } catch (err) {
+            console.log(err);
+            throw new Error(ERROR_MESSAGES[500]);
+        }
+    }
     static async getMenuByName(name: string) {
         try {
             await db.connectDB();
@@ -259,12 +269,17 @@ export class Menu implements IMenu {
             throw new Error(ERROR_MESSAGES[500]);
         }
     }
-
-    static async getMenusByUserEmail(userEmail: string) {
+    /**
+     * Get all menus by user id
+     * @param userId 
+     * @returns Menu[] | null
+     * @throws Error
+     */
+    static async getMenusByUserId(userId: string) {
         try {
             await db.connectDB();
             const menus = await MenuModel.find({
-                userEmail: userEmail
+                userId: userId
             });
             if (!menus) return null;
             return new Array<Menu>(...menus.map(menu => new Menu(menu)));
@@ -273,13 +288,18 @@ export class Menu implements IMenu {
             throw new Error(ERROR_MESSAGES[500]);
         }
     }
-
-    static async getMenuByIdAndUserEmail(id: string, userEmail: string) {
+    /**
+     * Get a menu by id and user id
+     * @param id 
+     * @param userId 
+     * @returns 
+     */
+    static async getMenuByIdAndUserId(id: string, userId: string) {
         try {
             await db.connectDB();
             const menu = await MenuModel.findOne({
                 _id: id,
-                userEmail: userEmail
+                userId: userId
             });
             if (!menu) return null;
             return new Menu(menu);

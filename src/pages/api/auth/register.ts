@@ -40,15 +40,7 @@ export const POST: APIRoute = async ({ request, redirect }) => {
             displayName: name,
             disabled: false,
             emailVerified: false,
-        })/* .then((user) => {
-            registerUser({
-                displayName: user.displayName, email: user.email, uid: user.uid,
-                menuList: [],
-                menuLimit: 0,
-                emailVerified: user.emailVerified,
-                disabled: user.disabled
-            })
-        }) */
+        })
         const registerUser = await new User({
             displayName: user.displayName,
             email: user.email || "",

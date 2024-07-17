@@ -1,20 +1,17 @@
-import type { APIRoute } from 'astro';
-import { preference } from '../../../server/config/mp';
-import { z } from 'astro/zod';
-import { MENU_NAMES_PROHIBITED } from '../../../server/utils/constants';
-import { Menu } from '../../../server/class/Menu';
+import type { APIRoute } from "astro";
+import { z } from "astro/zod";
+import { MENU_NAMES_PROHIBITED } from "../../../server/utils/constants";
+import { Menu } from "../../../server/class/Menu";
+import { preference } from "../../../server/config/mp";
 
-export const POST: APIRoute = async ({ request, redirect, locals }) => {
+export const POST: APIRoute = async ({ request, locals }) => {
     const body = await request.formData()
-    console.log(body)
     const reqSchema = z.object({
         menuName: z.string().min(4).max(30),
-        description: z.string().max(150).optional(),
         suscription: z.enum(["1 Mes", "3 Meses", "6 Meses", "12 Meses"]),
     });
     const validated = reqSchema.safeParse({
         menuName: body.get("menuName"),
-        description: body.get("description"),
         suscription: body.get("suscription"),
     })
     if (!validated.success) {
@@ -27,7 +24,6 @@ export const POST: APIRoute = async ({ request, redirect, locals }) => {
     if (menu !== null) {
         return new Response("not found", { status: 404 });
     }
-
     const price = 5000;
     const unit_price = {
         "1 Mes": price,
@@ -56,12 +52,11 @@ export const POST: APIRoute = async ({ request, redirect, locals }) => {
                 success: "https://snapmenu.onrender.com/dashboard",
             },
             // URLS Servidor
-            notification_url: "https://snapmenu.onrender.com/api/payment/webhook?source_news=webhooks",
+            notification_url: "https://snapmenu.onrender.com/api/payment/webhook-renew?source_news=webhooks",
             statement_descriptor: "SNAPMENU",
             metadata: {
                 account_id: locals.user.id,
                 menu: validated.data.menuName,
-                description: validated.data.description,
             },
         },
         requestOptions: {
@@ -69,9 +64,9 @@ export const POST: APIRoute = async ({ request, redirect, locals }) => {
             plataformId: "www.snapmenu.online",
         }
     });
-    console.log(result)
-    if (!result.init_point) {
-        return new Response("Error", { status: 500 });
-    }
-    return redirect(result.init_point)
+    return new Response(JSON.stringify({ message: "Payment renewed" }), {
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
 }

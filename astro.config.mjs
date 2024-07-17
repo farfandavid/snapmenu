@@ -18,7 +18,6 @@ export default defineConfig({
     port: 3000,
     host: true
   },
-  site: "http://localhost:3000",
   vite: {
     mode: "production"
   }

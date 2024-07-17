@@ -21,7 +21,6 @@ const ProductSchemaMongoose = new Schema<IProductModel>({
     _id: {
         type: String,
         required: true,
-        unique: true,
     },
     name: {
         type: String,
@@ -49,7 +48,6 @@ const CategoriesSchemaMongoose = new Schema<ICategoryModel>({
     _id: {
         type: String,
         required: true,
-        unique: true,
     },
     name: {
         type: String,
@@ -75,7 +73,7 @@ const MenuSchemaMongoose = new Schema<IMenuModel>({
         required: true,
         unique: true,
     },
-    userEmail: {
+    userId: {
         type: String,
         required: true,
     },
@@ -131,7 +129,7 @@ const MenuSchemaMongoose = new Schema<IMenuModel>({
     },
     expDate: {
         type: Date,
-        required: false,
+        required: true,
     },
     maxProducts: {
         type: Number,

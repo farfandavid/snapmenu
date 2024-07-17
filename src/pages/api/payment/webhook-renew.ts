@@ -1,7 +1,6 @@
 import type { APIRoute } from "astro";
 import { payment } from "../../../server/config/mp";
 import type { IPayment } from "../../../server/interface/Payment";
-import { User } from "../../../server/class/User";
 import { Menu } from "../../../server/class/Menu";
 
 export const POST: APIRoute = async ({ request, url }) => {
@@ -11,7 +10,6 @@ export const POST: APIRoute = async ({ request, url }) => {
         return new Response("not found", { status: 404 });
     }
     const res = await request.json();
-
     if (res.type === "payment") {
         const paymentResult = await payment.get({
             id: res.data.id,
@@ -21,44 +19,29 @@ export const POST: APIRoute = async ({ request, url }) => {
             }
 
         });
-        //console.log(paymentResult);
+        console.log(paymentResult);
         if (paymentResult.status === "approved") {
             if (paymentResult.status_detail === "partially_refunded" || paymentResult.status_detail === "refunded") {
-                //console.log("Payment Refunded");
+                console.log("Payment Refunded");
                 if (paymentResult.metadata?.account_id) {
-                    const user = await User.getUserById(paymentResult.metadata.account_id);
-                    if (user instanceof User) {
-                        console.log(user);
-                        const menu = await Menu.getMenuByName(paymentResult.metadata.menu);
-                        if (menu instanceof Menu) {
-                            await menu.delete().catch((err) => {
-                                console.error(err);
-                            });
-                        }
+                    const menu = await Menu.getMenuByName(paymentResult.metadata.menu);
+                    if (menu instanceof Menu) {
+                        const expDate = menu.expDate;
+                        const month = parseInt(paymentResult.additional_info?.items?.[0]?.id ?? "0");
+                        expDate.setMonth(expDate.getMonth() - month);
+                        menu.setExpDate(expDate);
                     }
                 }
             }
             if (paymentResult.status_detail === "accredited") {
                 console.log("Payment Approved");
                 if (paymentResult.metadata?.account_id) {
-                    const user = await User.getUserById(paymentResult.metadata.account_id);
-                    if (user instanceof User) {
-                        console.log(user);
-                        const expDate = new Date();
+                    const menu = await Menu.getMenuByName(paymentResult.metadata.menu);
+                    if (menu instanceof Menu) {
+                        const expDate = menu.expDate;
                         const month = parseInt(paymentResult.additional_info?.items?.[0]?.id ?? "0");
                         expDate.setMonth(expDate.getMonth() + month);
-                        const menu = new Menu({
-                            name: paymentResult.metadata.menu,
-                            active: true,
-                            description: paymentResult.metadata.description,
-                            userId: user._id?.toString() || "",
-                            expDate: expDate,
-                            maxProducts: 100,
-                        })
-
-                        await menu.save().catch((err) => {
-                            console.error(err);
-                        });
+                        menu.setExpDate(expDate);
                     }
                 }
             }
@@ -97,12 +80,6 @@ export const POST: APIRoute = async ({ request, url }) => {
                 }
             }),
         }
-        //console.log(paymentData);
-        /* console.log("Payment Result", paymentResult.metadata);
-        console.log("Payment Result", paymentResult.additional_info?.items);
-        console.log("Payment Status", paymentResult.status);
-        console.log("Payment Status Detail", paymentResult.status_detail);
-        console.log("payer", paymentResult.payer); */
     }
-    return new Response("webhook", { status: 200, headers: { 'content-type': 'application/json' } });
+    return new Response("not found", { status: 404 });
 }

@@ -7,34 +7,39 @@ const SERVICE_CONTENT = {
         "Elige el plan que mejor se adapte a tus necesidades y comienza a crear tu menú QR hoy mismo.",
     plans: [
         {
-            name: "Básico",
+            name: "3 MESES",
             features: [
-                "Hasta 100 productos en un menú QR.",
+                "Hasta 100 productos",
                 "Posibilidad de incorporar enlaces de WhatsApp para pedidos.",
-                "Perfil personalizado del restaurante.",
-                "Soporte por correo electrónico.",
-            ],
-            price: "AR$4500/mes",
-        },
-        {
-            name: "Estándar",
-            features: [
-                "Hasta 300 productos en un menú QR.",
-                "Posibilidad de cargar imágenes de productos.",
-                "Personalización avanzada del diseño del menú QR.",
                 "Soporte por correo electrónico y chat en vivo.",
             ],
-            price: "AR$6500/mes",
+            price: "AR$14250",
         },
         {
-            name: "Premium",
+            name: "6 MESES",
             features: [
-                "Hasta 500 productos en un menú QR.",
-                "Posibilidad de cargar imágenes de productos.",
-                "Personalización a pedido del diseño del menú",
+                "Posibilidad de incorporar enlaces de WhatsApp para pedidos.",
                 "Soporte prioritario por correo electrónico, chat en vivo y asistencia telefónica.",
             ],
-            price: "AR$8500/mes",
+            price: "AR$27000",
+        },
+        {
+            name: "12 MESES",
+            features: [
+                "Posibilidad de incorporar enlaces de WhatsApp para pedidos.",
+                "Soporte prioritario por correo electrónico, chat en vivo y asistencia telefónica.",
+            ],
+            price: "AR$48000",
+        },
+        {
+            name: "PERSONALIZADO",
+            features: [
+                "Menu totalmente personalizado a tu gusto.",
+                "Funcionalidades a medida para tu negocio.",
+                "Soporte prioritario por correo electrónico, chat en vivo y asistencia telefónica.",
+                "Y mucho más...",
+            ],
+            price: "Consultar",
         },
     ],
 };
@@ -43,7 +48,7 @@ const SERVICE_CONTENT = {
 <section id="services" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
     <h2 class="text-3xl font-bold mb-3">{SERVICE_CONTENT.title}</h2>
     <p class="text-xl mb-8">{SERVICE_CONTENT.description}</p>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
         {
             SERVICE_CONTENT.plans.map((plan) => (
                 <div class="flex flex-col justify-between bg-white rounded-lg shadow-lg p-6 fade-in">

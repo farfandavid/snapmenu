@@ -5,18 +5,22 @@ import DashboardLayout from "../../layouts/DashboardLayout.astro";
 import { Menu } from "../../server/class/Menu";
 import type { IUser } from "../../server/interface/User";
 
-const user = Astro.locals.user as IUser;
-const menus = await Menu.getMenusByUserEmail(user.email);
+const menus = await Menu.getMenusByUserId(Astro.locals.user.id || "").catch(
+    (err) => {
+        console.error(err);
+        return null;
+    },
+);
 ---
 
 <DashboardLayout>
     <div class="flex flex-col items-center space-y-2">
         <h1 class="font-bold text-2xl">Bienvenido a SnapMenu</h1>
         <p class="text-xl">Empecemos!</p>
-        <PayementForm />;
+        <PayementForm />
         {
             () => {
-                if (menus !== null) {
+                if (menus !== null && menus.length > 0) {
                     return <UserMenus menu={menus} />;
                 }
             }

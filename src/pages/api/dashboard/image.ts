@@ -1,12 +1,12 @@
-/* import type { APIRoute } from "astro";
-import { putObject } from "../../server/config/s3";
-import { getMenuByIdAndUserEmail, updateMenuLogo } from "../../controller/menuController";
-import { CDN_URL } from "../../utils/constant";
+import type { APIRoute } from "astro";
+import { putObject } from "../../../server/config/s3";
+import { CDN_URL } from "../../../utils/constant";
+import { Menu } from "../../../server/class/Menu";
 
 export const POST: APIRoute = async ({ request, locals }) => {
     const formData = await request.formData();
-    const menu = formData.get("menu") as string;
-    const image = formData.get("image") as File;
+    const menuId = formData.get("menu") as string;
+    const image = formData.get("logo") as File;
     console.log(formData)
     if (!image) {
         return new Response(JSON.stringify({ error: "No se ha proporcionado una imagen" }), { status: 400 });
@@ -15,7 +15,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     if (image.size > 1024 * 1024 * 3) {
         return new Response(JSON.stringify({ error: "La imagen es muy pesada" }), { status: 400 });
     }
-    if (typeof menu !== "string") {
+    if (typeof menuId !== "string") {
         return new Response(JSON.stringify({ error: "No se ha proporcionado un menú" }), { status: 400 });
     }
     if (typeof image !== "object") {
@@ -27,24 +27,27 @@ export const POST: APIRoute = async ({ request, locals }) => {
     if (!image.type.startsWith("image/") || !allowedExtensions.includes(image.type.split("/").pop() || "")) {
         return new Response(JSON.stringify({ error: "El archivo no es una imagen" }), { status: 400 });
     }
-
-    const menudata = await getMenuByIdAndUserEmail(menu, locals.user.email || "");
-
-    //Subir imagen
+    const menu = await Menu.getMenuByIdAndUserId(menuId, locals.user.id || "");
+    if (!menu) {
+        return new Response(JSON.stringify({ error: "Menú no encontrado" }), { status: 404 });
+    }
+    // Subir imagen
     //const extension = image.type.split("/").pop();
-    const data = await putObject(`logos/${menudata.name}`, Buffer.from(await image.arrayBuffer()), image.type);
-    if (!data) return new Response(JSON.stringify({ error: "No se ha podido subir la imagen" }), { status: 500 });
+    const data = await putObject(`logos/${menu.name}`, Buffer.from(await image.arrayBuffer()), image.type);
+    if (!data) {
+        return new Response(JSON.stringify({ error: "No se ha podido subir la imagen" }), { status: 500 });
+    }
+    // Actualizar logoUrl
+    const updated = await menu.updateLogo(`${CDN_URL}logos/${menu.name}`);
+    if (!updated) {
+        return new Response(JSON.stringify({ error: "No se ha podido actualizar el menú" }), { status: 500 });
+    }
+    console.log(locals.user.email + ";" + updated.logoUrl)
+    return new Response(JSON.stringify({ success: true, logoUrl: updated.logoUrl }), { status: 200 });
 
-    //Actualizar logoUrl
-    const menuUpdated = await updateMenuLogo(menudata._id, locals.user.email || "", `${CDN_URL}logos/${menudata.name}`);
-
-    if (!menuUpdated) return new Response(JSON.stringify({ error: "No se ha podido actualizar el menú" }), { status: 500 });
-
-    console.log(locals.user.email, "subio una imagen al menu", menudata.name);
-    return new Response(JSON.stringify({ success: true, logoUrl: menuUpdated.logoUrl }), { status: 200, headers: { "Content-Type": "application/json" } });
 }
 
 export const GET: APIRoute = async ({ request, locals }) => {
     console.log(locals.user)
     return new Response(JSON.stringify({ error: "Method not allowed" }), { status: 405 });
-} */
+} 

@@ -14,7 +14,7 @@ const menuData = await MenuClass.getMenuByName(menu).catch((err) => {
 if (!menuData) {
     return Astro.redirect("/404");
 }
-if (menuData.expDate && new Date(menuData.expDate) < new Date()) {
+if (new Date(menuData.expDate) < new Date()) {
     return Astro.redirect("/404");
 }
 ---

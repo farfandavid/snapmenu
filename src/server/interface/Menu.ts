@@ -64,7 +64,7 @@ export class CategoriesError implements ICategoriesErrors {
 const MenuSchema = z.object({
     _id: z.instanceof(Types.ObjectId).optional(),
     name: z.string().min(4).max(30).regex(/^[a-zA-Z0-9]+$/, { message: "Solo se permiten letras y números" }),
-    userEmail: z.string().email(),
+    userId: z.string(),
     description: z.string().max(150).optional(),
     active: z.boolean(),
     categories: z.array(CategoriesSchema).optional(),
@@ -81,7 +81,7 @@ const MenuSchema = z.object({
         twitter: z.string().max(100).optional(),
     }).optional(),
     openingHours: z.array(openingHoursSchema).optional(),
-    expDate: z.date().optional(),
+    expDate: z.date(),
     maxProducts: z.number(),
 });
 
@@ -90,7 +90,7 @@ type IMenu = z.infer<typeof MenuSchema>;
 export interface IMenuErrors {
     _id?: string[] | undefined;
     name?: string[] | undefined;
-    userEmail?: string[] | undefined;
+    userId?: string[] | undefined;
     description?: string[] | undefined;
     active?: string[] | undefined;
     categories?: string[] | undefined;
@@ -107,7 +107,7 @@ export interface IMenuErrors {
 export class MenuError implements IMenuErrors {
     _id?: string[] | undefined;
     name?: string[] | undefined;
-    userEmail?: string[] | undefined;
+    userId?: string[] | undefined;
     description?: string[] | undefined;
     active?: string[] | undefined;
     categories?: string[] | undefined;
@@ -123,7 +123,7 @@ export class MenuError implements IMenuErrors {
     constructor(error: IMenuErrors) {
         this._id = error._id;
         this.name = error.name;
-        this.userEmail = error.userEmail;
+        this.userId = error.userId;
         this.description = error.description;
         this.active = error.active;
         this.categories = error.categories;

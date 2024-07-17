@@ -4,7 +4,7 @@ import { MenuError } from "../../../server/interface/Menu";
 
 export const GET: APIRoute = async ({ locals }) => {
     try {
-        const menus = await Menu.getMenusByUserEmail(locals.user.email || "");
+        const menus = await Menu.getMenusByUserId(locals.user.id || "");
         if (!menus) return new Response("No menus found", { status: 404 });
         return new Response(JSON.stringify(
             menus.map(({ _id, name, categories }) => ({ _id, name, categories }))
@@ -18,7 +18,7 @@ export const GET: APIRoute = async ({ locals }) => {
 export const PUT: APIRoute = async ({ request, locals }) => {
     const { menuId, categoriesData } = await request.json().catch(() => ({}));
     if (!menuId || !categoriesData) return new Response("Invalid data", { status: 400 });
-    const menu = await Menu.getMenuByIdAndUserEmail(menuId, locals.user.email || "");
+    const menu = await Menu.getMenuByIdAndUserId(menuId, locals.user.id || "");
     if (!menu) return new Response("Menu not found", { status: 404 });
     try {
         const updated = await menu.updateCategories(categoriesData);

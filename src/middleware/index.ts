@@ -76,6 +76,7 @@ export const onRequest = defineMiddleware(async (context, next,) => {
                     disabled: userDB.disabled
                 }
             };
+            console.log(context.locals.user);
             return next();
         } catch (err) {
             console.error(err);

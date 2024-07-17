@@ -3,7 +3,7 @@ import DashboardLayout from "../../layouts/DashboardLayout.astro";
 import ProductsMain from "../../components/dashboard/Products.tsx";
 import { Menu } from "../../server/class/Menu";
 const user = Astro.locals.user;
-const menu = await Menu.getMenusByUserEmail(user.email || "");
+const menu = await Menu.getMenusByUserId(user.id || "");
 ---
 
 <DashboardLayout>
