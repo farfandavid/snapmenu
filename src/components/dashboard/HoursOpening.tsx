@@ -11,17 +11,17 @@ interface Menu {
     phone: number;
     mapUrl: string;
     social: string[];
-    openingHours: { open: string, close: string }[];
+    openingHours: { openH: string, closeH: string }[];
 }
 
-export default function ConfigDash() {
+export default function HoursOpening() {
     const [menuSelected, setMenuSelected] = useState<Menu>();
     const [menus, setMenus] = useState<Menu[]>([]);
     const [toolTip, setToolTip] = useState({ show: false, message: "" });
 
 
     useEffect(() => {
-        fetch("/api/menu/categories")
+        fetch("/api/dashboard/openingHours")
             .then((response) => response.json())
             .then((data) => {
                 setMenus(data)
@@ -49,36 +49,36 @@ export default function ConfigDash() {
         formData.append("menu", menuSelected?._id || "");
         let openingHours = [
             {
-                open: form.open[6].value as string,
-                close: form.close[6].value as string,
+                openH: form.open[6].value as string,
+                closeH: form.close[6].value as string,
             },
             {
-                open: form.open[0].value as string,
-                close: form.close[0].value as string,
+                openH: form.open[0].value as string,
+                closeH: form.close[0].value as string,
             },
             {
-                open: form.open[1].value as string,
-                close: form.close[1].value as string,
+                openH: form.open[1].value as string,
+                closeH: form.close[1].value as string,
             },
             {
-                open: form.open[2].value as string,
-                close: form.close[2].value as string,
+                openH: form.open[2].value as string,
+                closeH: form.close[2].value as string,
             },
             {
-                open: form.open[3].value as string,
-                close: form.close[3].value as string,
+                openH: form.open[3].value as string,
+                closeH: form.close[3].value as string,
             },
             {
-                open: form.open[4].value as string,
-                close: form.close[4].value as string,
+                openH: form.open[4].value as string,
+                closeH: form.close[4].value as string,
             },
             {
-                open: form.open[5].value as string,
-                close: form.close[5].value as string,
+                openH: form.open[5].value as string,
+                closeH: form.close[5].value as string,
             },
         ];
         formData.append("openingHours", JSON.stringify(openingHours));
-        await fetch("/api/menu/update", {
+        await fetch("/api/dashboard/openingHours", {
             method: "PUT",
             body: formData
         })
@@ -112,39 +112,39 @@ export default function ConfigDash() {
                     <div className="grid grid-cols-2 gap-1">
                         <fieldset className="col-span-1 space-x-1 border border-solid border-slate-400 px-1 py-2 rounded">
                             <legend>Lunes</legend>
-                            <input type="time" className="px-1 rounded shadow-md" name="open" defaultValue={menuSelected?.openingHours.length ? menuSelected.openingHours[1].open : ""} />
-                            <input type="time" className="px-1 rounded shadow-md" name="close" defaultValue={menuSelected?.openingHours.length ? menuSelected.openingHours[1].close : ""} />
+                            <input type="time" className="px-1 rounded shadow-md" name="open" defaultValue={menuSelected?.openingHours.length ? menuSelected.openingHours[1].openH : ""} />
+                            <input type="time" className="px-1 rounded shadow-md" name="close" defaultValue={menuSelected?.openingHours.length ? menuSelected.openingHours[1].closeH : ""} />
                         </fieldset>
                         <fieldset className="col-span-1 space-x-1 border border-solid border-slate-400 px-1 py-2 rounded">
                             <legend>Martes</legend>
                             <input type="time" className="px-1 rounded shadow-md" name="open"
-                                defaultValue={menuSelected?.openingHours.length ? menuSelected.openingHours[2].open : ""} />
-                            <input type="time" className="px-1 rounded shadow-md" name="close" defaultValue={menuSelected?.openingHours.length ? menuSelected.openingHours[2].close : ""} />
+                                defaultValue={menuSelected?.openingHours.length ? menuSelected.openingHours[2].openH : ""} />
+                            <input type="time" className="px-1 rounded shadow-md" name="close" defaultValue={menuSelected?.openingHours.length ? menuSelected.openingHours[2].closeH : ""} />
                         </fieldset>
                         <fieldset className="col-span-1 space-x-1 border border-solid border-slate-400 px-1 py-2 rounded">
                             <legend>Miercoles</legend>
-                            <input type="time" className="px-1 rounded shadow-md" name="open" defaultValue={menuSelected?.openingHours.length ? menuSelected.openingHours[3].open : ""} />
-                            <input type="time" className="px-1 rounded shadow-md" name="close" defaultValue={menuSelected?.openingHours.length ? menuSelected.openingHours[3].close : ""} />
+                            <input type="time" className="px-1 rounded shadow-md" name="open" defaultValue={menuSelected?.openingHours.length ? menuSelected.openingHours[3].openH : ""} />
+                            <input type="time" className="px-1 rounded shadow-md" name="close" defaultValue={menuSelected?.openingHours.length ? menuSelected.openingHours[3].closeH : ""} />
                         </fieldset>
                         <fieldset className="col-span-1 space-x-1 border border-solid border-slate-400 px-1 py-2 rounded">
                             <legend>Jueves</legend>
-                            <input type="time" className="px-1 rounded shadow-md" name="open" defaultValue={menuSelected?.openingHours.length ? menuSelected.openingHours[4].open : ""} />
-                            <input type="time" className="px-1 rounded shadow-md" name="close" defaultValue={menuSelected?.openingHours.length ? menuSelected.openingHours[4].close : ""} />
+                            <input type="time" className="px-1 rounded shadow-md" name="open" defaultValue={menuSelected?.openingHours.length ? menuSelected.openingHours[4].openH : ""} />
+                            <input type="time" className="px-1 rounded shadow-md" name="close" defaultValue={menuSelected?.openingHours.length ? menuSelected.openingHours[4].closeH : ""} />
                         </fieldset>
                         <fieldset className="col-span-1 space-x-1 border border-solid border-slate-400 px-1 py-2 rounded">
                             <legend>Viernes</legend>
-                            <input type="time" className="px-1 rounded shadow-md" name="open" defaultValue={menuSelected?.openingHours.length ? menuSelected.openingHours[5].open : ""} />
-                            <input type="time" className="px-1 rounded shadow-md" name="close" defaultValue={menuSelected?.openingHours.length ? menuSelected.openingHours[5].close : ""} />
+                            <input type="time" className="px-1 rounded shadow-md" name="open" defaultValue={menuSelected?.openingHours.length ? menuSelected.openingHours[5].openH : ""} />
+                            <input type="time" className="px-1 rounded shadow-md" name="close" defaultValue={menuSelected?.openingHours.length ? menuSelected.openingHours[5].closeH : ""} />
                         </fieldset>
                         <fieldset className="col-span-1 space-x-1 border border-solid border-slate-400 px-1 py-2 rounded">
                             <legend>Sabado</legend>
-                            <input type="time" className="px-1 rounded shadow-md" name="open" defaultValue={menuSelected?.openingHours.length ? menuSelected.openingHours[6].open : ""} />
-                            <input type="time" className="px-1 rounded shadow-md" name="close" defaultValue={menuSelected?.openingHours.length ? menuSelected.openingHours[6].close : ""} />
+                            <input type="time" className="px-1 rounded shadow-md" name="open" defaultValue={menuSelected?.openingHours.length ? menuSelected.openingHours[6].openH : ""} />
+                            <input type="time" className="px-1 rounded shadow-md" name="close" defaultValue={menuSelected?.openingHours.length ? menuSelected.openingHours[6].closeH : ""} />
                         </fieldset>
                         <fieldset className="col-span-2 space-x-1 border border-solid border-slate-400 px-1 py-2 rounded flex justify-center">
                             <legend className="mx-auto">Domingo</legend>
-                            <input type="time" className="px-1 rounded shadow-md" name="open" defaultValue={menuSelected?.openingHours.length ? menuSelected.openingHours[0].open : ""} />
-                            <input type="time" className="px-1 rounded shadow-md" name="close" defaultValue={menuSelected?.openingHours.length ? menuSelected.openingHours[0].close : ""} />
+                            <input type="time" className="px-1 rounded shadow-md" name="open" defaultValue={menuSelected?.openingHours.length ? menuSelected.openingHours[0].openH : ""} />
+                            <input type="time" className="px-1 rounded shadow-md" name="close" defaultValue={menuSelected?.openingHours.length ? menuSelected.openingHours[0].closeH : ""} />
                         </fieldset>
                     </div>
                 </div>

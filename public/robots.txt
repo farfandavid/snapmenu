@@ -1,0 +1,9 @@
+User-agent: *
+Disallow: /dashboard/
+Disallow: /api/
+Disallow: /auth/
+
+User-agent: *
+Allow: /
+
+Sitemap: https://www.snapmenu.online/sitemap.xml

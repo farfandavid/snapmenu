@@ -1,4 +1,10 @@
 ---
+import ClipboardFill from "../assets/ClipboardFill.astro";
+import EnvelopeAtFill from "../assets/EnvelopeAtFill.astro";
+import Facebook from "../assets/Facebook.astro";
+import Instagram from "../assets/Instagram.astro";
+import Whatsapp from "../assets/Whatsapp.astro";
+
 const CONTACT_CONTENT = {
     title: "Contacto",
     description:
@@ -21,8 +27,7 @@ const CONTACT_CONTENT = {
                 class="flex justify-between bg-white p-5 items-center text-xl mb-2 shadow-md rounded fade-in"
             >
                 <div class="flex font-medium gap-1 items-center">
-                    <i class="bi bi-envelope-at-fill text-orange-500 text-2xl"
-                    ></i>
+                    <EnvelopeAtFill className="fill-orange-500 h-8" />
                     <a
                         id="email-copy"
                         href=`mailto:${CONTACT_CONTENT.email}`
@@ -36,15 +41,16 @@ const CONTACT_CONTENT = {
                 <button
                     class="bg-orange-500 text-white w-10 h-10 rounded hover:ring-1 hover:ring-orange-500 hover:bg-white hover:text-orange-500"
                     data-copy="email-copy"
+                    aria-label="Copiar email"
                 >
-                    <i class="bi bi-clipboard-fill"></i>
+                    <ClipboardFill />
                 </button>
             </div>
             <div
                 class="flex justify-between bg-white p-5 items-center text-xl mb-2 shadow-md rounded fade-in"
             >
                 <div class="flex font-medium gap-1 items-center">
-                    <i class="bi bi-whatsapp text-green-500 text-2xl"></i>
+                    <Whatsapp className="fill-green-500 h-8" />
                     <a
                         id="whatsapp-copy"
                         href={`https://wa.me/${CONTACT_CONTENT.whatsapp}`}
@@ -58,15 +64,16 @@ const CONTACT_CONTENT = {
                 <button
                     class="bg-green-500 text-white w-10 h-10 rounded hover:ring-1 hover:ring-green-500 hover:bg-white hover:text-green-500"
                     data-copy="whatsapp-copy"
+                    aria-label="Copiar whatsapp"
                 >
-                    <i class="bi bi-clipboard-fill"></i>
+                    <ClipboardFill />
                 </button>
             </div>
             <div
                 class="flex justify-between bg-white p-5 items-center text-xl mb-2 shadow-md rounded fade-in"
             >
                 <div class="flex font-medium gap-1 items-center">
-                    <i class="bi bi-facebook text-blue-500 text-2xl"></i>
+                    <Facebook className="fill-blue-500 h-8" />
                     <a
                         id="facebook-copy"
                         href={CONTACT_CONTENT.facebook}
@@ -80,15 +87,16 @@ const CONTACT_CONTENT = {
                 <button
                     class="bg-blue-500 text-white w-10 h-10 rounded hover:ring-1 hover:ring-blue-500 hover:bg-white hover:text-blue-500"
                     data-copy="facebook-copy"
+                    aria-label="Copiar facebook"
                 >
-                    <i class="bi bi-clipboard-fill"></i>
+                    <ClipboardFill />
                 </button>
             </div>
             <div
                 class="flex justify-between bg-white p-5 items-center text-xl mb-2 shadow-md rounded max-md:fade-in"
             >
                 <div class="flex font-medium gap-1 items-center">
-                    <i class="bi bi-instagram text-pink-500 text-2xl"></i>
+                    <Instagram className="fill-pink-500 h-8" />
                     <a
                         id="instagram-copy"
                         href={CONTACT_CONTENT.instagram}
@@ -102,8 +110,9 @@ const CONTACT_CONTENT = {
                 <button
                     class="bg-pink-500 text-white w-10 h-10 rounded hover:ring-1 hover:ring-pink-500 hover:bg-white hover:text-pink-500"
                     data-copy="instagram-copy"
+                    aria-label="Copiar instagram"
                 >
-                    <i class="bi bi-clipboard-fill"></i>
+                    <ClipboardFill />
                 </button>
             </div>
         </div>
@@ -148,7 +157,8 @@ const CONTACT_CONTENT = {
                     class="g-recaptcha bg-orange-500 text-white px-4 py-2 rounded-md mt-4 inline-block hover:bg-white hover:text-orange-500 hover:border-orange-500 border-2"
                     data-sitekey="6Lf9VuQpAAAAAAR2Ub93R7uxzF0NNS6UsrtrDjgl"
                     data-callback="onSubmit"
-                    data-action="submit">Enviar</button
+                    data-action="submit"
+                    aria-label="Enviar Formulario de Contacto">Enviar</button
                 >
                 <script is:inline>
                     function onSubmit(token) {

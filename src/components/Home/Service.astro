@@ -37,7 +37,6 @@ const SERVICE_CONTENT = {
                 "Menu totalmente personalizado a tu gusto.",
                 "Funcionalidades a medida para tu negocio.",
                 "Soporte prioritario por correo electrónico, chat en vivo y asistencia telefónica.",
-                "Y mucho más...",
             ],
             price: "Consultar",
         },
@@ -51,18 +50,20 @@ const SERVICE_CONTENT = {
     <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
         {
             SERVICE_CONTENT.plans.map((plan) => (
-                <div class="flex flex-col justify-between bg-white rounded-lg shadow-lg p-6 fade-in">
-                    <h3 class="text-2xl font-bold mb-4">{plan.name}</h3>
-                    <ul class="list-disc px-6">
+                <div class="grid grid-rows-7 bg-white rounded-lg shadow-lg p-5 fade-in">
+                    <h3 class="row-span-1 text-xl font-bold m-0 p-0 h-fit">
+                        {plan.name}
+                    </h3>
+                    <ul class="list-disc px-5 row-span-4">
                         {plan.features.map((feature) => (
                             <li>{feature}</li>
                         ))}
                     </ul>
-                    <div class="mt-2">
-                        <p class="text-2xl font-bold mb-1">{plan.price}</p>
+                    <div class=" justify-self-end row-span-2 mx-auto">
+                        <p class="text-2xl font-bold">{plan.price}</p>
                         <a
                             href={PUBLIC_ROUTES.SIGN_IN}
-                            class="bg-orange-500 text-white px-4 py-2 rounded-md mt-4 inline-block hover:bg-white hover:text-orange-500 hover:border-orange-500 border-2"
+                            class="bg-orange-500 text-white px-4 py-2 rounded-md mt-1 inline-block hover:bg-white hover:text-orange-500 hover:border-orange-500 border-2"
                         >
                             Elegir Plan
                         </a>

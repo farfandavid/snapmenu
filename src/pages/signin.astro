@@ -2,6 +2,7 @@
 import { app } from "../server/config/firebaseServer";
 import { getAuth } from "firebase-admin/auth";
 import Layout from "../layouts/Layout.astro";
+import HouseFill from "../components/assets/HouseFill.astro";
 
 /* Verificar si el usuario está autenticado */
 const auth = getAuth(app);
@@ -28,8 +29,7 @@ if (Astro.cookies.has("session")) {
                 href="/"
                 class="absolute top-1 left-1 text-gray-500 flex justify-center items-center hover:underline font-bold gap-1 text-xl"
             >
-                <i class="bi bi-arrow-left-square-fill text-orange-500"
-                ></i>Inicio
+                <HouseFill className="h-8 fill-orange-500" /> Inicio
             </a>
         </span>
         <div

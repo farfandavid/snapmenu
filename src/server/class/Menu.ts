@@ -13,6 +13,10 @@ export class Menu implements IMenu {
     categories?: ICategories[];
     productsLimit?: number;
     address?: string;
+    city?: string;
+    state?: string;
+    postalCode?: string;
+    country?: string;
     mapUrl?: string;
     phone?: string;
     logoUrl?: string;
@@ -42,6 +46,10 @@ export class Menu implements IMenu {
         this.categories = data.categories;
         this.productsLimit = data.productsLimit;
         this.address = data.address;
+        this.city = data.city;
+        this.state = data.state;
+        this.postalCode = data.postalCode;
+        this.country = data.country;
         this.mapUrl = data.mapUrl;
         this.phone = data.phone;
         this.logoUrl = data.logoUrl;
@@ -50,6 +58,7 @@ export class Menu implements IMenu {
         this.openingHours = data.openingHours;
         this.expDate = data.expDate;
         this.maxProducts = data.maxProducts;
+
     }
 
     validate(): Menu | MenuError {
@@ -112,6 +121,18 @@ export class Menu implements IMenu {
         try {
             await db.connectDB();
             const menu = await MenuModel.findByIdAndUpdate(this._id, { logoUrl: logoUrl }, { new: true });
+            if (!menu) return null;
+            return new Menu(menu);
+        } catch (err) {
+            console.log(err);
+            throw new Error(ERROR_MESSAGES[500]);
+        }
+    }
+
+    async updateBanner(bannerUrl: string) {
+        try {
+            await db.connectDB();
+            const menu = await MenuModel.findByIdAndUpdate(this._id, { bannerUrl: bannerUrl }, { new: true });
             if (!menu) return null;
             return new Menu(menu);
         } catch (err) {
@@ -185,19 +206,20 @@ export class Menu implements IMenu {
             throw new Error(ERROR_MESSAGES[500]);
         }
     }
-    async updateInfo(menuData: IMenu) {
+    async updateInfo() {
         try {
             await db.connectDB();
             const menu = await MenuModel.findByIdAndUpdate(this._id, {
                 $set: {
-                    name: menuData.name,
-                    description: menuData.description,
-                    categories: menuData.categories,
-                    address: menuData.address,
-                    mapUrl: menuData.mapUrl,
-                    phone: menuData.phone,
-                    bannerUrl: menuData.bannerUrl,
-                    social: menuData.social,
+                    description: this.description,
+                    address: this.address,
+                    mapUrl: this.mapUrl,
+                    phone: this.phone,
+                    social: this.social,
+                    city: this.city,
+                    state: this.state,
+                    postalCode: this.postalCode,
+                    country: this.country
                 }
             }, { new: true });
             if (!menu) return null;

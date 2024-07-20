@@ -1,4 +1,11 @@
 ---
+import QRCodeScan from "../assets/QRCodeScan.astro";
+import SearchHeart from "../assets/SearchHeart.astro";
+import PostcardHeartFill from "../assets/PostcardHeartFill.astro";
+import Share from "../assets/Share.astro";
+import PencilFill from "../assets/PencilFill.astro";
+import Piggy from "../assets/Piggy.astro";
+
 interface Props {
     icon: string;
     title: string;
@@ -14,7 +21,23 @@ const { icon, title, description }: Props = Astro.props;
     <div
         class="w-14 h-14 flex items-center justify-center aspect-square bg-orange-500 xl:text-3xl rounded text-white col-span-1"
     >
-        <i class=`bi ${icon}`></i>
+        {
+            () => {
+                if (icon === "bi-qr-code-scan") {
+                    return <QRCodeScan className="h-8" />;
+                } else if (icon === "bi-search-heart") {
+                    return <SearchHeart className="h-8" />;
+                } else if (icon === "bi-postcard-heart-fill") {
+                    return <PostcardHeartFill className="h-8" />;
+                } else if (icon === "bi-share-fill") {
+                    return <Share className="h-8" />;
+                } else if (icon === "bi-pencil-fill") {
+                    return <PencilFill className="h-8" />;
+                } else if (icon === "bi-piggy-bank-fill") {
+                    return <Piggy className="h-8" />;
+                }
+            }
+        }
     </div>
     <div class="w-auto col-span-4">
         <h3 class="xl:text-lg font-bold">{title}</h3>

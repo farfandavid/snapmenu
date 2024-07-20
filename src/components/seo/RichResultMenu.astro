@@ -1,0 +1,57 @@
+---
+import { Menu } from "../../server/class/Menu";
+import extractCoordinates from "../../server/utils/Geo.ts";
+interface Props {
+    menu: Menu;
+}
+
+const { menu } = Astro.props;
+
+if (!menu) {
+    return;
+}
+const coordinates = extractCoordinates(menu?.mapUrl || "");
+const days = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+];
+const lat = coordinates?.lat;
+const lng = coordinates?.lng;
+const RichMenuSchema = {
+    "@context": "https://schema.org",
+    "@type": "Restaurant",
+    image: [menu?.logoUrl, menu?.bannerUrl],
+    name: menu?.name,
+    address: {
+        "@type": "PostalAddress",
+        streetAddress: menu?.address,
+        addressLocality: menu?.city,
+        postalCode: menu?.postalCode,
+        addressRegion: menu?.state,
+        addressCountry: menu?.country,
+    },
+    geo: {
+        "@type": "GeoCoordinates",
+        latitude: lat,
+        longitude: lng,
+    },
+    url: `www.snapmenu.online/${menu.name}`,
+    telephone: `+${menu.phone}`,
+    openingHoursSpecification: [
+        menu.openingHours?.map((day, index) => ({
+            "@type": "OpeningHoursSpecification",
+            dayOfWeek: days[index],
+            opens: day.openH,
+            closes: day.closeH,
+        })),
+    ],
+    menu: `www.snapmenu.online/${menu.name}`,
+};
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(RichMenuSchema)} />

@@ -5,6 +5,7 @@ import Service from "../components/Home/Service.astro";
 import Contact from "../components/Home/Contact.astro";
 import Layout from "../layouts/Layout.astro";
 import { Image } from "astro:assets";
+import List from "../components/assets/List.astro";
 
 const NAVBAR = [
 	{
@@ -50,7 +51,7 @@ const NAVBAR = [
 				id="btn-dropdown"
 				class="text-3xl text-orange-500 md:hidden"
 			>
-				<i class="bi bi-list"></i>
+				<List className="h-8" />
 			</button>
 		</div>
 		<nav

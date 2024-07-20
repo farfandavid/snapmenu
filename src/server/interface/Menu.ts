@@ -70,7 +70,11 @@ const MenuSchema = z.object({
     categories: z.array(CategoriesSchema).optional(),
     productsLimit: z.number().optional(),
     //error: z.string().optional(),
-    address: z.string().max(10).optional(),
+    address: z.string().max(50).optional(),
+    city: z.string().max(50).optional(),
+    state: z.string().max(50).optional(),
+    postalCode: z.string().max(10).optional(),
+    country: z.string().max(50).optional(),
     mapUrl: z.string().optional(),
     phone: z.string().max(20).optional(),
     logoUrl: z.string().optional(),
@@ -112,6 +116,10 @@ export class MenuError implements IMenuErrors {
     active?: string[] | undefined;
     categories?: string[] | undefined;
     address?: string[] | undefined;
+    city?: string[] | undefined;
+    state?: string[] | undefined;
+    postalCode?: string[] | undefined;
+    country?: string[] | undefined;
     mapUrl?: string[] | undefined;
     phone?: string[] | undefined;
     logoUrl?: string[] | undefined;

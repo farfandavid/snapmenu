@@ -70,6 +70,12 @@ export const MENU_NAMES_PROHIBITED = [
     'pdf',
     'drugs',
     'robot',
+    "robots",
+    "robots.txt",
+    "init",
+    ".env",
+    "favicon",
+    "demo",
     'medicine',
     'administrador',
     'assets',
@@ -79,5 +85,6 @@ export const MENU_NAMES_PROHIBITED = [
     'google',
     'droga',
     'html',
-    'webhook'
+    'webhook',
+    "sitemap",
 ]

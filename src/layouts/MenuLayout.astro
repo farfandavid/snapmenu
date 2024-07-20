@@ -1,5 +1,7 @@
 ---
-const { title } = Astro.props;
+import RichResultMenu from "../components/seo/RichResultMenu.astro";
+
+const { title, menu } = Astro.props;
 ---
 
 <html lang="es">
@@ -14,6 +16,12 @@ const { title } = Astro.props;
             type="text/css"
         />
         <title>{title}</title>
+        <meta
+            name="google-site-verification"
+            content="ogo30vUH2dxlKXdMdH9NpbVHiaMmIz5K90SdaUQO3aY"
+        />
+        <meta name="author" content="SnapMenu" />
+        <RichResultMenu menu={menu} />
     </head>
     <body class="h-screen w-screen bg-black overflow-hidden">
         <slot />
@@ -21,32 +29,32 @@ const { title } = Astro.props;
             class="w-screen h-screen absolute top-0 -z-10 bg-[url('https://th.bing.com/th/id/R.c697adb39de642e86dc2a0e8a4a24982?rik=xLE6dqFrzXwocg&pid=ImgRaw&r=0')] bg-cover bg-no-repeat bg-center filter blur-lg"
         >
         </div>
+        <style is:global>
+            *::-webkit-scrollbar {
+                height: 4px;
+                width: 4px;
+                background: rgba(75, 75, 75, 0);
+            }
+
+            /* Track */
+            *::-webkit-scrollbar-track {
+                background: #5f5f5f00;
+            }
+
+            /* Handle */
+            *::-webkit-scrollbar-thumb {
+                background: #888;
+            }
+
+            /* Handle on hover */
+            *::-webkit-scrollbar-thumb:hover {
+                background: #555;
+            }
+
+            *::-webkit-scrollbar-thumb:horizontal {
+                background: #929292;
+                border-radius: 10px;
+            }
+        </style>
     </body>
 </html>
-<style is:global>
-    *::-webkit-scrollbar {
-        height: 4px;
-        width: 4px;
-        background: rgba(75, 75, 75, 0);
-    }
-
-    /* Track */
-    *::-webkit-scrollbar-track {
-        background: #5f5f5f00;
-    }
-
-    /* Handle */
-    *::-webkit-scrollbar-thumb {
-        background: #888;
-    }
-
-    /* Handle on hover */
-    *::-webkit-scrollbar-thumb:hover {
-        background: #555;
-    }
-
-    *::-webkit-scrollbar-thumb:horizontal {
-        background: #929292;
-        border-radius: 10px;
-    }
-</style>

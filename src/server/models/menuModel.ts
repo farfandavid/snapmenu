@@ -14,7 +14,11 @@ const HoursSchemaMongoose = new Schema<IHoursModel>({
     closeH: {
         type: String,
         required: true,
+
     }
+}, {
+    timestamps: false,
+    _id: false,
 })
 
 const ProductSchemaMongoose = new Schema<IProductModel>({
@@ -92,6 +96,22 @@ const MenuSchemaMongoose = new Schema<IMenuModel>({
     address: {
         type: String,
         required: false,
+    },
+    city: {
+        type: String,
+        required: false,
+    },
+    state: {
+        type: String,
+        required: false,
+    },
+    postalCode: {
+        type: String,
+        required: false,
+    },
+    country: {
+        type: String,
+        required: false
     },
     mapUrl: {
         type: String,

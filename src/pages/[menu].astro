@@ -19,7 +19,7 @@ if (new Date(menuData.expDate) < new Date()) {
 }
 ---
 
-<MenuLayout title={menuData.name}>
+<MenuLayout title={menuData.name} menu={menuData}>
     <div
         class="bg-slate-200 h-screen w-screen overflow-auto relative md:flex md:flex-col md:items-center"
     >
@@ -430,8 +430,8 @@ if (new Date(menuData.expDate) < new Date()) {
             }
         }
     } else {
-        openClose.textContent = ``;
-        openClose.parentElement?.classList.add("hidden");
+        openClose.textContent = `Cerrado`;
+        openClose.parentElement?.classList.add("bg-red-500");
     }
 </script>
 <style>
