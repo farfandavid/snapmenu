@@ -3,10 +3,21 @@ import { defineMiddleware } from "astro/middleware";
 import { PRIVATE_ROUTES } from "../server/utils/constants";
 import { verifyAuth } from "../utils/verifyAuth";
 import { User } from "../server/class/User";
+import { verifyMPWebhook } from "../utils/mercadopagoValidator";
 
 export const onRequest = defineMiddleware(async (context, next,) => {
     if (import.meta.env.SSR) {
         console.log(context.clientAddress + ";" + context.url.pathname);
+    }
+    if (context.url.pathname === "/api/payment/webhook" && context.request.method === "POST" && context.request.headers.get("Referer") === "https://mercadopago.com.ar") {
+        const dataID = context.url.searchParams.get("data.id");
+        if (verifyMPWebhook(context.request.headers, dataID || "")) {
+            console.log("Webhook verified");
+            return next();
+        } else {
+            console.log("Webhook not verified");
+            return new Response("Unauthorized", { status: 401 });
+        }
     }
     const isPrivateRoute = PRIVATE_ROUTES.some(route => context.url.pathname.startsWith(route));
     if (isPrivateRoute) {
