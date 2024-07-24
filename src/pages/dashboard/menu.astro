@@ -1,10 +1,35 @@
 ---
 import DashboardLayout from "../../layouts/DashboardLayout.astro";
 import MenuDash from "../../components/dashboard/MenuDash.tsx";
+import { Menu as MenuClass } from "../../server/class/Menu";
 const user = Astro.locals.user;
+
+const menus = await MenuClass.getMenusByUserId(
+    Astro.locals.user.id || "",
+).catch((err) => {
+    console.error(err);
+    return null;
+});
 console.log(user);
 ---
 
 <DashboardLayout>
-    <MenuDash client:load />
+    {
+        () => {
+            if (menus !== null && menus.length > 0) {
+                return <MenuDash client:load />;
+            } else {
+                return (
+                    <div class="flex justify-center items-center h-96">
+                        <div class="text-center">
+                            <h1 class="text-4xl font-bold">No tienes Menus</h1>
+                            <p class="text-lg">
+                                Crea un menu para empezar a vender
+                            </p>
+                        </div>
+                    </div>
+                );
+            }
+        }
+    }
 </DashboardLayout>

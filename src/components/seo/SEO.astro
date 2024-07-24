@@ -4,9 +4,10 @@ interface Props {
 	description: string;
 	canonical?: string;
 	image?: string;
+	favicon?: string;
 }
 
-const { title, description, canonical, image } = Astro.props as Props;
+const { title, description, canonical, image, favicon } = Astro.props as Props;
 
 const determineCanonicalURL = () => {
 	if (Astro.url.host.includes("localhost")) return "http://localhost:3000";
@@ -17,6 +18,7 @@ const canonicalURL = new URL(determineCanonicalURL(), Astro.site);
 ---
 
 <title>{title}</title>
+<link rel="icon" type="image/svg+xml" href={favicon} />
 
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width" />
@@ -42,7 +44,3 @@ const canonicalURL = new URL(determineCanonicalURL(), Astro.site);
 
 <meta name="robots" content="index, follow" />
 <meta name="googlebot" content="index, follow" />
-
-<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-
-<link rel="icon" type="image/svg+xml" href="/favicon.svg" />

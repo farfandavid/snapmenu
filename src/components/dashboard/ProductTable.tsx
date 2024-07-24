@@ -91,6 +91,7 @@ export const ProductTable = ({ index, category, editCategory, deleteCategory, ed
                                     value={product.name}
                                     onChange={(e) => editProduct(index, indexProduct, e)}
                                     disabled
+                                    max={150}
                                     className="border p-1 w-full active:bg-white active:border-blue-300 disabled:bg-gray-50 enabled:bg-white enabled:border-blue-300 enabled:ring-1 ring-blue-300 text-wrap break-words"
                                 />
                             </td>
@@ -101,6 +102,7 @@ export const ProductTable = ({ index, category, editCategory, deleteCategory, ed
                                     data-field="description"
                                     onChange={(e) => editProduct(index, indexProduct, e)}
                                     disabled
+                                    max={150}
                                     className="border p-1 w-full active:bg-white active:border-blue-300 disabled:bg-gray-50 enabled:bg-white enabled:border-blue-300 enabled:ring-1 ring-blue-300 text-wrap break-words"
                                 />
                             </td>
@@ -111,6 +113,7 @@ export const ProductTable = ({ index, category, editCategory, deleteCategory, ed
                                     data-field="price"
                                     onChange={(e) => editProduct(index, indexProduct, e)}
                                     disabled
+                                    max={9999999}
                                     className="border p-1 w-full active:bg-white active:border-blue-300 disabled:bg-gray-50 enabled:bg-white enabled:border-blue-300 enabled:ring-1 ring-blue-300 text-wrap break-words"
                                 />
                             </td>

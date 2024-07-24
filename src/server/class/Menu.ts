@@ -1,5 +1,5 @@
 import type { Types } from "mongoose";
-import { CategoriesError, CategoriesSchema, MenuError, MenuSchema, type ICategories, type IMenu } from "../interface/Menu";
+import { CategoriesError, MenuError, MenuSchema, type ICategories, type IMenu } from "../interface/Menu";
 import db from "../config/db";
 import { MenuModel } from "../models/menuModel";
 import { ERROR_MESSAGES } from "../utils/constants";

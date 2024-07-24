@@ -1,4 +1,3 @@
-import { set } from "mongoose";
 import { useEffect, useState } from "react";
 interface Menu {
     _id?: string;
@@ -48,7 +47,7 @@ export default function MenuDash() {
                         return data
                     });
             } catch (error) {
-                set
+
             } finally {
                 setLoading(false);
             }

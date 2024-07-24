@@ -1,5 +1,756 @@
 ---
 import DashboardLayout from "../../layouts/DashboardLayout.astro";
+import { Menu } from "../../server/class/Menu";
+const menus = await Menu.getMenusByUserId(Astro.locals.user.id || "").catch(
+    (err) => {
+        console.error(err);
+        return null;
+    },
+);
 ---
 
-<DashboardLayout> qr </DashboardLayout>
+<DashboardLayout>
+    <div class="w-full flex flex-col items-center">
+        <h1>QR Generator</h1>
+        <p>Generate QR codes for your products.</p>
+        <div class="w-full flex justify-center">
+            <div id="canvas"></div>
+        </div>
+
+        <div class="flex flex-col w-full md:w-1/3">
+            <h2>Selecciona un Menu</h2>
+            <select name="own-menu" id="own-menu" class="p-2 rounded">
+                {
+                    menus?.map((menu) => (
+                        <option
+                            value={import.meta.env.SITE_URL + "/" + menu.name}
+                        >
+                            {menu.name}
+                        </option>
+                    ))
+                }
+            </select>
+            <h2>O ingresa manualmente su URL</h2>
+            <input
+                type="text"
+                id="url-menu"
+                class="p-2 rounded"
+                placeholder="Ingrese una URL"
+            />
+            <h2>Logo</h2>
+            <div class="flex flex-col">
+                <input
+                    type="file"
+                    id="inp-image"
+                    class="bg-orange-500 rounded text-white p-1"
+                />
+                <div class="flex items-center gap-2">
+                    <label for="hide-dot">Tapar Puntos</label>
+                    <input
+                        type="checkbox"
+                        name="hide-dot"
+                        id="hide-dot"
+                        class="h-4 w-4"
+                    />
+                </div>
+                <label for="img-size">Tamaño</label>
+                <input
+                    type="range"
+                    min="0"
+                    max="10"
+                    id="img-size"
+                    value="5"
+                    class="accent-orange-500 rounded-full bg-slate-50"
+                />
+                <label for="img-margin">Margen</label>
+                <input
+                    type="range"
+                    min="0"
+                    max="10"
+                    id="img-margin"
+                    value="0"
+                    class="accent-orange-500 my-2"
+                />
+            </div>
+            <button
+                id="btn-dots"
+                class="flex justify-between p-2 bg-orange-500 rounded text-white"
+                >Patron<span><i class="bi bi-plus-lg"></i></span></button
+            >
+            <div
+                class="flex flex-col w-full overflow-hidden bg-slate-200 px-2 rounded h-0"
+                id="form-type-dots"
+            >
+                <label for="type-dots">Tipo de puntos</label>
+                <select class="p-2 rounded" name="type-dots" id="type-dots">
+                    <option value="dots">Dots</option>
+                    <option value="rounded">Rounded</option>
+                    <option value="classy">Classy</option>
+                    <option value="classy-rounded">Classy Rounded</option>
+                    <option value="square" selected>Square</option>
+                    <option value="extra-rounded">Extra Rounded</option>
+                </select>
+                <label for="type-color">Tipo de Color</label>
+                <div class="flex w-full justify-between">
+                    <div>
+                        <label for="single-color">Un solo color</label>
+                        <input
+                            type="radio"
+                            name="type-color"
+                            value="single-col"
+                            class="accent-orange-500"
+                            checked
+                        />
+                    </div>
+                    <div>
+                        <label for="gradient-color">Degradado</label>
+                        <input
+                            type="radio"
+                            name="type-color"
+                            class="accent-orange-500"
+                            value="gradient-col"
+                        />
+                    </div>
+                </div>
+                <div id="form-single">
+                    <input
+                        type="color"
+                        id="one-color"
+                        class="rounded-full h-8 w-8"
+                    />
+                </div>
+                <div
+                    id="form-gradiente"
+                    class="flex flex-col w-full"
+                    style="display:none;"
+                >
+                    <select
+                        name="type-gradient"
+                        id="type-gradiente"
+                        class="p-2 rounded"
+                    >
+                        <option value="radial">Radial</option>
+                        <option value="linear">Linear</option>
+                    </select>
+                    <div class="flex items-center">
+                        <label for="color1">Color 1</label>
+                        <input
+                            type="color"
+                            id="color1"
+                            class="rounded-full h-8 w-8 border"
+                        />
+                        <label for="color2">Color 2</label>
+                        <input
+                            type="color"
+                            id="color2"
+                            class="rounded-full h-8 w-8 border"
+                        />
+                    </div>
+                    <label for="rotation">Rotación</label>
+                    <input
+                        type="range"
+                        min="0"
+                        max="360"
+                        id="rotation"
+                        value="0"
+                        class="accent-orange-500 my-2"
+                    />
+                </div>
+            </div>
+            <button
+                id="btn-corners"
+                class="flex justify-between p-2 bg-orange-500 rounded text-white"
+                >Cuadros<span><i class="bi bi-plus-lg"></i></span></button
+            >
+            <div
+                id="form-type-corners"
+                class="flex flex-col w-full overflow-hidden bg-slate-200 px-2 rounded h-0"
+            >
+                <label for="type-corners">Tipo de Cuadros</label>
+                <select
+                    class="p-2 rounded"
+                    name="type-corners"
+                    id="type-corners"
+                >
+                    <option value="" selected>Ninguno</option>
+                    <option value="dots">Dots</option>
+                    <option value="square">Square</option>
+                    <option value="extra-rounded">Extra Rounded</option>
+                </select>
+                <label for="type-color-c">Tipo de color</label>
+                <div class="flex w-full justify-between">
+                    <div>
+                        <label for="single-color-c">Un solo color</label>
+                        <input
+                            type="radio"
+                            name="type-color-c"
+                            value="single-col"
+                            class="accent-orange-500"
+                            checked
+                        />
+                    </div>
+                    <div>
+                        <label for="gradient-color-c">Degradado</label>
+                        <input
+                            type="radio"
+                            name="type-color-c"
+                            class="accent-orange-500"
+                            value="gradient-col"
+                        />
+                    </div>
+                </div>
+                <div id="form-single-c">
+                    <input
+                        type="color"
+                        id="one-color-c"
+                        class="rounded-full h-8 w-8"
+                    />
+                </div>
+                <div
+                    id="form-gradiente-c"
+                    class="flex flex-col w-full"
+                    style="display:none;"
+                >
+                    <select
+                        class="p-2 rounded"
+                        name="type-gradient-c"
+                        id="type-gradiente-c"
+                    >
+                        <option value="radial">Radial</option>
+                        <option value="linear">Linear</option>
+                    </select>
+                    <div class="flex items-center">
+                        <label for="color1-c">Color 1</label>
+                        <input
+                            type="color"
+                            id="color1-c"
+                            class="rounded-full h-8 w-8"
+                        />
+                        <label for="color2-c">Color 2</label>
+                        <input
+                            type="color"
+                            id="color2-c"
+                            class="rounded-full h-8 w-8"
+                        />
+                    </div>
+                    <label for="rotation-c">Rotación</label>
+                    <input
+                        type="range"
+                        min="0"
+                        max="360"
+                        id="rotation-c"
+                        class="accent-orange-500 my-2"
+                        value="0"
+                    />
+                </div>
+            </div>
+            <button
+                id="btn-points"
+                class="flex justify-between p-2 bg-orange-500 rounded text-white"
+                >Puntos de los Cuadros<span><i class="bi bi-plus-lg"></i></span
+                ></button
+            >
+            <div
+                id="form-type-points"
+                class="flex flex-col w-full overflow-hidden bg-slate-200 px-2 rounded h-0"
+            >
+                <label for="type-corners-p">Tipo de Cuadros</label>
+                <select
+                    class="p-2 rounded"
+                    name="type-corners-p"
+                    id="type-corners-p"
+                >
+                    <option value="" selected>Ninguno</option>
+                    <option value="dots">Dots</option>
+                    <option value="square">Square</option>
+                </select>
+                <label for="type-color-p">Tipo de color</label>
+                <div class="flex w-full justify-between">
+                    <div>
+                        <label for="single-color-p">Un solo color</label>
+                        <input
+                            type="radio"
+                            name="type-color-p"
+                            value="single-col"
+                            class="accent-orange-500"
+                            checked
+                        />
+                    </div>
+                    <div>
+                        <label for="gradient-color-p">Degradado</label>
+                        <input
+                            type="radio"
+                            name="type-color-p"
+                            class="accent-orange-500"
+                            value="gradient-col"
+                        />
+                    </div>
+                </div>
+                <div id="form-single-p">
+                    <input
+                        type="color"
+                        id="one-color-p"
+                        class="rounded-full h-8 w-8"
+                    />
+                </div>
+                <div
+                    id="form-gradiente-p"
+                    class="flex flex-col w-full"
+                    style="display:none;"
+                >
+                    <select
+                        class="p-2 rounded"
+                        name="type-gradient-p"
+                        id="type-gradiente-p"
+                    >
+                        <option value="radial">Radial</option>
+                        <option value="linear">Linear</option>
+                    </select>
+                    <div>
+                        <label for="color1-p">Color 1</label>
+                        <input
+                            type="color"
+                            id="color1-p"
+                            class="rounded-full h-8 w-8"
+                        />
+                        <label for="color2-p">Color 2</label>
+                        <input
+                            type="color"
+                            id="color2-p"
+                            class="rounded-full h-8 w-8"
+                        />
+                    </div>
+                    <label for="rotation-p">Rotación</label>
+                    <input
+                        type="range"
+                        min="0"
+                        max="360"
+                        id="rotation-p"
+                        class="accent-orange-500 my-2"
+                        value="0"
+                    />
+                </div>
+            </div>
+        </div>
+    </div>
+</DashboardLayout>
+<style>
+    label {
+        font-weight: 600;
+    }
+</style>
+<script>
+    import type {
+        CornerDotType,
+        CornerSquareType,
+        DotType,
+    } from "qr-code-styling";
+    import { QrCode } from "../../client/class/QrCode.ts";
+    const qrCode = new QrCode({
+        width: 300,
+        height: 300,
+        data: "https://www.snapmenu.online",
+        margin: 5,
+        qrOptions: {
+            typeNumber: 0,
+            mode: "Byte",
+            errorCorrectionLevel: "H",
+        },
+        imageOptions: {
+            hideBackgroundDots: false,
+            imageSize: 0.5,
+            margin: 0,
+        },
+        dotsOptions: {
+            type: "square",
+            color: "#000",
+        },
+        backgroundOptions: {
+            color: "#ffffff",
+        },
+        image: "",
+        cornersSquareOptions: {
+            color: "#000000",
+        },
+        cornersDotOptions: {
+            color: "#000000",
+        },
+    });
+    const qrElement = qrCode.createQrCode();
+    // get image from url
+    const inpFile = document.getElementById("inp-image") as HTMLInputElement;
+    const imgSize = document.getElementById("img-size") as HTMLInputElement;
+    const urlMenu = document.getElementById("url-menu") as HTMLInputElement;
+    const imgMargin = document.getElementById("img-margin") as HTMLInputElement;
+    const typeDots = document.getElementById("type-dots") as HTMLSelectElement;
+    const typeColor = document.getElementsByName(
+        "type-color",
+    ) as NodeListOf<HTMLInputElement>;
+
+    const formSingle = document.getElementById("form-single") as HTMLElement;
+    const formGradient = document.getElementById(
+        "form-gradiente",
+    ) as HTMLElement;
+    const typeGradient = document.getElementById(
+        "type-gradiente",
+    ) as HTMLSelectElement;
+    const oneColor = document.getElementById("one-color") as HTMLInputElement;
+    const color1 = document.getElementById("color1") as HTMLInputElement;
+    const color2 = document.getElementById("color2") as HTMLInputElement;
+    const rotation = document.getElementById("rotation") as HTMLInputElement;
+    const typeCorners = document.getElementById(
+        "type-corners",
+    ) as HTMLSelectElement;
+
+    // Corners Optione
+    const typeColorC = document.getElementsByName(
+        "type-color-c",
+    ) as NodeListOf<HTMLInputElement>;
+    const formSingleC = document.getElementById("form-single-c") as HTMLElement;
+    const formGradientC = document.getElementById(
+        "form-gradiente-c",
+    ) as HTMLElement;
+    const typeGradientC = document.getElementById(
+        "type-gradiente-c",
+    ) as HTMLSelectElement;
+    const oneColorC = document.getElementById(
+        "one-color-c",
+    ) as HTMLInputElement;
+    const color1C = document.getElementById("color1-c") as HTMLInputElement;
+    const color2C = document.getElementById("color2-c") as HTMLInputElement;
+    const rotationC = document.getElementById("rotation-c") as HTMLInputElement;
+    // Corners Points
+    const typeColorP = document.getElementsByName(
+        "type-color-p",
+    ) as NodeListOf<HTMLInputElement>;
+    const formSingleP = document.getElementById("form-single-p") as HTMLElement;
+    const formGradientP = document.getElementById(
+        "form-gradiente-p",
+    ) as HTMLElement;
+    const typeGradientP = document.getElementById(
+        "type-gradiente-p",
+    ) as HTMLSelectElement;
+    const oneColorP = document.getElementById(
+        "one-color-p",
+    ) as HTMLInputElement;
+    const color1P = document.getElementById("color1-p") as HTMLInputElement;
+    const color2P = document.getElementById("color2-p") as HTMLInputElement;
+    const rotationP = document.getElementById("rotation-p") as HTMLInputElement;
+
+    const btnDots = document.getElementById("btn-dots") as HTMLButtonElement;
+    const btnCorners = document.getElementById(
+        "btn-corners",
+    ) as HTMLButtonElement;
+    const btnPoints = document.getElementById(
+        "btn-points",
+    ) as HTMLButtonElement;
+    const hideDots = document.getElementById("hide-dot") as HTMLInputElement;
+    const ownMenu = document.getElementById("own-menu") as HTMLSelectElement;
+
+    ownMenu.addEventListener("change", (e) => {
+        urlMenu.value = ownMenu.value;
+        qrElement._options.data = ownMenu.value;
+        qrElement.update();
+    });
+
+    hideDots.addEventListener("change", (e) => {
+        qrElement._options.imageOptions.hideBackgroundDots = hideDots.checked;
+        qrElement.update();
+    });
+
+    btnPoints.addEventListener("click", (e) => {
+        const formTypePoints = document.getElementById(
+            "form-type-points",
+        ) as HTMLElement;
+        formTypePoints.style.height =
+            formTypePoints.style.height === "0px" ? "auto" : "0px";
+    });
+
+    btnCorners.addEventListener("click", (e) => {
+        const formTypeCorners = document.getElementById(
+            "form-type-corners",
+        ) as HTMLElement;
+        formTypeCorners.style.height =
+            formTypeCorners.style.height === "0px" ? "auto" : "0px";
+    });
+
+    btnDots.addEventListener("click", (e) => {
+        const formTypeDots = document.getElementById(
+            "form-type-dots",
+        ) as HTMLElement;
+        formTypeDots.style.height =
+            formTypeDots.style.height === "0px" ? "auto" : "0px";
+    });
+    // Corners Points
+    const typeCornersP = document.getElementById(
+        "type-corners-p",
+    ) as HTMLSelectElement;
+
+    typeColorP.forEach((input) => {
+        input.addEventListener("input", (e) => {
+            if (input.value === "single-col") {
+                formSingleP.style.display = "flex";
+                formGradientP.style.display = "none";
+            } else {
+                formSingleP.style.display = "none";
+                formGradientP.style.display = "flex";
+            }
+        });
+    });
+
+    oneColorP.addEventListener("input", async (e) => {
+        if (qrElement._options.cornersDotOptions) {
+            qrElement._options.cornersDotOptions.gradient = undefined;
+            qrElement._options.cornersDotOptions.color = oneColorP.value;
+        }
+        qrElement.update();
+    });
+
+    typeGradientP.addEventListener("change", async (e) => {
+        if (qrElement._options.cornersDotOptions) {
+            qrElement._options.cornersDotOptions.gradient = {
+                colorStops: [
+                    { color: color1P.value, offset: 0 },
+                    { color: color2P.value, offset: 100 },
+                ],
+                type: typeGradientP.value as "radial" | "linear",
+                rotation: parseInt(rotationP.value),
+            };
+        }
+        qrElement.update();
+    });
+
+    rotationP.addEventListener("input", async (e) => {
+        if (qrElement._options.cornersDotOptions) {
+            qrElement._options.cornersDotOptions.gradient = {
+                colorStops: [
+                    { color: color1P.value, offset: 0 },
+                    { color: color2P.value, offset: 100 },
+                ],
+                type: typeGradientP.value as "radial" | "linear",
+                rotation: parseInt(rotationP.value),
+            };
+        }
+        qrElement.update();
+    });
+
+    color1P.addEventListener("input", async (e) => {
+        if (qrElement._options.cornersDotOptions) {
+            qrElement._options.cornersDotOptions.gradient = {
+                colorStops: [
+                    { color: color1P.value, offset: 0 },
+                    { color: color2P.value, offset: 100 },
+                ],
+                type: typeGradientP.value as "radial" | "linear",
+                rotation: parseInt(rotationP.value),
+            };
+        }
+        qrElement.update();
+    });
+
+    color2P.addEventListener("input", async (e) => {
+        if (qrElement._options.cornersDotOptions) {
+            qrElement._options.cornersDotOptions.gradient = {
+                colorStops: [
+                    { color: color1P.value, offset: 0 },
+                    { color: color2P.value, offset: 100 },
+                ],
+                type: typeGradientP.value as "radial" | "linear",
+                rotation: parseInt(rotationP.value),
+            };
+        }
+        qrElement.update();
+    });
+
+    typeCornersP.addEventListener("change", async (e) => {
+        if (qrElement._options.cornersDotOptions) {
+            qrElement._options.cornersDotOptions.type =
+                typeCornersP.value as CornerDotType;
+            qrElement.update();
+        }
+    });
+
+    // Corners
+    typeCorners.addEventListener("change", async (e) => {
+        if (qrElement._options.cornersSquareOptions) {
+            qrElement._options.cornersSquareOptions.type =
+                typeCorners.value as CornerSquareType;
+            qrElement.update();
+        }
+    });
+
+    typeColorC.forEach((input) => {
+        input.addEventListener("input", (e) => {
+            if (input.value === "single-col") {
+                formSingleC.style.display = "flex";
+                formGradientC.style.display = "none";
+            } else {
+                formSingleC.style.display = "none";
+                formGradientC.style.display = "flex";
+            }
+        });
+    });
+
+    oneColorC.addEventListener("input", async (e) => {
+        if (qrElement._options.cornersSquareOptions) {
+            qrElement._options.cornersSquareOptions.gradient = undefined;
+            qrElement._options.cornersSquareOptions.color = oneColorC.value;
+        }
+        qrElement.update();
+    });
+
+    typeGradientC.addEventListener("change", async (e) => {
+        if (qrElement._options.cornersSquareOptions) {
+            qrElement._options.cornersSquareOptions.gradient = {
+                colorStops: [
+                    { color: color1C.value, offset: 0 },
+                    { color: color2C.value, offset: 100 },
+                ],
+                type: typeGradientC.value as "radial" | "linear",
+                rotation: parseInt(rotationC.value),
+            };
+        }
+        qrElement.update();
+    });
+
+    rotationC.addEventListener("input", async (e) => {
+        if (qrElement._options.cornersSquareOptions) {
+            qrElement._options.cornersSquareOptions.gradient = {
+                colorStops: [
+                    { color: color1C.value, offset: 0 },
+                    { color: color2C.value, offset: 100 },
+                ],
+                type: typeGradientC.value as "radial" | "linear",
+                rotation: parseInt(rotationC.value),
+            };
+        }
+        qrElement.update();
+    });
+
+    color1C.addEventListener("input", async (e) => {
+        if (qrElement._options.cornersSquareOptions) {
+            qrElement._options.cornersSquareOptions.gradient = {
+                colorStops: [
+                    { color: color1C.value, offset: 0 },
+                    { color: color2C.value, offset: 100 },
+                ],
+                type: typeGradientC.value as "radial" | "linear",
+                rotation: parseInt(rotationC.value),
+            };
+        }
+        qrElement.update();
+    });
+
+    color2C.addEventListener("input", async (e) => {
+        if (qrElement._options.cornersSquareOptions) {
+            qrElement._options.cornersSquareOptions.gradient = {
+                colorStops: [
+                    { color: color1C.value, offset: 0 },
+                    { color: color2C.value, offset: 100 },
+                ],
+                type: typeGradientC.value as "radial" | "linear",
+                rotation: parseInt(rotationC.value),
+            };
+        }
+        qrElement.update();
+    });
+
+    // Dots color
+    typeColor.forEach((input) => {
+        input.addEventListener("input", (e) => {
+            if (input.value === "single-col") {
+                formSingle.style.display = "flex";
+                formGradient.style.display = "none";
+            } else {
+                formSingle.style.display = "none";
+                formGradient.style.display = "flex";
+            }
+        });
+    });
+
+    oneColor.addEventListener("input", async (e) => {
+        qrElement._options.dotsOptions.gradient = undefined;
+        qrElement._options.dotsOptions.color = oneColor.value;
+        qrElement.update();
+    });
+
+    typeGradient.addEventListener("change", async (e) => {
+        qrElement._options.dotsOptions.gradient = {
+            colorStops: [
+                { color: color1.value, offset: 0 },
+                { color: color2.value, offset: 100 },
+            ],
+            type: typeGradient.value as "radial" | "linear",
+            rotation: parseInt(rotation.value),
+        };
+        qrElement.update();
+    });
+
+    rotation.addEventListener("input", async (e) => {
+        qrElement._options.dotsOptions.gradient = {
+            colorStops: [
+                { color: color1.value, offset: 0 },
+                { color: color2.value, offset: 100 },
+            ],
+            type: typeGradient.value as "radial" | "linear",
+            rotation: parseInt(rotation.value),
+        };
+        qrElement.update();
+    });
+
+    color1.addEventListener("input", async (e) => {
+        qrElement._options.dotsOptions.gradient = {
+            colorStops: [
+                { color: color1.value, offset: 0 },
+                { color: color2.value, offset: 100 },
+            ],
+            type: typeGradient.value as "radial" | "linear",
+            rotation: parseInt(rotation.value),
+        };
+        qrElement.update();
+    });
+
+    color2.addEventListener("input", async (e) => {
+        qrElement._options.dotsOptions.gradient = {
+            colorStops: [
+                { color: color1.value, offset: 0 },
+                { color: color2.value, offset: 100 },
+            ],
+            type: typeGradient.value as "radial" | "linear",
+            rotation: parseInt(rotation.value),
+        };
+        qrElement.update();
+    });
+    typeDots.addEventListener("input", async (e) => {
+        qrElement._options.dotsOptions.type = typeDots.value as DotType;
+        qrElement.update();
+    });
+
+    imgMargin.addEventListener("input", async (e) => {
+        qrElement._options.imageOptions.margin = parseInt(imgMargin.value);
+        qrElement.update();
+    });
+    urlMenu.addEventListener("input", async (e) => {
+        qrElement._options.data = urlMenu.value;
+        qrElement.update();
+    });
+    inpFile.addEventListener("change", async (e) => {
+        const file = (e.target as HTMLInputElement)?.files?.[0];
+        const url = URL.createObjectURL(file || new Blob());
+        qrElement._options.image = url;
+        qrElement.update();
+        //qrCode
+    });
+    // change image size
+    imgSize.addEventListener("input", async (e) => {
+        console.log(imgSize.value);
+        if (qrCode.imageOptions) {
+            qrCode.imageOptions.imageSize = parseInt(imgSize.value);
+            qrElement._options.imageOptions.imageSize =
+                parseInt(imgSize.value) / 10;
+            qrElement.update();
+        }
+    });
+
+    qrElement.append(document.getElementById("canvas") as HTMLElement);
+</script>

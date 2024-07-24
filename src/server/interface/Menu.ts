@@ -1,14 +1,6 @@
 import { z } from "astro/zod";
 import { Types } from "mongoose";
 
-/* const SocialSchema = z.object({
-    facebook: z.string().max(100).optional(),
-    instagram: z.string().max(100).optional(),
-    twitter: z.string().max(100).optional(),
-});
-
-type ISocial = z.infer<typeof SocialSchema>; */
-
 const openingHoursSchema = z.object({
     openH: z.string().max(10).optional(),
     closeH: z.string().max(10).optional(),
@@ -18,8 +10,8 @@ type IHours = z.infer<typeof openingHoursSchema>;
 
 const ProductSchema = z.object({
     _id: z.string().uuid(),
-    name: z.string().max(50),
-    description: z.string().max(100).optional(),
+    name: z.string().max(150),
+    description: z.string().max(150).optional(),
     price: z.number().optional(),
     quantity: z.number().optional(),
     active: z.boolean(),
@@ -29,8 +21,8 @@ type IProduct = z.infer<typeof ProductSchema>;
 
 const CategoriesSchema = z.object({
     _id: z.string().uuid(),
-    name: z.string().max(50),
-    description: z.string().max(100).optional(),
+    name: z.string().max(150),
+    description: z.string().max(150).optional(),
     active: z.boolean(),
     products: z.array(ProductSchema).optional(),
 });
@@ -75,9 +67,9 @@ const MenuSchema = z.object({
     state: z.string().max(50).optional(),
     postalCode: z.string().max(10).optional(),
     country: z.string().max(50).optional(),
-    mapUrl: z.string().optional(),
+    mapUrl: z.string().max(500).optional(),
     phone: z.string().max(20).optional(),
-    logoUrl: z.string().optional(),
+    logoUrl: z.string().max(200).optional(),
     bannerUrl: z.string().optional(),
     social: z.object({
         facebook: z.string().max(100).optional(),
