@@ -126,21 +126,25 @@ if (new Date(menuData.expDate) < new Date()) {
                         <div class="py-2 category" data-category={category._id}>
                             {category.products?.map((product) => (
                                 <div
-                                    class="grid grid-cols-5 grid-rows-2 bg-slate-50 backdrop-blur-md rounded mb-3 shadow-md ring-1 ring-slate-400"
+                                    class="flex flex-col bg-slate-50 backdrop-blur-md rounded mb-3 shadow-md ring-1 ring-slate-400"
                                     data-product={product.name}
                                     data-idproduct={product._id}
                                     data-price={product.price}
                                 >
-                                    <div class="col-span-4  py-2 px-2 font-medium">
-                                        {product.name}
+                                    <div class="flex justify-between">
+                                        <div class="py-2 px-2 font-medium">
+                                            {product.name}
+                                        </div>
+                                        <div class="py-2 px-2 text-end font-bold">
+                                            ${product.price}
+                                        </div>
                                     </div>
-                                    <div class="row-start-2 col-span-4  py-0 px-2">
+
+                                    <div class="py-0 px-2">
                                         {product.description}
                                     </div>
-                                    <div class="col-start-5 py-2 px-2 text-end font-bold">
-                                        ${product.price}
-                                    </div>
-                                    <div class="col-start-5  py-2 px-2 text-end flex justify-end gap-1">
+
+                                    <div class="py-2 px-2 text-end flex justify-end gap-1">
                                         <button
                                             class="bg-green-400 rounded-full aspect-square h-6 min-h-6 w-6 text-white font-extrabold flex items-center justify-center shadow-md"
                                             title={`Quitar del carrito ${product.name}`}
