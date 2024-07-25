@@ -11,7 +11,7 @@ export const POST: APIRoute = async ({ request, url }) => {
         return new Response("not found", { status: 404 });
     }
     const res = await request.json();
-
+    console.log(res);
     if (res.type === "payment") {
         const paymentResult = await payment.get({
             id: res.data.id,

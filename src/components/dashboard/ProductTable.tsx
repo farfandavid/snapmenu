@@ -13,7 +13,7 @@ interface Category {
     products: IProduct[];
     active: boolean;
 }
-export const ProductTable = ({ index, category, editCategory, deleteCategory, editProduct, deleteProduct, addProduct }: { index: number, category: Category, editCategory: any, deleteCategory: any, editProduct: any, deleteProduct: any, addProduct: any }) => {
+export const ProductTable = ({ index, category, editCategory, deleteCategory, editProduct, deleteProduct, addProduct, moveCatUp, moveCatDown }: { index: number, category: Category, editCategory: any, deleteCategory: any, editProduct: any, deleteProduct: any, addProduct: any, moveCatUp: any, moveCatDown: any }) => {
 
     const changeClass = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         if (event.currentTarget.classList.contains("text-blue-500")) {
@@ -62,6 +62,7 @@ export const ProductTable = ({ index, category, editCategory, deleteCategory, ed
         });
     }
 
+
     return (
         <div key={"table" + index} id={"table" + index} className="flex flex-col items-center bg-slate-50 mb-2 max-md:w-full w-2/3 rounded mt-2 shadow-lg border-2 border-slate-100">
             <div className="flex w-full justify-between bg-orange-400 p-2 rounded">
@@ -69,15 +70,18 @@ export const ProductTable = ({ index, category, editCategory, deleteCategory, ed
                 <div>
                     <button onClick={() => deleteCategory(index)} className="text-red-500 bg-slate-50 px-1 py-1 mx-1 rounded-full w-8 h-8 hover:ring-1 hover:ring-slate-500"><i className="bi bi-trash-fill"></i></button>
                     <button onClick={(e) => enableEditCategory(e)} className="text-blue-500 px-1 py-1 mx-1 rounded-full w-8 h-8 bg-slate-50 hover:ring-1 hover:ring-slate-500"><i className="bi bi-pen-fill"></i></button>
+                    <button onClick={(e) => moveCatUp(index)} className="text-blue-500 px-1 py-1 mx-1 rounded-full w-8 h-8 bg-slate-50 hover:ring-1 hover:ring-slate-500"><i className="bi bi-arrow-up"></i></button>
+                    <button onClick={(e) => moveCatDown(index)} className="text-blue-500 px-1 py-1 mx-1 rounded-full w-8 h-8 bg-slate-50 hover:ring-1 hover:ring-slate-500"><i className="bi bi-arrow-down"></i></button>
                 </div>
             </div>
             <table className="w-full">
                 <thead>
                     <tr>
-                        <th className="py-1">Name</th>
-                        <th className="py-1">Description</th>
-                        <th className="py-1">Price</th>
-                        <th className="py-1">Actions</th>
+                        <th className="py-1">Nombre</th>
+                        <th className="py-1">Descripcion</th>
+                        <th className="py-1">Precio</th>
+                        <th className="py-1">Activo</th>
+                        <th className="py-1">Acción</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -107,18 +111,27 @@ export const ProductTable = ({ index, category, editCategory, deleteCategory, ed
                                 />
                             </td>
                             <td className="border">
-                                <input
-                                    type="number"
-                                    value={product.price}
-                                    data-field="price"
-                                    onChange={(e) => editProduct(index, indexProduct, e)}
-                                    disabled
-                                    max={9999999}
-                                    className="border p-1 w-full active:bg-white active:border-blue-300 disabled:bg-gray-50 enabled:bg-white enabled:border-blue-300 enabled:ring-1 ring-blue-300 text-wrap break-words"
-                                />
+
+                                <div className="flex items-center justify-center">
+                                    <input
+                                        type="number"
+                                        value={product.price}
+                                        data-field="price"
+                                        onChange={(e) => editProduct(index, indexProduct, e)}
+                                        disabled
+                                        max={9999999}
+                                        className="border p-1 w-full active:bg-white active:border-blue-300 disabled:bg-gray-50 enabled:bg-white enabled:border-blue-300 enabled:ring-1 ring-blue-300 text-wrap break-words"
+                                    />
+                                </div>
+
                             </td>
                             <td className="border">
-                                <div className="flex max-md:text-3xl gap-1 items-center justify-center">
+                                <div className="flex items-center justify-center">
+                                    <input type="checkbox" name="" id="" />
+                                </div>
+                            </td>
+                            <td className="border">
+                                <div className="flex max-md:text-2xl gap-1 items-center justify-center">
                                     <button
                                         className=" text-red-500 px-1 rounded hover:ring-1 ring-slate-500"
                                         onClick={() => deleteProduct(index, indexProduct)}

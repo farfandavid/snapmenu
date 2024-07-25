@@ -166,6 +166,23 @@ export default function ProductsMain() {
         setCategories([...newTables]);
     }
 
+    const moveCatUp = (categoryIndex: number) => {
+        if (categoryIndex === 0) return;
+        const newCategories = [...categories];
+        const temp = newCategories[categoryIndex];
+        newCategories[categoryIndex] = newCategories[categoryIndex - 1];
+        newCategories[categoryIndex - 1] = temp;
+        setCategories(newCategories);
+    }
+
+    const moveCatDown = (categoryIndex: number) => {
+        if (categoryIndex === categories.length - 1) return;
+        const newCategories = [...categories];
+        const temp = newCategories[categoryIndex];
+        newCategories[categoryIndex] = newCategories[categoryIndex + 1];
+        newCategories[categoryIndex + 1] = temp;
+        setCategories(newCategories);
+    }
     return (
         <div className="w-full flex flex-col items-center relative p-0">
             <div className="sticky top-0 flex flex-col justify-between w-full items-center gap-1 bg-white m-0 px-4 pt-1">
@@ -190,7 +207,7 @@ export default function ProductsMain() {
                 <div className="flex flex-col items-start w-full">
                     <div className="flex gap-2">
                         <p className="text-center text-slate-500">Categorias: {categories.length}</p>
-                        <p className="text-center text-slate-500">Total de Productos: {countProducts}/100</p>
+                        <p className="text-center text-slate-500">Productos: {countProducts}/100</p>
                     </div>
                     <hr className="w-full border-slate-500" />
                 </div>
@@ -198,7 +215,7 @@ export default function ProductsMain() {
             {showModal && <Modal categories={categories} setCategories={setCategories} setShowModal={setShowModal} />}
             <div className="w-full flex flex-col items-center px-2">
                 {categories.map((category, index) => {
-                    return <ProductTable addProduct={addProduct} category={category} deleteCategory={deleteCategory} deleteProduct={deleteProduct} editCategory={editCategory} editProduct={editProduct} index={index} key={category._id}></ProductTable>
+                    return <ProductTable addProduct={addProduct} category={category} deleteCategory={deleteCategory} deleteProduct={deleteProduct} editCategory={editCategory} editProduct={editProduct} index={index} key={category._id} moveCatUp={moveCatUp} moveCatDown={moveCatDown} ></ProductTable>
                 })}
             </div>
         </div>

@@ -53,10 +53,10 @@ export const POST: APIRoute = async ({ request, redirect, locals }) => {
             // URLS Cliente
             auto_return: "approved",
             back_urls: {
-                success: "https://snapmenu.onrender.com/dashboard",
+                success: `${import.meta.env.SITE_URL}/dashboard`,
             },
             // URLS Servidor
-            notification_url: "https://snapmenu.onrender.com/api/payment/webhook?source_news=webhooks",
+            notification_url: `${import.meta.env.SITE_URL}/api/payment/webhook?source_news=webhooks`,
             statement_descriptor: "SNAPMENU",
             metadata: {
                 account_id: locals.user.id,

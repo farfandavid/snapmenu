@@ -1,8 +1,28 @@
 ---
 import DashboardLayout from "../../layouts/DashboardLayout.astro";
 import HoursOpening from "../../components/dashboard/HoursOpening.tsx";
+import { Menu } from "../../server/class/Menu";
+const user = Astro.locals.user;
+const menu = await Menu.getMenusByUserId(user.id || "");
 ---
 
 <DashboardLayout>
-    <HoursOpening client:load />
+    {
+        () => {
+            if (menu?.length === 0) {
+                return (
+                    <div class="flex justify-center items-center h-96">
+                        <div class="text-center">
+                            <h1 class="text-4xl font-bold">No tienes Menus</h1>
+                            <p class="text-lg">
+                                Crea un menu para empezar a vender
+                            </p>
+                        </div>
+                    </div>
+                );
+            } else {
+                return <HoursOpening client:load />;
+            }
+        }
+    }
 </DashboardLayout>
