@@ -25,6 +25,7 @@ export const GET: APIRoute = async ({ request, cookies, redirect }) => {
     }
 
     /* Crear y establecer una cookie de sesión */
+    // 5 días
     const fiveDays = 60 * 60 * 24 * 5 * 1000;
     const sessionCookie = await auth.createSessionCookie(idToken, {
         expiresIn: fiveDays,

@@ -11,8 +11,8 @@ const menus = await Menu.getMenusByUserId(Astro.locals.user.id || "").catch(
 
 <DashboardLayout>
     <div class="w-full flex flex-col items-center">
-        <h1>QR Generator</h1>
-        <p>Generate QR codes for your products.</p>
+        <h1>Generador QR</h1>
+        <p>Genera código QR para tu SnapMenu!</p>
         <div class="w-full flex justify-center">
             <div id="canvas"></div>
         </div>

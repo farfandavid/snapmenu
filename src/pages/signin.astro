@@ -90,9 +90,33 @@ if (Astro.cookies.has("session")) {
                     </p>
                     <button
                         id="btn-submit"
-                        class="flex rounded-lg bg-orange-500 px-5 py-3 text-sm font-medium text-white"
-                        >Iniciar Sesión</button
-                    >
+                        class="flex gap-1 rounded-lg bg-orange-500 px-5 py-2 text-nowrap text-sm font-medium text-white"
+                        >Iniciar Sesión
+                        <span
+                            id="spin-wait"
+                            class="animate-spin text-white hidden"
+                        >
+                            <svg
+                                class="w-5 h-5"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                            >
+                                <circle
+                                    class="opacity-25"
+                                    cx="12"
+                                    cy="12"
+                                    r="10"
+                                    stroke="currentColor"
+                                    stroke-width="4"></circle>
+                                <path
+                                    class="opacity-75"
+                                    fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                ></path>
+                            </svg>
+                        </span>
+                    </button>
                 </div>
             </form>
             <div class="relative flex py-5 items-center w-1/4">
@@ -127,8 +151,10 @@ if (Astro.cookies.has("session")) {
     const auth = getAuth(app);
     auth.setPersistence(inMemoryPersistence);
     const form = document.querySelector("form") as HTMLFormElement;
+    const spinWait = document.getElementById("spin-wait") as HTMLSpanElement;
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
+        spinWait.classList.remove("hidden");
         const formData = new FormData(form);
         const email = formData.get("email")?.toString();
         const password = formData.get("password")?.toString();
@@ -136,21 +162,28 @@ if (Astro.cookies.has("session")) {
         if (!email || !password) {
             return;
         }
+        try {
+            const userCredential = await signInWithEmailAndPassword(
+                auth,
+                email,
+                password,
+            );
+            const idToken = await userCredential.user.getIdToken();
+            const response = await fetch("/api/auth/signin", {
+                headers: {
+                    Authorization: `Bearer ${idToken}`,
+                },
+            });
 
-        const userCredential = await signInWithEmailAndPassword(
-            auth,
-            email,
-            password,
-        );
-        const idToken = await userCredential.user.getIdToken();
-        const response = await fetch("/api/auth/signin", {
-            headers: {
-                Authorization: `Bearer ${idToken}`,
-            },
-        });
-
-        if (response.redirected) {
-            window.location.assign(response.url);
+            if (response.redirected) {
+                window.location.assign(response.url);
+            } else {
+                alert("Error al iniciar sesión");
+            }
+        } catch (error) {
+            alert("Error al iniciar sesión");
+        } finally {
+            spinWait.classList.add("hidden");
         }
     });
 
