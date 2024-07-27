@@ -45,7 +45,7 @@ if (new Date(menuData.expDate) < new Date()) {
                     </button>
 
                     <div
-                        class="flex gap-2 text-white font-bold rounded-xl px-3 py-1"
+                        class="flex text-sm gap-2 text-white font-bold rounded-xl px-3 py-2 h-fit"
                     >
                         <i class="bi bi-clock-fill"></i>
                         <span id="open-close"></span>
@@ -74,7 +74,7 @@ if (new Date(menuData.expDate) < new Date()) {
             allowfullscreen=""
             loading="lazy"
             referrerpolicy="no-referrer-when-downgrade"></iframe>
-        <section class="w-full md:w-3/5">
+        <section class="w-full md:w-3/5 pb-8">
             <div class="mt-2 px-2 relative">
                 <input
                     id="searchMenu"
@@ -426,7 +426,7 @@ if (new Date(menuData.expDate) < new Date()) {
             const closeTime = new Date();
             closeTime.setHours(closeH, closeM, 0, 0);
             if (now >= openTime && now <= closeTime) {
-                openClose.textContent = `Abierto hasta las ${hours[currentDay].dataset.close}`;
+                openClose.textContent = `${hours[currentDay].dataset.open} - ${hours[currentDay].dataset.close}`;
                 openClose.parentElement?.classList.add("bg-green-500");
             } else {
                 openClose.textContent = `Abre a las ${hours[currentDay].dataset.open}`;
