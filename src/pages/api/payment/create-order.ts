@@ -3,6 +3,7 @@ import { preference } from '../../../server/config/mp';
 import { z } from 'astro/zod';
 import { MENU_NAMES_PROHIBITED } from '../../../server/utils/constants';
 import { Menu } from '../../../server/class/Menu';
+import { PRICE } from '../../../client/utils/constant';
 
 export const POST: APIRoute = async ({ request, redirect, locals }) => {
     const body = await request.formData()
@@ -11,11 +12,13 @@ export const POST: APIRoute = async ({ request, redirect, locals }) => {
         menuName: z.string().min(4).max(30),
         description: z.string().max(150).optional(),
         suscription: z.enum(["1 Mes", "3 Meses", "6 Meses", "12 Meses"]),
+        type: z.enum(["renew", "new"]).optional(),
     });
     const validated = reqSchema.safeParse({
         menuName: body.get("menuName"),
         description: body.get("description"),
         suscription: body.get("suscription"),
+        type: body.get("type"),
     })
     if (!validated.success) {
         return new Response(JSON.stringify(validated.error.flatten().fieldErrors), { status: 400, headers: { 'content-type': 'application/json' } });
@@ -28,12 +31,11 @@ export const POST: APIRoute = async ({ request, redirect, locals }) => {
         return new Response("not found", { status: 404 });
     }
 
-    const price = 5000;
     const unit_price = {
-        "1 Mes": price,
-        "3 Meses": price * 3 - price * 3 * 0.05,
-        "6 Meses": price * 6 - price * 6 * 0.1,
-        "12 Meses": price * 12 - price * 12 * 0.2,
+        "1 Mes": PRICE,
+        "3 Meses": PRICE * 3 - PRICE * 3 * 0.05,
+        "6 Meses": PRICE * 6 - PRICE * 6 * 0.1,
+        "12 Meses": PRICE * 12 - PRICE * 12 * 0.2,
     }
     const result = await preference.create({
         body: {
@@ -62,6 +64,7 @@ export const POST: APIRoute = async ({ request, redirect, locals }) => {
                 account_id: locals.user.id,
                 menu: validated.data.menuName,
                 description: validated.data.description,
+                type: validated.data.type || "new",
             },
         },
         requestOptions: {
