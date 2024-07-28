@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
 import { putObject } from "../../../server/config/s3";
-import { CDN_URL } from "../../../utils/constant";
+import { CDN_URL } from "../../../client/utils/constant";
 import { Menu } from "../../../server/class/Menu";
 
 export const POST: APIRoute = async ({ request, locals }) => {
