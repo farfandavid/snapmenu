@@ -6,7 +6,7 @@ import { Menu } from '../../../server/class/Menu';
 import { PRICE } from '../../../client/utils/constant';
 
 export const POST: APIRoute = async ({ request, redirect, locals }) => {
-    const body = await request.formData()
+    const body = await request.formData().catch(() => new URLSearchParams());
     console.log(body)
     const reqSchema = z.object({
         menuName: z.string().min(4).max(30),
@@ -21,7 +21,7 @@ export const POST: APIRoute = async ({ request, redirect, locals }) => {
         type: body.get("type"),
     })
     if (!validated.success) {
-        return new Response(JSON.stringify(validated.error.flatten().fieldErrors), { status: 400, headers: { 'content-type': 'application/json' } });
+        return new Response(JSON.stringify({ error: "Datos invalidos" }), { status: 400, headers: { 'content-type': 'application/json' } });
     }
     if (MENU_NAMES_PROHIBITED.includes(validated.data.menuName.toLowerCase())) {
         return new Response("not found", { status: 404 });
@@ -72,9 +72,12 @@ export const POST: APIRoute = async ({ request, redirect, locals }) => {
             plataformId: "www.snapmenu.online",
         }
     });
-    console.log(result)
     if (!result.init_point) {
         return new Response("Error", { status: 500 });
     }
-    return redirect(result.init_point)
+    return new Response("", {
+        status: 300, headers: {
+            "Location": result.init_point,
+        },
+    });
 }

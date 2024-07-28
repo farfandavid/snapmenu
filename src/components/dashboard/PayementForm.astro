@@ -4,8 +4,6 @@
 
 <form
     class="flex flex-col items-center w-full p-5 gap-2 bg-slate-50 rounded border border-orange-300 shadow-md overflow-hidden relative lg:w-1/3"
-    method="post"
-    action="/api/payment/create-order"
     id="form-payment"
 >
     <div class="flex flex-col gap-1 w-full">
@@ -164,6 +162,21 @@
     ) as HTMLButtonElement;
     const loader = document.getElementById("loader") as HTMLElement;
     const payform = document.getElementById("payform") as HTMLDivElement;
+    const formPay = document.getElementById("form-payment") as HTMLFormElement;
+
+    formPay.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const data = new FormData(formPay);
+        data.append("type", "new");
+        const response = await fetch("/api/payment/create-order", {
+            method: "POST",
+            body: data,
+        });
+        if (response.headers.get("Location")) {
+            window.location.href =
+                response.headers.get("Location") || "/dashboard";
+        }
+    });
 
     checkAvailability.addEventListener("click", async (e) => {
         const inputValue = name.value;

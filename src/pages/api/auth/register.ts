@@ -1,7 +1,6 @@
 import type { APIRoute } from "astro";
 import { getAuth } from "firebase-admin/auth";
 import { app } from "../../../server/config/firebaseServer";
-import { PUBLIC_ROUTES } from "../../../utils/constant";
 import { verifyRecaptcha } from "../../../utils/recaptcha";
 import { Resend } from "resend";
 import { User } from "../../../server/class/User";
@@ -71,5 +70,5 @@ export const POST: APIRoute = async ({ request, redirect }) => {
             { status: 400 }
         );
     }
-    return redirect(PUBLIC_ROUTES.SIGN_IN);
+    return redirect('/signin');
 };
