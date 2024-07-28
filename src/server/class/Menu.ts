@@ -257,6 +257,19 @@ export class Menu implements IMenu {
         }
     }
 
+    async changeName() {
+        try {
+            await db.connectDB();
+            const menu = await MenuModel.findByIdAndUpdate(this
+                ._id, { name: this.name }, { new: true });
+            if (!menu) return null;
+            return new Menu(menu);
+        } catch (err) {
+            console.log(err);
+            throw new Error(ERROR_MESSAGES[500]);
+        }
+    }
+
     static async getAllMenus() {
         try {
             await db.connectDB();
@@ -321,6 +334,21 @@ export class Menu implements IMenu {
             await db.connectDB();
             const menu = await MenuModel.findOne({
                 _id: id,
+                userId: userId
+            });
+            if (!menu) return null;
+            return new Menu(menu);
+        } catch (err) {
+            console.log(err);
+            throw new Error(ERROR_MESSAGES[500]);
+        }
+    }
+
+    static async getMenuByNameAndUserId(name: string, userId: string) {
+        try {
+            await db.connectDB();
+            const menu = await MenuModel.findOne({
+                name: name,
                 userId: userId
             });
             if (!menu) return null;
