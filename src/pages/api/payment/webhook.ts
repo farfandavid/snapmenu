@@ -69,7 +69,7 @@ export const POST: APIRoute = async ({ request, url }) => {
             }
             // Renew Payment
             if (paymentResult.metadata?.type === "renew" && paymentResult.status_detail === "accredited" && paymentResult.metadata?.menu_id) {
-                const menu = await Menu.getMenuByNameAndUserId(paymentResult.metadata.menu, paymentResult.metadata.menu);
+                const menu = await Menu.getMenuByNameAndUserId(paymentResult.metadata.menu, paymentResult.metadata.account_id);
                 if (menu instanceof Menu) {
                     const expDate = menu.expDate > new Date() ? menu.expDate : new Date();
                     const month = parseInt(paymentResult.additional_info?.items?.[0]?.id ?? "0");
