@@ -123,7 +123,6 @@ const { menus } = Astro.props;
         e.preventDefault();
         const data = new FormData(formPay);
         data.append("type", "renew");
-        console.log(data);
         const response = await fetch("/api/payment/create-order", {
             method: "PUT",
             body: data,

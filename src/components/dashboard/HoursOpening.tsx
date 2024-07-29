@@ -25,7 +25,6 @@ export default function HoursOpening() {
             .then((response) => response.json())
             .then((data) => {
                 setMenus(data)
-                console.log(data);
                 setMenuSelected(data[0])
             })
     }, []);
@@ -38,7 +37,6 @@ export default function HoursOpening() {
     }
 
     const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        console.log(e.target.value);
         setMenuSelected(menus.filter((menu) => menu._id === e.target.value)[0]);
     }
 

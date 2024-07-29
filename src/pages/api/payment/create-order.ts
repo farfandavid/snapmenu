@@ -91,7 +91,6 @@ export const PUT: APIRoute = async ({ request, locals }) => {
     if (!body) {
         return new Response("Invalid form data", { status: 400 });
     }
-    console.log(body)
     const validated = reqSchema.safeParse({
         menuName: body.get("menuName"),
         description: body.get("description"),
@@ -99,7 +98,6 @@ export const PUT: APIRoute = async ({ request, locals }) => {
         type: body.get("type"),
     })
     if (!validated.success) {
-        console.log(validated.error);
         return new Response(JSON.stringify({ error: "Datos invalidos" }), { status: 400, headers: { 'content-type': 'application/json' } });
     }
     if (MENU_NAMES_PROHIBITED.includes(validated.data.menuName.toLowerCase())) {

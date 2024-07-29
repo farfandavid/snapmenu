@@ -7,7 +7,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
     const formData = await request.formData();
     const menuId = formData.get("menu") as string;
     const image = formData.get("portrait") as File;
-    console.log(formData)
     if (!image) {
         return new Response(JSON.stringify({ error: "No se ha proporcionado una imagen" }), { status: 400 });
     }
@@ -48,6 +47,5 @@ export const POST: APIRoute = async ({ request, locals }) => {
 }
 
 export const GET: APIRoute = async ({ request, locals }) => {
-    console.log(locals.user)
     return new Response(JSON.stringify({ error: "Method not allowed" }), { status: 405 });
 } 

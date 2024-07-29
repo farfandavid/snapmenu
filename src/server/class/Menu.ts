@@ -80,7 +80,7 @@ export class Menu implements IMenu {
             await menu.save();
             return new Menu(menu);
         } catch (err) {
-            console.log(err);
+            console.error(err);
             throw new Error(ERROR_MESSAGES[500]);
         }
     }
@@ -98,7 +98,7 @@ export class Menu implements IMenu {
             if (!menu) return null;
             return new Menu(menu);
         } catch (err: Error | MenuError | any) {
-            console.log(err);
+            console.error(err);
             throw err;
         }
     }
@@ -112,7 +112,7 @@ export class Menu implements IMenu {
             const menu = await MenuModel.findByIdAndDelete(this._id);
             return menu;
         } catch (err) {
-            console.log(err);
+            console.error(err);
             return new Error(ERROR_MESSAGES[500]);
         }
     }
@@ -124,7 +124,7 @@ export class Menu implements IMenu {
             if (!menu) return null;
             return new Menu(menu);
         } catch (err) {
-            console.log(err);
+            console.error(err);
             throw new Error(ERROR_MESSAGES[500]);
         }
     }
@@ -136,7 +136,7 @@ export class Menu implements IMenu {
             if (!menu) return null;
             return new Menu(menu);
         } catch (err) {
-            console.log(err);
+            console.error(err);
             throw new Error(ERROR_MESSAGES[500]);
         }
     }
@@ -148,7 +148,7 @@ export class Menu implements IMenu {
             if (!menu) return null;
             return new Menu(menu);
         } catch (err) {
-            console.log(err);
+            console.error(err);
             throw new Error(ERROR_MESSAGES[500]);
         }
     }
@@ -161,7 +161,7 @@ export class Menu implements IMenu {
             if (!menu) return null;
             return new Menu(menu);
         } catch (err) {
-            console.log(err);
+            console.error(err);
             throw new Error(ERROR_MESSAGES[500]);
         }
     }
@@ -174,7 +174,7 @@ export class Menu implements IMenu {
             if (!menu) return null;
             return new Menu(menu);
         } catch (err) {
-            console.log(err);
+            console.error(err);
             throw new Error(ERROR_MESSAGES[500]);
         }
     }
@@ -225,7 +225,7 @@ export class Menu implements IMenu {
             if (!menu) return null;
             return new Menu(menu);
         } catch (err) {
-            console.log(err);
+            console.error(err);
             throw new Error(ERROR_MESSAGES[500]);
         }
     }
@@ -240,7 +240,7 @@ export class Menu implements IMenu {
             if (!menu) return null;
             return new Menu(menu);
         } catch (err) {
-            console.log(err);
+            console.error(err);
             throw new Error(ERROR_MESSAGES[500]);
         }
     }
@@ -252,7 +252,7 @@ export class Menu implements IMenu {
             if (!menu) return null;
             return new Menu(menu);
         } catch (err) {
-            console.log(err);
+            console.error(err);
             throw new Error(ERROR_MESSAGES[500]);
         }
     }
@@ -265,7 +265,7 @@ export class Menu implements IMenu {
             if (!menu) return null;
             return new Menu(menu);
         } catch (err) {
-            console.log(err);
+            console.error(err);
             throw new Error(ERROR_MESSAGES[500]);
         }
     }
@@ -276,7 +276,7 @@ export class Menu implements IMenu {
             const menus = await MenuModel.find();
             return menus;
         } catch (err) {
-            console.log(err);
+            console.error(err);
             throw new Error(ERROR_MESSAGES[500]);
         }
     }
@@ -287,7 +287,7 @@ export class Menu implements IMenu {
             if (!menu) return null;
             return new Menu(menu);
         } catch (err) {
-            console.log(err);
+            console.error(err);
             throw new Error(ERROR_MESSAGES[500]);
         }
     }
@@ -300,7 +300,7 @@ export class Menu implements IMenu {
             if (!menu) return null;
             return new Menu(menu);
         } catch (err) {
-            console.log(err);
+            console.error(err);
             throw new Error(ERROR_MESSAGES[500]);
         }
     }
@@ -319,7 +319,7 @@ export class Menu implements IMenu {
             if (!menus) return null;
             return new Array<Menu>(...menus.map(menu => new Menu(menu)));
         } catch (err) {
-            console.log(err);
+            console.error(err);
             throw new Error(ERROR_MESSAGES[500]);
         }
     }
@@ -339,7 +339,7 @@ export class Menu implements IMenu {
             if (!menu) return null;
             return new Menu(menu);
         } catch (err) {
-            console.log(err);
+            console.error(err);
             throw new Error(ERROR_MESSAGES[500]);
         }
     }
@@ -354,7 +354,7 @@ export class Menu implements IMenu {
             if (!menu) return null;
             return new Menu(menu);
         } catch (err) {
-            console.log(err);
+            console.error(err);
             throw new Error(ERROR_MESSAGES[500]);
         }
     }

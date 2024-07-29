@@ -20,7 +20,6 @@ export const POST: APIRoute = async ({ request, url }) => {
             }
 
         });
-        console.log(paymentResult);
         if (paymentResult.status === "approved") {
             // New Payment
             if (paymentResult.metadata?.type === "new" && paymentResult.status_detail === "accredited" && paymentResult.metadata?.account_id) {

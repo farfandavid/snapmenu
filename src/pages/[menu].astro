@@ -340,7 +340,6 @@ if (new Date(menuData.expDate) < new Date()) {
                     quantity: count,
                 });
             }
-            console.log(cart);
             updateOrder();
         });
         minus.addEventListener("click", () => {
@@ -354,7 +353,6 @@ if (new Date(menuData.expDate) < new Date()) {
                     }
                     return item.quantity > 0;
                 });
-                console.log(cart);
             }
             quantity.textContent = count.toString();
             updateOrder();

@@ -18,7 +18,6 @@ export const GET: APIRoute = async ({ locals }) => {
 export const PUT: APIRoute = async ({ request, locals }) => {
     try {
         const body = await request.formData().catch(() => { throw new Error("Invalid form data") });
-        console.log(body);
         const menuId = body.get("menu") as string;
         const description = body.get("description") as string;
         const address = body.get("address") as string;

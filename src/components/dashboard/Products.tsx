@@ -75,7 +75,6 @@ export default function ProductsMain() {
     }, [trigger]);
     // Change Menu
     useEffect(() => {
-        console.log(menuSelected);
         if (!menuSelected) return;
         const changeMenu = async () => {
             const response = await fetch("/api/dashboard/products", {

@@ -46,7 +46,7 @@ export class User implements IUser {
             await user.save();
             return new User(user);
         } catch (err) {
-            console.log(err);
+            console.error(err);
             throw new Error(ERROR_MESSAGES[500]);
         }
     }
@@ -65,7 +65,7 @@ export class User implements IUser {
             if (!user) return null;
             return new User(user);
         } catch (err: Error | UserError | any) {
-            console.log(err);
+            console.error(err);
             throw err;
         }
     }
@@ -80,7 +80,7 @@ export class User implements IUser {
             const user = await UserModel.findByIdAndDelete(this._id);
             return user;
         } catch (err) {
-            console.log(err);
+            console.error(err);
             return new Error(ERROR_MESSAGES[500]);
         }
     }
@@ -91,7 +91,7 @@ export class User implements IUser {
             const user = await UserModel.findByIdAndUpdate(this._id, { $push: { menuList: menuId } }, { new: true });
             return user;
         } catch (err) {
-            console.log(err);
+            console.error(err);
             return new Error(ERROR_MESSAGES[500]);
         }
     }
@@ -102,7 +102,7 @@ export class User implements IUser {
             const user = await UserModel.findByIdAndUpdate(this._id, { $pull: { menuList: menuId } }, { new: true });
             return user;
         } catch (err) {
-            console.log(err);
+            console.error(err);
             return new Error(ERROR_MESSAGES[500]);
         }
     }
@@ -113,7 +113,7 @@ export class User implements IUser {
             const user = await UserModel.findByIdAndUpdate(this._id, { suscription: suscription }, { new: true });
             return user;
         } catch (err) {
-            console.log(err);
+            console.error(err);
             return new Error(ERROR_MESSAGES[500]);
         }
     }
@@ -124,7 +124,7 @@ export class User implements IUser {
             const user = await UserModel.findByIdAndUpdate(this._id, { suscription: null }, { new: true });
             return user;
         } catch (err) {
-            console.log(err);
+            console.error(err);
             return new Error(ERROR_MESSAGES[500]);
         }
     }
@@ -135,7 +135,7 @@ export class User implements IUser {
             const user = await UserModel.findByIdAndUpdate(this._id, { suscription: suscription }, { new: true });
             return user;
         } catch (err) {
-            console.log(err);
+            console.error(err);
             return new Error(ERROR_MESSAGES[500]);
         }
     }

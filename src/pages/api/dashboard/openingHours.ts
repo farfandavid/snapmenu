@@ -20,7 +20,6 @@ export const PUT: APIRoute = async ({ request, locals }) => {
         const body = await request.formData().catch(() => { throw new Error("Invalid form data") });
         const menuId = body.get("menu") as string;
         const openingHours = JSON.parse(body.get("openingHours") as string);
-        console.log(openingHours);
         const menu = await Menu.getMenuByIdAndUserId(menuId, locals.user.id || "");
         if (!menu) return new Response("Menu not found", { status: 404 });
         const validate = await menu.validate();
