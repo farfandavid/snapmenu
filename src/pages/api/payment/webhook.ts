@@ -45,7 +45,7 @@ export const POST: APIRoute = async ({ request, url }) => {
 
             }
             // Renew Payment
-            if (paymentResult.metadata?.type === "renew" && paymentResult.status_detail === "accredited" && paymentResult.metadata?.menu_id) {
+            if (paymentResult.metadata?.type === "renew" && paymentResult.status_detail === "accredited" && paymentResult.metadata?.menu) {
                 const menu = await Menu.getMenuByNameAndUserId(paymentResult.metadata.menu, paymentResult.metadata.account_id);
                 if (menu instanceof Menu) {
                     const expDate = menu.expDate > new Date() ? menu.expDate : new Date();
@@ -59,8 +59,8 @@ export const POST: APIRoute = async ({ request, url }) => {
             }
 
         }
+        // Refund Payment
         if (paymentResult.status === "refunded") {
-            // Refund Payment
             if (paymentResult.status_detail === "partially_refunded" || paymentResult.status_detail === "refunded") {
                 if (paymentResult.metadata?.type === "new") {
                     const menu = await Menu.getMenuByNameAndUserId(paymentResult.metadata.menu, paymentResult.metadata.account_id);
@@ -103,7 +103,7 @@ export const POST: APIRoute = async ({ request, url }) => {
                 first_name: paymentResult.payer?.first_name,
                 last_name: paymentResult.payer?.last_name,
                 account_id: paymentResult.metadata?.account_id || undefined,
-                menu_id: paymentResult.metadata?.menu_id || undefined,
+                menu: paymentResult.metadata?.menu || undefined,
             },
             items: paymentResult.additional_info?.items?.map((item: any) => {
                 return {

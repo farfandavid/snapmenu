@@ -16,7 +16,7 @@ interface Payer {
     first_name?: string;
     last_name?: string;
     account_id: string;
-    menu_id: string;
+    menu: string;
 }
 
 export interface IPayment {
