@@ -22,29 +22,6 @@ export const POST: APIRoute = async ({ request, url }) => {
         });
         console.log(paymentResult);
         if (paymentResult.status === "approved") {
-            // Refund Payment
-            if (paymentResult.status_detail === "partially_refunded" || paymentResult.status_detail === "refunded") {
-                if (paymentResult.metadata?.type === "new") {
-                    const menu = await Menu.getMenuByNameAndUserId(paymentResult.metadata.menu, paymentResult.metadata.account_id);
-                    if (menu instanceof Menu) {
-                        await menu.delete().catch((err) => {
-                            console.error(err);
-                        });
-                    }
-                }
-                if (paymentResult.metadata?.type === "renew") {
-                    const menu = await Menu.getMenuByNameAndUserId(paymentResult.metadata.menu, paymentResult.metadata.account_id);
-                    if (menu instanceof Menu) {
-                        const month = parseInt(paymentResult.additional_info?.items?.[0]?.id ?? "0");
-                        const expDate = menu.expDate;
-                        expDate.setMonth(expDate.getMonth() - month);
-                        menu.expDate = expDate;
-                        await menu.save().catch((err) => {
-                            console.error(err);
-                        });
-                    }
-                }
-            }
             // New Payment
             if (paymentResult.metadata?.type === "new" && paymentResult.status_detail === "accredited" && paymentResult.metadata?.account_id) {
                 const user = await User.getUserById(paymentResult.metadata.account_id);
@@ -81,6 +58,31 @@ export const POST: APIRoute = async ({ request, url }) => {
                 }
             }
 
+        }
+        if (paymentResult.status === "refunded") {
+            // Refund Payment
+            if (paymentResult.status_detail === "partially_refunded" || paymentResult.status_detail === "refunded") {
+                if (paymentResult.metadata?.type === "new") {
+                    const menu = await Menu.getMenuByNameAndUserId(paymentResult.metadata.menu, paymentResult.metadata.account_id);
+                    if (menu instanceof Menu) {
+                        await menu.delete().catch((err) => {
+                            console.error(err);
+                        });
+                    }
+                }
+                if (paymentResult.metadata?.type === "renew") {
+                    const menu = await Menu.getMenuByNameAndUserId(paymentResult.metadata.menu, paymentResult.metadata.account_id);
+                    if (menu instanceof Menu) {
+                        const month = parseInt(paymentResult.additional_info?.items?.[0]?.id ?? "0");
+                        const expDate = menu.expDate;
+                        expDate.setMonth(expDate.getMonth() - month);
+                        menu.expDate = expDate;
+                        await menu.save().catch((err) => {
+                            console.error(err);
+                        });
+                    }
+                }
+            }
         }
         //console.log(paymentResult.date_created)
         const paymentData: IPayment = {
