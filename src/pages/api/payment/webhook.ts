@@ -20,7 +20,7 @@ export const POST: APIRoute = async ({ request, url }) => {
             }
 
         });
-        //console.log(paymentResult);
+        console.log(paymentResult);
         if (paymentResult.status === "approved") {
             // Refund Payment
             if (paymentResult.status_detail === "partially_refunded" || paymentResult.status_detail === "refunded") {
