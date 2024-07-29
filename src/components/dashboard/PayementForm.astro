@@ -104,10 +104,34 @@
                 </p>
             </div>
         </div>
+        <div>
+            <div>
+                <input type="checkbox" name="terms" id="terms-check" />
+                <label for="terms-check">
+                    Acepto los
+                    <a
+                        href="/terms-of-service"
+                        target="_blank"
+                        class="text-blue-500">Terminos y Condiciones</a
+                    >
+                </label>
+            </div>
+            <div>
+                <input type="checkbox" name="privacy" id="privacy-check" />
+                <label for="privacy-check">
+                    Acepto la
+                    <a
+                        href="/privacy-policy"
+                        target="_blank"
+                        class="text-blue-500">Politica de Privacidad</a
+                    >
+                </label>
+            </div>
+        </div>
         <button
             id="pay-button"
             type="submit"
-            class="flex gap-1 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded mt-2"
+            class="hidden gap-1 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded mt-2"
             style="background-color: #009ee3;"
             disabled
             ><svg
@@ -163,6 +187,34 @@
     const loader = document.getElementById("loader") as HTMLElement;
     const payform = document.getElementById("payform") as HTMLDivElement;
     const formPay = document.getElementById("form-payment") as HTMLFormElement;
+    const checkTerms = document.getElementById(
+        "terms-check",
+    ) as HTMLInputElement;
+    const checkPrivacy = document.getElementById(
+        "privacy-check",
+    ) as HTMLInputElement;
+    const payButton = document.getElementById(
+        "pay-button",
+    ) as HTMLButtonElement;
+
+    checkTerms.addEventListener("change", (e) => {
+        if (checkTerms.checked && checkPrivacy.checked) {
+            payButton.classList.remove("hidden");
+            payButton.classList.add("flex");
+        } else {
+            payButton.classList.add("hidden");
+            payButton.classList.remove("flex");
+        }
+    });
+    checkPrivacy.addEventListener("change", (e) => {
+        if (checkTerms.checked && checkPrivacy.checked) {
+            payButton.classList.remove("hidden");
+            payButton.classList.add("flex");
+        } else {
+            payButton.classList.add("hidden");
+            payButton.classList.remove("flex");
+        }
+    });
 
     formPay.addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -183,9 +235,6 @@
         const textCheck = document.getElementById(
             "txt-buttoncheck",
         ) as HTMLSpanElement;
-        const payButton = document.getElementById(
-            "pay-button",
-        ) as HTMLButtonElement;
 
         loader.classList.remove("hidden");
         textCheck.classList.add("hidden");
