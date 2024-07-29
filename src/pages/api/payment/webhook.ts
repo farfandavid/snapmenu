@@ -52,7 +52,7 @@ export const POST: APIRoute = async ({ request, url }) => {
                     const month = parseInt(paymentResult.additional_info?.items?.[0]?.id ?? "0");
                     expDate.setMonth(expDate.getMonth() + month);
                     menu.expDate = expDate;
-                    await menu.save().catch((err) => {
+                    await menu.update().catch((err) => {
                         console.error(err);
                     });
                 }
@@ -77,7 +77,7 @@ export const POST: APIRoute = async ({ request, url }) => {
                         const expDate = menu.expDate;
                         expDate.setMonth(expDate.getMonth() - month);
                         menu.expDate = expDate;
-                        await menu.save().catch((err) => {
+                        await menu.update().catch((err) => {
                             console.error(err);
                         });
                     }
