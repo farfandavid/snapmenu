@@ -25,6 +25,7 @@ const ProductSchemaMongoose = new Schema<IProductModel>({
     _id: {
         type: String,
         required: true,
+        unique: false,
     },
     name: {
         type: String,
@@ -52,6 +53,7 @@ const CategoriesSchemaMongoose = new Schema<ICategoryModel>({
     _id: {
         type: String,
         required: true,
+        unique: false,
     },
     name: {
         type: String,
