@@ -44,6 +44,8 @@ export default function MenuDash() {
                         }
                         setMenus(data);
                         setMenuSelected(data[0]);
+                        setLogo(data[0].logoUrl || "");
+                        setBanner(data[0].bannerUrl || "");
                         return data
                     });
             } catch (error) {
@@ -87,6 +89,8 @@ export default function MenuDash() {
                 twitter: changed.social?.twitter || ""
             }
         });
+        setLogo(changed.logoUrl || "");
+        setBanner(changed.bannerUrl || "");
         setTrigger(!trigger);
     }
 
@@ -228,8 +232,8 @@ export default function MenuDash() {
                 </select>
             </div>
             <div id="form-image" className="flex flex-col justify-center border-dotted border-2 relative border-orange-500 min-h-52 max-h-52 overflow-hidden" >
-                <img src={menuSelected?.bannerUrl ? menuSelected.bannerUrl : `https://placehold.co/380x256/FAFAFA/FAFAFA`} alt="" className="object-contain absolute left-1/2 -translate-x-1/2 z-0" />
-                <img src={menuSelected?.logoUrl ? menuSelected?.logoUrl : `https://placehold.co/250x250?text=${menuSelected?.name?.at(0)}`} alt="" className="h-32 object-contain absolute left-1/2 -translate-x-1/2" />
+                <img src={banner !== "" ? banner : `https://placehold.co/380x256/FAFAFA/FAFAFA`} alt="" className="object-contain absolute left-1/2 -translate-x-1/2 z-0" />
+                <img src={logo !== "" ? logo : `https://placehold.co/250x250?text=${menuSelected?.name?.at(0)}`} alt="" className="h-32 object-contain absolute left-1/2 -translate-x-1/2" />
                 <label className="absolute left-1/2 bottom-0 -translate-x-1/2 origin-center bg-orange-500 text-white rounded-full aspect-square flex items-center justify-center h-12 border-2 gap-1 font-bold px-2">
                     <input type="file" hidden accept="image/jpg, image/jpeg, image/png, iamge/webp" onChange={handleLogo} name="portrait" />
                     <i className="bi bi-camera-fill text-2xl"></i>
