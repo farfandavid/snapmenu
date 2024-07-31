@@ -21,7 +21,7 @@ if (new Date(menuData.expDate) < new Date()) {
 
 <MenuLayout title={menuData.name} menu={menuData}>
     <div
-        class="bg-slate-200 h-screen w-screen overflow-auto relative md:flex md:flex-col md:items-center"
+        class="bg-slate-200 h-dvh w-screen overflow-auto relative md:flex md:flex-col md:items-center border"
     >
         <header
             style=`background: url(${menuData.bannerUrl ?? "https://placehold.co/640x480/white/white"}); background-size: cover; background-position: center; background-repeat: no-repeat;`
@@ -41,11 +41,13 @@ if (new Date(menuData.expDate) < new Date()) {
                         class="flex gap-2 bg-black/50 rounded-xl px-3 py-1"
                     >
                         <i class="bi bi-geo-alt-fill text-red-500"></i>
-                        <p class="text-white font-bold">{menuData.address}</p>
+                        <p class="text-white text-sm font-bold text-nowrap">
+                            {menuData.address}
+                        </p>
                     </button>
 
                     <div
-                        class="flex text-sm gap-2 text-white font-bold rounded-xl px-3 py-2 h-fit"
+                        class="flex text-sm gap-2 text-white font-bold rounded-xl px-3 py-2 h-fit text-nowrap"
                     >
                         <i class="bi bi-clock-fill"></i>
                         <span id="open-close"></span>
