@@ -1,4 +1,5 @@
 ---
+import { PRICE } from "../../client/utils/constant";
 const SERVICE_CONTENT = {
     title: "Planes de Precios",
     description:
@@ -11,7 +12,7 @@ const SERVICE_CONTENT = {
                 "Posibilidad de incorporar enlaces de WhatsApp para pedidos.",
                 "Soporte por correo electrónico y chat en vivo.",
             ],
-            price: "AR$14250",
+            price: `AR$${PRICE * 3 * 0.95}`,
         },
         {
             name: "6 MESES",
@@ -19,7 +20,7 @@ const SERVICE_CONTENT = {
                 "Posibilidad de incorporar enlaces de WhatsApp para pedidos.",
                 "Soporte prioritario por correo electrónico, chat en vivo y asistencia telefónica.",
             ],
-            price: "AR$27000",
+            price: `AR$${PRICE * 6 * 0.9}`,
         },
         {
             name: "12 MESES",
@@ -27,7 +28,7 @@ const SERVICE_CONTENT = {
                 "Posibilidad de incorporar enlaces de WhatsApp para pedidos.",
                 "Soporte prioritario por correo electrónico, chat en vivo y asistencia telefónica.",
             ],
-            price: "AR$48000",
+            price: `AR$${PRICE * 12 * 0.8}`,
         },
         {
             name: "PERSONALIZADO",
