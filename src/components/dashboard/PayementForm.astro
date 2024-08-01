@@ -171,6 +171,8 @@
     </div>
 </form>
 <script>
+    import { PRICE } from "../../client/utils/constant";
+
     const select = document.getElementById("suscription") as HTMLSelectElement;
     const price = document.getElementById("price") as HTMLParagraphElement;
     const offer = document.getElementById("offer") as HTMLSpanElement;
@@ -268,7 +270,7 @@
             name.value = inputValue.replace(/[^a-zA-Z0-9]/g, "");
         }
     });
-    const priceValue = 5000;
+    const priceValue = PRICE;
     select.addEventListener("change", (e) => {
         const value = select.value;
         switch (value) {
