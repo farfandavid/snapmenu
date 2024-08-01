@@ -16,7 +16,9 @@ const menus = await Menu.getMenusByUserId(Astro.locals.user.id || "").catch(
         <div class="w-full flex justify-center">
             <div id="canvas"></div>
         </div>
-
+        <button id="download-qr" class="bg-orange-500 rounded text-white p-1"
+            >Descargar</button
+        >
         <div class="flex flex-col w-full md:w-1/3">
             <h2>Selecciona un Menu</h2>
             <select name="own-menu" id="own-menu" class="p-2 rounded">
@@ -346,37 +348,7 @@ const menus = await Menu.getMenusByUserId(Astro.locals.user.id || "").catch(
         DotType,
     } from "qr-code-styling";
     import { QrCode } from "../../client/class/QrCode.ts";
-    const qrCode = new QrCode({
-        width: 300,
-        height: 300,
-        data: "https://www.snapmenu.online",
-        margin: 5,
-        qrOptions: {
-            typeNumber: 0,
-            mode: "Byte",
-            errorCorrectionLevel: "H",
-        },
-        imageOptions: {
-            hideBackgroundDots: false,
-            imageSize: 0.5,
-            margin: 0,
-        },
-        dotsOptions: {
-            type: "square",
-            color: "#000",
-        },
-        backgroundOptions: {
-            color: "#ffffff",
-        },
-        image: "",
-        cornersSquareOptions: {
-            color: "#000000",
-        },
-        cornersDotOptions: {
-            color: "#000000",
-        },
-    });
-    const qrElement = qrCode.createQrCode();
+
     // get image from url
     const inpFile = document.getElementById("inp-image") as HTMLInputElement;
     const imgSize = document.getElementById("img-size") as HTMLInputElement;
@@ -446,6 +418,50 @@ const menus = await Menu.getMenusByUserId(Astro.locals.user.id || "").catch(
     ) as HTMLButtonElement;
     const hideDots = document.getElementById("hide-dot") as HTMLInputElement;
     const ownMenu = document.getElementById("own-menu") as HTMLSelectElement;
+
+    const downloadQr = document.getElementById(
+        "download-qr",
+    ) as HTMLButtonElement;
+    const qrCode = new QrCode({
+        width: 300,
+        height: 300,
+        data: ownMenu.value,
+        margin: 5,
+        qrOptions: {
+            typeNumber: 0,
+            mode: "Byte",
+            errorCorrectionLevel: "H",
+        },
+        imageOptions: {
+            hideBackgroundDots: false,
+            imageSize: 0.5,
+            margin: 0,
+        },
+        dotsOptions: {
+            type: "square",
+            color: "#000",
+        },
+        backgroundOptions: {
+            color: "#ffffff",
+        },
+        image: "",
+        cornersSquareOptions: {
+            color: "#000000",
+        },
+        cornersDotOptions: {
+            color: "#000000",
+        },
+    });
+    const qrElement = qrCode.createQrCode();
+
+    downloadQr.addEventListener("click", (e) => {
+        /* const canvas = document.getElementById("canvas") as HTMLCanvasElement;
+        const a = document.createElement("a");
+        a.href = canvas.toDataURL();
+        a.download = "qr-code.png";
+        a.click(); */
+        qrElement.download("qr-code.png");
+    });
 
     ownMenu.addEventListener("change", (e) => {
         urlMenu.value = ownMenu.value;
