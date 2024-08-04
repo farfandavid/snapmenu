@@ -1,5 +1,5 @@
 ---
-
+import { PRICE } from "../../client/utils/constant";
 ---
 
 <form
@@ -88,7 +88,7 @@
                     class="absolute flex gap-1 text-xs -right-3 -top-3"
                     style="display: none;"
                     id="offer"
-                    ><p id="off-price" class="line-through p-1">$3500</p>
+                    ><p id="off-price" class="line-through p-1">${PRICE}</p>
                     <p
                         id="discount"
                         class="bg-red-500 p-1 text-nowrap text-white rounded-md font-semibold"
@@ -100,7 +100,7 @@
                     class="flex w-full justify-start p-2 font-extrabold text-xl"
                     id="price"
                 >
-                    $5000
+                    ${PRICE}
                 </p>
             </div>
         </div>
