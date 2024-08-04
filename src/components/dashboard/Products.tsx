@@ -129,14 +129,17 @@ export default function ProductsMain() {
     }
 
     const editProduct = (categoryIndex: number, productIndex: number, event: React.ChangeEvent<HTMLInputElement>) => {
+        console.log(event.target.dataset.field)
         const newTables = categories.map((category, i) => {
             if (i !== categoryIndex) {
                 return category
             }
+
             const newProducts = category.products.map((product, j) => {
                 if (j !== productIndex) {
                     return product
                 }
+
                 switch (event.target.dataset.field) {
                     case "name":
                         return {
@@ -152,6 +155,11 @@ export default function ProductsMain() {
                         return {
                             ...product,
                             price: parseFloat(event.target.value)
+                        }
+                    case "active":
+                        return {
+                            ...product,
+                            active: event.target.checked
                         }
                     default:
                         return product;
@@ -186,8 +194,8 @@ export default function ProductsMain() {
         <div className="w-full flex flex-col items-center relative p-0">
             <div className="sticky top-0 flex flex-col justify-between w-full items-center gap-1 bg-white m-0 px-4 pt-1">
                 <div className="flex justify-between w-full">
-                    <div className="flex gap-1 items-center">
-                        <h1 className="text-xl font-bold text-center">Menu</h1>
+                    <div className="flex max-sm:flex-col gap-1 items-center">
+                        <h1 className="font-bold text-center">Menu</h1>
                         <select name="menu" id="menu-select" onChange={(e) => setMenuSelected(e.target.value)} defaultValue={menuSelected}
                             className="px-2 py-1 ring-1 ring-slate-600 rounded">
                             {menu.map((menu: any) => (
@@ -196,7 +204,7 @@ export default function ProductsMain() {
                             ))}
                         </select>
                     </div>
-                    <div className="flex">
+                    <div className="flex items-center">
                         <button className=" bg-orange-500 px-2 py-1 rounded text-white flex justify-center items-center mx-1" onClick={() => setShowModal(!showModal)}><i className="bi bi-plus-circle-fill text-xl mx-1"></i>Categoria</button>
                         <button className="bg-blue-500 text-white px-2 py-1 rounded flex justify-center items-center mx-1 disabled:bg-blue-300" disabled={trigger} onClick={() => setTrigger(!trigger)}>
                             {save ? <i className="bi bi-hourglass animate-spin text-xl mx-1"></i> : <i className="bi bi-floppy-fill text-xl mx-1"></i>}Guardar</button>
@@ -214,7 +222,7 @@ export default function ProductsMain() {
             {showModal && <Modal categories={categories} setCategories={setCategories} setShowModal={setShowModal} />}
             <div className="w-full flex flex-col items-center px-2">
                 {categories.map((category, index) => {
-                    return <ProductTable addProduct={addProduct} category={category} deleteCategory={deleteCategory} deleteProduct={deleteProduct} editCategory={editCategory} editProduct={editProduct} index={index} key={category._id} moveCatUp={moveCatUp} moveCatDown={moveCatDown} ></ProductTable>
+                    return <ProductTable addProduct={addProduct} category={category} deleteCategory={deleteCategory} deleteProduct={deleteProduct} editCategory={editCategory} editProduct={editProduct} indexCat={index} key={category._id} moveCatUp={moveCatUp} moveCatDown={moveCatDown} ></ProductTable>
                 })}
             </div>
         </div>
