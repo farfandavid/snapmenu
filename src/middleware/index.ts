@@ -36,6 +36,7 @@ export const onRequest = defineMiddleware(async (context, next,) => {
                     uid: user.uid,
                     email: user.email || "",
                     emailVerified: user.emailVerified,
+                    disable: user.disabled
                 });
                 await newUser.save();
                 context.locals = {
