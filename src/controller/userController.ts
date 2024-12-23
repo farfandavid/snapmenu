@@ -1,4 +1,3 @@
-import mongoose from 'mongoose';
 import User from '../models/userModel';
 import type { IUser } from '../types/User';
 import db from '../db/db';
@@ -40,7 +39,6 @@ export const registerUser = async (user: IUser) => {
     db.connectDB();
     const newUser = new User(
       {
-        _id: new mongoose.Types.ObjectId(),
         displayName: user.displayName,
         uid: user.uid,
         email: user.email,

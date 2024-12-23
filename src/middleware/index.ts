@@ -3,7 +3,7 @@ import { defineMiddleware } from "astro/middleware";
 import { PRIVATE_ROUTES, PUBLIC_ROUTES } from "../utils/constant";
 import { verifyAuth } from "../utils/verifyAuth";
 import { getUserByEmail, registerUser, updateUser } from "../controller/userController";
-import { verifyMPWebhook } from "../utils/mercadopagoValidator.ts"
+import { verifyMPWebhook } from "../utils/mercadopagoValidator"
 
 export const onRequest = defineMiddleware(async (context, next,) => {
     console.log(context.url.pathname);
