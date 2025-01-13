@@ -1,10 +1,11 @@
 ---
-import QRCodeScan from "../assets/QRCodeScan.astro";
-import SearchHeart from "../assets/SearchHeart.astro";
-import PostcardHeartFill from "../assets/PostcardHeartFill.astro";
-import Share from "../assets/Share.astro";
-import PencilFill from "../assets/PencilFill.astro";
-import Piggy from "../assets/Piggy.astro";
+import QRCodeScan from "../assets/icons/QRCodeScan.astro";
+import SearchHeart from "../assets/icons/SearchHeart.astro";
+import PostcardHeartFill from "../assets/icons/PostcardHeartFill.astro";
+import Share from "../assets/icons/Share.astro";
+import PencilFill from "../assets/icons/PencilFill.astro";
+import Piggy from "../assets/icons/Piggy.astro";
+import Container from "../default/Container.astro";
 
 interface Props {
     icon: string;
@@ -15,8 +16,9 @@ interface Props {
 const { icon, title, description }: Props = Astro.props;
 ---
 
-<div
-    class="bg-white shadow-md rounded-lg p-4 gap-1 items-center grid grid-cols-5 hover:shadow-xl hover:-translate-y-1 transition duration-300 linear select-none fade-in"
+<Container
+    className="p-4 gap-1 items-center grid grid-cols-5 hover:shadow-xl hover:-translate-y-1 transition duration-300 linear select-none fade-in"
+    addToClass
 >
     <div
         class="max-sm:w-12 max-sm:h-12 w-14 h-14 flex items-center justify-center aspect-square bg-orange-500 xl:text-3xl rounded text-white col-span-1"
@@ -45,4 +47,4 @@ const { icon, title, description }: Props = Astro.props;
             {description}
         </p>
     </div>
-</div>
+</Container>

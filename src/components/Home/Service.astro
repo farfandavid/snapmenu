@@ -1,5 +1,6 @@
 ---
 import { PRICE } from "../../client/utils/constant";
+import Container from "../default/Container.astro";
 const SERVICE_CONTENT = {
     title: "Planes de Precios",
     description:
@@ -49,7 +50,7 @@ const SERVICE_CONTENT = {
     <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
         {
             SERVICE_CONTENT.plans.map((plan) => (
-                <div class="grid grid-rows-7 bg-white rounded-lg shadow-lg p-5 fade-in">
+                <Container className="grid grid-rows-7 fade-in" addToClass>
                     <h3 class="row-span-1 text-xl font-bold m-0 p-0 h-fit">
                         {plan.name}
                     </h3>
@@ -67,7 +68,7 @@ const SERVICE_CONTENT = {
                             Elegir Plan
                         </a>
                     </div>
-                </div>
+                </Container>
             ))
         }
     </div>

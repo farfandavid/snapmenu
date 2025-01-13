@@ -7,7 +7,7 @@ import { PRICE } from '../../../client/utils/constant';
 
 const reqSchema = z.object({
     menuName: z.string().min(4).max(30),
-    description: z.string().max(150).optional().nullable(),
+    description: z.string().max(250).optional().nullable(),
     suscription: z.enum(["1 Mes", "3 Meses", "6 Meses", "12 Meses"]),
     type: z.enum(["renew", "new"]).optional(),
 });
@@ -32,7 +32,7 @@ export const POST: APIRoute = async ({ request, redirect, locals }) => {
     }
     const menu = await Menu.getMenuByName(validated.data.menuName);
     if (menu !== null) {
-        return new Response("not found", { status: 404 });
+        return new Response("Menu already exist!", { status: 404 });
     }
 
     const unit_price = {
@@ -75,7 +75,14 @@ export const POST: APIRoute = async ({ request, redirect, locals }) => {
             corporationId: "SnapMenu",
             plataformId: "www.snapmenu.online",
         }
+    }).catch((e) => {
+        console.log(e);
+        return null;
     });
+
+    if (!result) {
+        return new Response("Error", { status: 500 });
+    }
     if (!result.init_point) {
         return new Response("Error", { status: 500 });
     }

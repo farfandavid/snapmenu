@@ -1,0 +1,89 @@
+---
+interface Props extends astroHTML.JSX.HTMLAttributes {
+    className?: string;
+    addToClass?: boolean;
+    type?: astroHTML.JSX.HTMLInputTypeAttribute;
+    name?: string;
+    placeholder?: string;
+    required?: boolean;
+    maxLength?: number;
+    minLength?: number;
+    customType?: "input" | "textarea" | "switch";
+    id?: string;
+    [key: string]: any;
+}
+
+const {
+    className = "p-3 bg-gray-100 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-0 focus:border-2 focus:border-orange-500 disabled:text-gray-400 disabled:bg-slate-200",
+    addToClass = false,
+    type,
+    name = "input",
+    placeholder,
+    autocomplete = "off",
+    required = false,
+    maxLength,
+    minLength = 0,
+    id = "input",
+    customType = "input",
+    ...rest
+} = Astro.props;
+
+const finalClassName = addToClass
+    ? `${className} p-3 bg-gray-100 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-0 focus:border-2 focus:border-orange-500 disabled:text-gray-400 disabled:bg-slate-200`
+    : className;
+---
+
+{
+    () => {
+        switch (customType) {
+            case "input":
+                return (
+                    <input
+                        id={id}
+                        type={type}
+                        name={name}
+                        placeholder={placeholder}
+                        autocomplete={autocomplete}
+                        required={required}
+                        class={finalClassName}
+                        maxlength={maxLength}
+                        minlength={minLength}
+                        {...rest}
+                    />
+                );
+
+            case "textarea":
+                return (
+                    <textarea
+                        id={id}
+                        name={name}
+                        placeholder={placeholder}
+                        autocomplete={autocomplete}
+                        required={required}
+                        class={finalClassName}
+                        maxlength={maxLength}
+                        minlength={minLength}
+                        {...rest}
+                    />
+                );
+            case "switch":
+                return (
+                    <div class="bg-gray-300 border border-gray-400 has-[:checked]:bg-orange-500 flex has-[:checked]:border-orange-500 w-10 h-5 rounded-full relative transition-all duration-300">
+                        <label
+                            for={id}
+                            class="bg-gray-100 border-gray-400 has-[:checked]:border-orange-500 border border-inherit h-full aspect-square rounded-full absolute has-[:checked]:right-0 top-1/2 transform -translate-y-1/2 hover:cursor-pointer transition-all duration-300"
+                        >
+                            <input
+                                type="checkbox"
+                                name={id}
+                                id={id}
+                                class="hidden"
+                            />
+                        </label>
+                    </div>
+                );
+            default:
+                break;
+        }
+    }
+}

@@ -57,7 +57,7 @@ const MenuSchema = z.object({
     _id: z.instanceof(Types.ObjectId).optional(),
     name: z.string().min(4).max(30).regex(/^[a-zA-Z0-9]+$/, { message: "Solo se permiten letras y números" }),
     userId: z.string(),
-    description: z.string().max(150).optional(),
+    description: z.string().max(250).optional(),
     active: z.boolean(),
     categories: z.array(CategoriesSchema).optional(),
     productsLimit: z.number().optional(),

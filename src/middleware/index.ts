@@ -39,16 +39,15 @@ export const onRequest = defineMiddleware(async (context, next,) => {
                     disabled: user.disabled
                 });
                 await newUser.save();
-                context.locals = {
-                    user: {
-                        id: newUser._id?.toString(),
-                        displayName: newUser.displayName,
-                        uid: newUser.uid,
-                        email: newUser.email,
-                        emailVerified: newUser.emailVerified,
-                        disabled: newUser.disabled
-                    }
-                };
+                context.locals.user = {
+                    id: newUser._id?.toString(),
+                    displayName: newUser.displayName,
+                    uid: newUser.uid,
+                    email: newUser.email,
+                    emailVerified: newUser.emailVerified,
+                    disabled: newUser.disabled
+                }
+
                 return next();
             }
             if (userDB?.uid !== user.uid || userDB?.emailVerified !== user.emailVerified) {
@@ -65,28 +64,25 @@ export const onRequest = defineMiddleware(async (context, next,) => {
                     return new Response("Internal Server Error", { status: 500 });
                 }
 
-                context.locals = {
-                    user: {
-                        id: updated._id?.toString(),
-                        displayName: updated.displayName,
-                        uid: updated.uid,
-                        email: updated.email,
-                        emailVerified: updated.emailVerified,
-                        disabled: updated.disabled
-                    }
-                };
+                context.locals.user = {
+                    id: updated._id?.toString(),
+                    displayName: updated.displayName,
+                    uid: updated.uid,
+                    email: updated.email,
+                    emailVerified: updated.emailVerified,
+                    disabled: updated.disabled
+                }
                 return next();
             }
-            context.locals = {
-                user: {
-                    id: userDB._id?.toString(),
-                    displayName: userDB.displayName,
-                    uid: userDB.uid,
-                    email: userDB.email,
-                    emailVerified: userDB.emailVerified,
-                    disabled: userDB.disabled
-                }
-            };
+            context.locals.user = {
+                id: userDB._id?.toString(),
+                displayName: userDB.displayName,
+                uid: userDB.uid,
+                email: userDB.email,
+                emailVerified: userDB.emailVerified,
+                disabled: userDB.disabled
+            }
+
             return next();
         } catch (err) {
             console.error(err);

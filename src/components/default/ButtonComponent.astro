@@ -1,0 +1,30 @@
+---
+interface Props extends astroHTML.JSX.ButtonHTMLAttributes {
+    className?: string;
+    addToClass?: boolean;
+    id?: string;
+    isTable?: boolean;
+    [key: string]: any;
+}
+
+const defaultButton =
+    "px-3 py-2 bg-orange-500 hover:bg-orange-400 rounded-md text-white disabled:opacity-50 disabled:hover:bg-orange-500 font-bold";
+const tableButton =
+    "px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-md border border-gray-300 disabled:opacity-50 disabled:hover:bg-gray-100 font-bold";
+
+const {
+    className,
+    addToClass = false,
+    id,
+    isTable = false,
+    ...rest
+} = Astro.props;
+
+const finalClassName = addToClass
+    ? `${className} ${isTable ? tableButton : defaultButton}`
+    : `${className ? className : isTable ? tableButton : defaultButton}`;
+---
+
+<button id={id} class={finalClassName} {...rest}>
+    <slot />
+</button>

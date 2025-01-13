@@ -1,51 +1,57 @@
 ---
 import { PRICE } from "../../client/utils/constant";
+import ButtonComponent from "../default/ButtonComponent.astro";
+import InputComponent from "../default/InputComponent.astro";
+import SelectComponent from "../default/SelectComponent.astro";
 ---
 
-<form
-    class="flex flex-col items-center w-full p-5 gap-2 bg-slate-50 rounded border border-orange-300 shadow-md overflow-hidden relative lg:w-1/3"
-    id="form-payment"
->
+<form class="flex flex-col w-full gap-2 bg-slate-50 text-xl" id="form-payment">
     <div class="flex flex-col gap-1 w-full">
-        <label for="menuName" class="flex flex-col justify-between"
+        <label for="menuName" class="flex flex-col justify-between font-bold"
             >Elige el nombre para tu SnapMenu
             <p class="text-xs">
                 <i class="bi bi-info-circle"></i>
                 El nombre debe ser Alfanumerico sin espacios, minimo 4 caracteres
             </p>
         </label>
-        <div
-            class="flex items-center gap-1 p-2 rounded ring-1 ring-slate-500 w-full bg-white"
-        >
-            <label class="w-fit" for="menuName">www.snapmenu.online/</label>
-            <input
+        <div class="flex items-center gap-1 p-3">
+            <label class="w-fit font-bold" for="menuName"
+                >www.snapmenu.online/</label
+            >
+            <InputComponent
                 type="text"
                 name="menuName"
                 id="menuName"
-                class="w-full"
+                className="w-full bg-transparent p-1 rounded-md"
+                addToClass
                 placeholder="Nombre de tu Local"
                 required
-                autocomplete="off"
-                maxlength="30"
-                minlength="4"
+                maxLength={30}
+                minLength={4}
             />
         </div>
         <div class="w-full flex flex-col">
-            <label for="description">Descripcion de tu Local</label>
-            <textarea
+            <label for="description" class="font-bold"
+                >Descripcion de tu Local</label
+            >
+            <InputComponent
+                customType="textarea"
                 name="description"
-                class="p-2 rounded ring-1 ring-slate-500 resize-none"
                 id="description"
-                placeholder="Descripcion de tu Local"
-                maxlength="150"
-                rows="3"
+                className="w-full bg-transparent p-1 rounded-md resize-none"
+                addToClass
+                placeholder="Describe de tu Local"
                 required
-                autocomplete="off"></textarea>
+                autocomplete="off"
+                maxLength={250}
+                rows="3"
+            />
         </div>
-        <button
-            class="flex gap-1 bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded mt-2 justify-center h-10"
-            type="button"
+        <ButtonComponent
             id="check-availability"
+            type={"button"}
+            className="flex justify-center"
+            addToClass
         >
             <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -65,30 +71,38 @@ import { PRICE } from "../../client/utils/constant";
                     d="M5.95 5.7L7 6.75 8.05 7.8m8.4 8.4l.95.95.95.95m.2-12.4L17.5 6.75 16.45 7.8M6.35 12h-3.1m17.5 0h-2.6m-5.9 9v-3.1m0-14.9v3.1"
                 ></path></svg
             >
-            <span id="txt-buttoncheck">Comprobar Disponibilidad</span>
-        </button>
+            <span id="txt-buttoncheck">Verificar Disponibilidad</span>
+        </ButtonComponent>
     </div>
     <div class="w-full hidden flex-col items-center gap-2" id="payform">
+        <ButtonComponent id="btn-reset"> Elegir otro nombre </ButtonComponent>
         <label for="suscription" class="font-bold">
             Elige tu suscripción
         </label>
-        <div class="flex w-full justify-between">
-            <select
-                class="w-3/4 p-2 rounded ring-1 ring-slate-500"
-                name="suscription"
+        <div class="flex w-full items-center justify-center">
+            <SelectComponent
+                autocomplete="off"
                 id="suscription"
+                name="suscription"
             >
                 <option value="1 Mes" selected>1 Mes</option>
                 <option value="3 Meses">3 Meses</option>
                 <option value="6 Meses">6 Meses</option>
                 <option value="12 Meses">12 Meses</option>
-            </select>
-            <div class="flex w-1/4 relative">
+            </SelectComponent>
+            <div class="flex relative justify-start items-start">
+                <p
+                    class="flex justify-start p-2 font-extrabold text-xl"
+                    id="price"
+                >
+                    ${PRICE}
+                </p>
                 <span
-                    class="absolute flex gap-1 text-xs -right-3 -top-3"
+                    class="flex gap-1 text-sm"
                     style="display: none;"
                     id="offer"
-                    ><p id="off-price" class="line-through p-1">${PRICE}</p>
+                >
+                    <p id="off-price" class="line-through p-1">${PRICE}</p>
                     <p
                         id="discount"
                         class="bg-red-500 p-1 text-nowrap text-white rounded-md font-semibold"
@@ -96,17 +110,16 @@ import { PRICE } from "../../client/utils/constant";
                         25% OFF
                     </p>
                 </span>
-                <p
-                    class="flex w-full justify-start p-2 font-extrabold text-xl"
-                    id="price"
-                >
-                    ${PRICE}
-                </p>
             </div>
         </div>
         <div>
             <div>
-                <input type="checkbox" name="terms" id="terms-check" />
+                <input
+                    type="checkbox"
+                    name="terms"
+                    id="terms-check"
+                    autocomplete="off"
+                />
                 <label for="terms-check">
                     Acepto los
                     <a
@@ -117,7 +130,12 @@ import { PRICE } from "../../client/utils/constant";
                 </label>
             </div>
             <div>
-                <input type="checkbox" name="privacy" id="privacy-check" />
+                <input
+                    type="checkbox"
+                    name="privacy"
+                    id="privacy-check"
+                    autocomplete="off"
+                />
                 <label for="privacy-check">
                     Acepto la
                     <a
@@ -198,6 +216,9 @@ import { PRICE } from "../../client/utils/constant";
     const payButton = document.getElementById(
         "pay-button",
     ) as HTMLButtonElement;
+    const textCheck = document.getElementById(
+        "txt-buttoncheck",
+    ) as HTMLSpanElement;
 
     checkTerms.addEventListener("change", (e) => {
         if (checkTerms.checked && checkPrivacy.checked) {
@@ -234,9 +255,6 @@ import { PRICE } from "../../client/utils/constant";
 
     checkAvailability.addEventListener("click", async (e) => {
         const inputValue = name.value;
-        const textCheck = document.getElementById(
-            "txt-buttoncheck",
-        ) as HTMLSpanElement;
 
         loader.classList.remove("hidden");
         textCheck.classList.add("hidden");
@@ -260,6 +278,9 @@ import { PRICE } from "../../client/utils/constant";
                 payform.classList.remove("hidden");
                 payform.classList.add("flex");
                 payButton.disabled = false;
+                document
+                    .getElementById("menuName")
+                    ?.setAttribute("disabled", "true");
             }
         }, 1500);
     });
@@ -297,5 +318,23 @@ import { PRICE } from "../../client/utils/constant";
                 price.textContent = `$${priceValue * 12 - priceValue * 12 * 0.2}`;
                 break;
         }
+    });
+
+    const btnReset = document.getElementById("btn-reset") as HTMLButtonElement;
+
+    btnReset.addEventListener("click", (e) => {
+        name.value = "";
+        checkAvailability.classList.remove("bg-green-500");
+        checkAvailability.classList.remove("bg-red-500");
+        checkAvailability.classList.add("bg-orange-500");
+        payform.classList.remove("flex");
+        payform.classList.add("hidden");
+        payButton.disabled = true;
+        payButton.classList.add("hidden");
+        payButton.classList.remove("flex");
+        checkTerms.checked = false;
+        checkPrivacy.checked = false;
+        textCheck.textContent = "Verificar Disponibilidad";
+        document.getElementById("menuName")?.removeAttribute("disabled");
     });
 </script>

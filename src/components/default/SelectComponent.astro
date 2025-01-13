@@ -1,0 +1,17 @@
+---
+interface Props extends astroHTML.JSX.SelectHTMLAttributes {
+    className?: string;
+    addToClass?: boolean;
+    id?: string;
+    [key: string]: any;
+}
+
+const { className, addToClass = false, id, rest }: Props = Astro.props;
+const finalClassName = addToClass
+    ? `${className} p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500`
+    : "p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500";
+---
+
+<select id={id} class={finalClassName} {...rest}>
+    <slot />
+</select>

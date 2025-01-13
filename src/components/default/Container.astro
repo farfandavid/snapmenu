@@ -1,0 +1,19 @@
+---
+interface Props {
+    className?: string;
+    addToClass?: boolean;
+}
+
+const {
+    className = "border border-gray-300 p-3 rounded-md bg-slate-50 shadow",
+    addToClass = false,
+} = Astro.props;
+
+const finalClassName = addToClass
+    ? `${className} border border-gray-300 p-3 rounded-md bg-slate-50 shadow`
+    : className;
+---
+
+<div class={finalClassName}>
+    <slot />
+</div>
