@@ -6,7 +6,71 @@ import Contact from "../components/Home/Contact.astro";
 import Layout from "../layouts/Layout.astro";
 import { Image } from "astro:assets";
 import List from "../components/assets/icons/List.astro";
+/* import { Menu, Category, Product } from "../server/class/draft";
+import { MenuError } from "../server/interface/Menu"; */
 
+/* try {
+	const menu = await Menu.getMenuById("679e84f83028cae5b5c8ff5c");
+	const category = new Category({
+		name: "Bebidas5",
+		description: "Bebidas refrescantes5",
+		active: true,
+		_id: "05215945-6cd4-44f8-9e48-d52b0da2ec0b",
+	});
+	const product = new Product({
+		name: "Coca Cola",
+		description: "Bebida refrescante updated 25",
+		price: 266.5,
+		active: true,
+		_id: "05215945-6cd4-44f8-9e48-d52b0da2ec0b",
+	});
+
+	const products = [
+		{
+			name: "Coca Cola",
+			description: "Bebida refrescante",
+			price: 266.5,
+			active: true,
+			_id: crypto.randomUUID(),
+		},
+		{
+			name: "Pepsi",
+			description: "Bebida refrescante",
+			price: 266.5,
+			active: true,
+			_id: crypto.randomUUID(),
+		},
+		{
+			name: "Sprite",
+			description: "Bebida refrescante",
+			price: 266.5,
+			active: true,
+			_id: crypto.randomUUID(),
+		},
+		{
+			name: "Fanta",
+			description: "Bebida refrescante",
+			price: 266.5,
+			active: true,
+			_id: crypto.randomUUID(),
+		},
+		{
+			name: "7up",
+			description: "Bebida refrescante",
+			price: 266.5,
+			active: true,
+			_id: crypto.randomUUID(),
+		},
+	];
+	if (menu) {
+		if (menu.categories && menu.categories.length > 0) {
+			console.log(menu.categories[0].products);
+		}
+	}
+} catch (error) {
+	console.log(error);
+}
+ */
 const NAVBAR = [
 	{
 		name: "Inicio",

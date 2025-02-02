@@ -1,15 +1,222 @@
-import type { Types } from "mongoose";
-import { CategoriesError, MenuError, MenuSchema, type ICategories, type IMenu } from "../interface/Menu";
+import type { ProjectionFields, Types } from "mongoose";
 import db from "../config/db";
+import { CategoriesError, CategoriesSchema, MenuError, MenuSchema, ProductError, ProductSchema, type ICategories, type IMenu, type IProduct } from "../interface/Menu";
 import { MenuModel } from "../models/menuModel";
 import { ERROR_MESSAGES } from "../utils/constants";
+
+export class Product implements IProduct {
+    _id: string;
+    name: string;
+    description?: string;
+    url_image?: string;
+    price?: number;
+    quantity?: number;
+    active: boolean;
+
+    constructor(data: IProduct) {
+        this._id = data._id;
+        this.name = data.name;
+        this.description = data.description;
+        this.url_image = data.url_image;
+        this.price = data.price;
+        this.quantity = data.quantity;
+        this.active = data.active;
+    }
+
+    validate(): Product | ProductError {
+        const validate = ProductSchema.safeParse(this);
+        if (!validate.success) {
+            throw new ProductError(validate.error?.flatten().fieldErrors)
+        } else {
+            return validate.data as Product;
+        }
+    }
+
+    async save(menuId: string, categoryId: string) {
+        this.validate();
+        await db.connectDB();
+        const menu = await MenuModel.findOneAndUpdate({ _id: menuId, "categories._id": categoryId }, { $push: { "categories.$.products": this } }, { new: true, runValidators: true });
+        if (!menu) {
+            // Verificamos si el menú existe o si el producto está duplicado
+            const menuExists = await MenuModel.findById(menuId);
+            if (!menuExists) {
+                throw new ProductError({ _id: [ERROR_MESSAGES.MENU_NOT_FOUND] });
+            }
+            // Si el menú existe, significa que el producto está duplicado
+            throw new ProductError({ _id: [ERROR_MESSAGES.PRODUCT_ALREADY_EXISTS] });
+        }
+
+        return new Product(this);
+    }
+
+    async update(menuId: string, categoryId: string, fields?: ProjectionFields<Product>) {
+        this.validate();
+        await db.connectDB();
+        const updateFields: { [key: string]: any } = {};
+        if (fields) {
+            Object.keys(fields).forEach(field => {
+                updateFields[`categories.$[category].products.$[product].${field}`] = (this as any)[field];
+            });
+        } else {
+            // Si no hay fields específicos, actualizamos todo el producto
+            updateFields["categories.$[category].products.$[product]"] = this;
+        }
+        const menu = await MenuModel.findOneAndUpdate(
+            { _id: menuId, "categories._id": categoryId },
+            { $set: updateFields },
+            { new: true, runValidators: true, arrayFilters: [{ "category._id": categoryId }, { "product._id": this._id }] }
+        );
+        if (!menu) {
+            throw new ProductError({ _id: [ERROR_MESSAGES.PRODUCT_NOT_UPDATED] });
+        }
+        return new Product(this);
+    }
+
+    async delete(menuId: string, categoryId: string) {
+        await db.connectDB();
+        const menu = await MenuModel.findOneAndUpdate({ _id: menuId, "categories._id": categoryId }, { $pull: { "categories.$.products": { _id: this._id } } }, { new: true });
+        if (!menu) {
+            throw new ProductError({ _id: [ERROR_MESSAGES.PRODUCT_NOT_DELETED] });
+        }
+        return new Product(this);
+    }
+
+    static fromJSON(data: IProduct) {
+        return new Product(data);
+    }
+
+    static fromFormData(data: FormData) {
+        return new Product({
+            _id: data.get('_id') as string,
+            name: data.get('name') as string,
+            description: data.get('description') as string,
+            url_image: data.get('url_image') as string,
+            price: Number(data.get('price')),
+            quantity: Number(data.get('quantity')),
+            active: data.get('active') === 'true',
+        });
+    }
+
+    static async updateManyProducts(menuId: string, categoryId: string, products: IProduct[]) {
+        await db.connectDB();
+
+        const menu = await MenuModel.findOneAndUpdate(
+            { _id: menuId, "categories._id": categoryId },
+            { $set: { "categories.$.products": products } },
+            { new: true, runValidators: true }
+        );
+        if (!menu) {
+            throw new ProductError({ _id: [ERROR_MESSAGES.PRODUCT_NOT_UPDATED] });
+        }
+        return products.map(product => new Product(product));
+    }
+}
+
+export class Category implements ICategories {
+    _id: string;
+    name: string;
+    description?: string;
+    active: boolean;
+    products?: any[];
+
+    constructor(data: ICategories) {
+        this._id = data._id;
+        this.name = data.name;
+        this.description = data.description;
+        this.active = data.active;
+        this.products = data.products;
+    }
+
+    validate(): Category | CategoriesError {
+        const validate = CategoriesSchema.safeParse(this);
+        if (!validate.success) {
+            throw new CategoriesError(validate.error?.flatten().fieldErrors)
+        } else {
+            return validate.data as Category;
+        }
+    }
+
+    async save(menuId: string) {
+        this.validate();
+        await db.connectDB();
+        const menu = await MenuModel.findOneAndUpdate({ _id: menuId, "categories._id": { $ne: this._id } }, { $push: { categories: this } }, { new: true, runValidators: true });
+        if (!menu) {
+            // Verificamos si el menú existe o si la categoría está duplicada
+            const menuExists = await MenuModel.findById(menuId);
+            if (!menuExists) {
+                throw new CategoriesError({ _id: [ERROR_MESSAGES.MENU_NOT_FOUND] });
+            }
+            // Si el menú existe, significa que la categoría está duplicada
+            throw new CategoriesError({ _id: [ERROR_MESSAGES.CATEGORY_ALREADY_EXISTS] });
+        }
+
+        return new Category(this);
+    }
+
+    async update(menuId: string, fields?: ProjectionFields<Category>) {
+        this.validate();
+        await db.connectDB();
+        const updateFields: { [key: string]: any } = {};
+        if (fields) {
+            Object.keys(fields).forEach(field => {
+                updateFields[`categories.$.${field}`] = (this as any)[field];
+            });
+        } else {
+            // Si no hay fields específicos, actualizamos toda la categoría
+            updateFields["categories.$"] = this;
+        }
+        const menu = await MenuModel.findOneAndUpdate(
+            { _id: menuId, "categories._id": this._id },
+            { $set: updateFields },
+            { new: true, runValidators: true }
+        );
+        if (!menu) {
+            throw new CategoriesError({ _id: [ERROR_MESSAGES.CATEGORY_NOT_FOUND] });
+        }
+        return new Category(this);
+    }
+
+    async delete(menuId: string) {
+        await db.connectDB();
+        const menu = await MenuModel.findOneAndUpdate({ _id: menuId, "categories._id": this._id }, { $pull: { categories: { _id: this._id } } }, { new: true });
+        if (!menu) {
+            throw new CategoriesError({ _id: [ERROR_MESSAGES.CATEGORY_NOT_DELETED] });
+        }
+        return new Category(this);
+    }
+
+    static fromJSON(data: ICategories) {
+        return new Category(data);
+    }
+
+    static fromFormData(data: FormData) {
+        return new Category({
+            _id: data.get('_id') as string,
+            name: data.get('name') as string,
+            description: data.get('description') as string,
+            active: data.get('active') === 'true',
+            products: JSON.parse(data.get('products') as string),
+        });
+    }
+
+    static async updateManyCategories(menuId: string, categories: ICategories[]) {
+        await db.connectDB();
+        const menu = await MenuModel.findByIdAndUpdate(menuId, { categories }, { new: true, runValidators: true });
+        if (!menu) {
+            throw new CategoriesError({ _id: [ERROR_MESSAGES.CATEGORY_NOT_UPDATED] });
+        }
+        return categories.map(category => new Category(category));
+    }
+}
 
 export class Menu implements IMenu {
     _id?: Types.ObjectId;
     name: string;
     userId: string;
-    description?: string;
+    expDate: Date;
+    maxProducts: number;
     active: boolean;
+    description?: string;
     categories?: ICategories[];
     productsLimit?: number;
     address?: string;
@@ -26,25 +233,16 @@ export class Menu implements IMenu {
         instagram?: string;
         twitter?: string;
     };
-    openingHours?: {
-        openH?: string;
-        closeH?: string;
-    }[];
-    expDate: Date;
-    maxProducts: number;
+    schedules?: {}[];
+
 
     constructor(data: IMenu) {
-        const validate = MenuSchema.safeParse(data);
-        if (!validate.success) {
-            throw new MenuError(validate.error?.flatten().fieldErrors)
-        }
         this._id = data._id;
         this.name = data.name;
         this.userId = data.userId;
         this.description = data.description;
         this.active = data.active;
         this.categories = data.categories;
-        this.productsLimit = data.productsLimit;
         this.address = data.address;
         this.city = data.city;
         this.state = data.state;
@@ -55,10 +253,9 @@ export class Menu implements IMenu {
         this.logoUrl = data.logoUrl;
         this.bannerUrl = data.bannerUrl;
         this.social = data.social;
-        this.openingHours = data.openingHours;
+        this.schedules = data.schedules;
         this.expDate = data.expDate;
-        this.maxProducts = data.maxProducts;
-
+        this.maxProducts = data.maxProducts ?? 100;
     }
 
     validate(): Menu | MenuError {
@@ -69,293 +266,110 @@ export class Menu implements IMenu {
             return validate.data as Menu;
         }
     }
-    /**
-     * Save a new menu in the database
-     * @returns Menu | Error
-     */
+
     async save() {
-        try {
-            await db.connectDB();
-            const menu = new MenuModel(this);
-            await menu.save();
-            return new Menu(menu);
-        } catch (err) {
-            console.error(err);
-            throw new Error(ERROR_MESSAGES[500]);
+        this.validate();
+        await db.connectDB();
+        const isExist = await MenuModel.findOne({ name: this.name }, { _id: 1, name: 1 });
+        if (isExist) {
+            throw new MenuError({ name: [ERROR_MESSAGES.MENU_ALREADY_EXISTS] });
         }
+        const menu = new MenuModel(this);
+        console.log(isExist);
+        await menu.save();
+        return new Menu(menu);
     }
-    /**
-     * Update an existing menu in the database
-     * @returns Menu | Error | MenuError | null
-     */
+
     async update() {
-        try {
-            if (this.validate() instanceof MenuError) {
-                throw this.validate();
-            }
-            await db.connectDB();
-            const menu = await MenuModel.findByIdAndUpdate(this._id, this, { new: true });
-            if (!menu) return null;
-            return new Menu(menu);
-        } catch (err: Error | MenuError | any) {
-            console.error(err);
-            throw err;
+        this.validate();
+        await db.connectDB();
+        const menu = await MenuModel.findByIdAndUpdate(this._id, this, { new: true });
+        if (!menu) {
+            throw new MenuError({ _id: [ERROR_MESSAGES.MENU_NOT_FOUND] });
         }
+        return new Menu(menu);
     }
-    /**
-     * Delete an existing menu in the database
-     * @returns Menu | Error
-     */
+
     async delete() {
-        try {
-            await db.connectDB();
-            const menu = await MenuModel.findByIdAndDelete(this._id);
-            return menu;
-        } catch (err) {
-            console.error(err);
-            return new Error(ERROR_MESSAGES[500]);
+        await db.connectDB();
+        const menu = await MenuModel.findByIdAndDelete(this._id);
+        if (!menu) {
+            throw new MenuError({ _id: [ERROR_MESSAGES.MENU_NOT_DELETED] });
         }
+        return new Menu(menu);
     }
 
-    async updateLogo(logoUrl: string) {
-        try {
-            await db.connectDB();
-            const menu = await MenuModel.findByIdAndUpdate(this._id, { logoUrl: logoUrl }, { new: true });
-            if (!menu) return null;
-            return new Menu(menu);
-        } catch (err) {
-            console.error(err);
-            throw new Error(ERROR_MESSAGES[500]);
-        }
+    static fromJSON(data: IMenu) {
+        return new Menu(data);
     }
 
-    async updateBanner(bannerUrl: string) {
-        try {
-            await db.connectDB();
-            const menu = await MenuModel.findByIdAndUpdate(this._id, { bannerUrl: bannerUrl }, { new: true });
-            if (!menu) return null;
-            return new Menu(menu);
-        } catch (err) {
-            console.error(err);
-            throw new Error(ERROR_MESSAGES[500]);
-        }
+    static fromFormData(data: FormData) {
+        return new Menu({
+            name: data.get('name') as string,
+            userId: data.get('userId') as string,
+            expDate: new Date(data.get('expDate') as string),
+            maxProducts: Number(data.get('maxProducts')),
+            active: data.get('active') === 'true',
+            description: data.get('description') as string,
+            categories: JSON.parse(data.get('categories') as string),
+            address: data.get('address') as string,
+            city: data.get('city') as string,
+            state: data.get('state') as string,
+            postalCode: data.get('postalCode') as string,
+            country: data.get('country') as string,
+            mapUrl: data.get('mapUrl') as string,
+            phone: data.get('phone') as string,
+            logoUrl: data.get('logoUrl') as string,
+            bannerUrl: data.get('bannerUrl') as string,
+            social: JSON.parse(data.get('social') as string),
+            schedules: JSON.parse(data.get('schedules') as string),
+        });
     }
 
-    async addCategory(category: ICategories) {
-        try {
-            await db.connectDB();
-            const menu = await MenuModel.findByIdAndUpdate(this._id, { $push: { categories: category } }, { new: true });
-            if (!menu) return null;
-            return new Menu(menu);
-        } catch (err) {
-            console.error(err);
-            throw new Error(ERROR_MESSAGES[500]);
+    static async getMenuById(menuId: string, fields?: ProjectionFields<Menu>) {
+        await db.connectDB();
+        const menu = await MenuModel.findById(menuId, fields);
+        if (!menu) {
+            throw new MenuError({ _id: [ERROR_MESSAGES.MENU_NOT_FOUND] });
         }
+        return new Menu(menu);
     }
 
-    async removeCategory(category: ICategories) {
-        try {
-            await db.connectDB();
-            const menu = await MenuModel.findByIdAndUpdate
-                (this._id, { $pull: { categories: category } }, { new: true });
-            if (!menu) return null;
-            return new Menu(menu);
-        } catch (err) {
-            console.error(err);
-            throw new Error(ERROR_MESSAGES[500]);
+    static async getMenuByName(name: string, fields?: ProjectionFields<Menu>) {
+        await db.connectDB();
+        const menu = await MenuModel.findOne({ name }, fields);
+        if (!menu) {
+            throw new MenuError({ name: [ERROR_MESSAGES.MENU_NOT_FOUND] });
         }
+        return new Menu(menu);
     }
 
-    async updateCategory(category: ICategories) {
-        try {
-            await db.connectDB();
-            const menu = await MenuModel.findOneAndUpdate
-                ({ _id: this._id, "categories._id": category._id }, { $set: { "categories.$": category } }, { new: true });
-            if (!menu) return null;
-            return new Menu(menu);
-        } catch (err) {
-            console.error(err);
-            throw new Error(ERROR_MESSAGES[500]);
+    static async getMenuByIdAndUserId(menuId: string, userId: string, fields?: ProjectionFields<Menu>) {
+        await db.connectDB();
+        const menu = await MenuModel.findOne({ _id: menuId, userId }, fields);
+        if (!menu) {
+            throw new MenuError({ _id: [ERROR_MESSAGES.MENU_NOT_FOUND] });
         }
-    }
-    async updateCategories(categories: ICategories[]) {
-        try {
-            await db.connectDB();
-            const validate = await MenuSchema.safeParseAsync({
-                ...this,
-                categories: categories
-            });
-            if (!validate.success) {
-                throw new MenuError(validate.error?.flatten().fieldErrors);
-            }
-            const countProducts = categories.reduce((acc, curr) => acc + (curr.products?.length ?? 0), 0);
-            if (countProducts > this.maxProducts) {
-                throw new CategoriesError({ products: ["Exceeded the maximum number of products"] });
-            }
-            const menu = await MenuModel.findByIdAndUpdate(this._id, { categories: categories }, { new: true });
-            if (!menu) return null;
-            return new Menu(menu);
-        } catch (err) {
-
-            if (err instanceof MenuError) {
-                throw new MenuError(err);
-            }
-            if (err instanceof CategoriesError) {
-                throw new CategoriesError(err);
-            }
-            throw new Error(ERROR_MESSAGES[500]);
-        }
-    }
-    async updateInfo() {
-        try {
-            await db.connectDB();
-            const menu = await MenuModel.findByIdAndUpdate(this._id, {
-                $set: {
-                    description: this.description,
-                    address: this.address,
-                    mapUrl: this.mapUrl,
-                    phone: this.phone,
-                    social: this.social,
-                    city: this.city,
-                    state: this.state,
-                    postalCode: this.postalCode,
-                    country: this.country
-                }
-            }, { new: true });
-            if (!menu) return null;
-            return new Menu(menu);
-        } catch (err) {
-            console.error(err);
-            throw new Error(ERROR_MESSAGES[500]);
-        }
+        return new Menu(menu);
     }
 
-    async updateOpeningHours(openingHours: {
-        openH: string;
-        closeH: string;
-    }[]) {
-        try {
-            await db.connectDB();
-            const menu = await MenuModel.findByIdAndUpdate(this._id, { openingHours: openingHours }, { new: true });
-            if (!menu) return null;
-            return new Menu(menu);
-        } catch (err) {
-            console.error(err);
-            throw new Error(ERROR_MESSAGES[500]);
+    static async getMenusByUserId(userId: string, fields?: ProjectionFields<Menu>) {
+        await db.connectDB();
+        //return MenuModel.find({ userId }, fields);
+        const menus = await MenuModel.find({ userId }, fields);
+        if (!menus) {
+            throw new MenuError({ _id: [ERROR_MESSAGES.MENU_NOT_FOUND] });
         }
+        return menus.map(menu => new Menu(menu));
     }
 
-    async setExpDate(expDate: Date) {
-        try {
-            await db.connectDB();
-            const menu = await MenuModel.findByIdAndUpdate(this._id, { expDate: expDate }, { new: true });
-            if (!menu) return null;
-            return new Menu(menu);
-        } catch (err) {
-            console.error(err);
-            throw new Error(ERROR_MESSAGES[500]);
+    static async getMenus(fields?: ProjectionFields<Menu>) {
+        await db.connectDB();
+        //return MenuModel.find({}, fields);
+        const menus = await MenuModel.find({}, fields);
+        if (!menus) {
+            throw new MenuError({ _id: [ERROR_MESSAGES.MENU_NOT_FOUND] });
         }
-    }
-
-    async changeName() {
-        try {
-            await db.connectDB();
-            const menu = await MenuModel.findByIdAndUpdate(this
-                ._id, { name: this.name }, { new: true });
-            if (!menu) return null;
-            return new Menu(menu);
-        } catch (err) {
-            console.error(err);
-            throw new Error(ERROR_MESSAGES[500]);
-        }
-    }
-
-    static async getAllMenus() {
-        try {
-            await db.connectDB();
-            const menus = await MenuModel.find();
-            return menus;
-        } catch (err) {
-            console.error(err);
-            throw new Error(ERROR_MESSAGES[500]);
-        }
-    }
-    static async getMenuById(id: string) {
-        try {
-            await db.connectDB();
-            const menu = await MenuModel.findById(id);
-            if (!menu) return null;
-            return new Menu(menu);
-        } catch (err) {
-            console.error(err);
-            throw new Error(ERROR_MESSAGES[500]);
-        }
-    }
-    static async getMenuByName(name: string) {
-        try {
-            await db.connectDB();
-            const menu = await MenuModel.findOne({
-                name: name
-            });
-            if (!menu) return null;
-            return new Menu(menu);
-        } catch (err) {
-            console.error(err);
-            throw new Error(ERROR_MESSAGES[500]);
-        }
-    }
-    /**
-     * Get all menus by user id
-     * @param userId 
-     * @returns Menu[] | null
-     * @throws Error
-     */
-    static async getMenusByUserId(userId: string) {
-        try {
-            await db.connectDB();
-            const menus = await MenuModel.find({
-                userId: userId
-            });
-            if (!menus) return null;
-            return new Array<Menu>(...menus.map(menu => new Menu(menu)));
-        } catch (err) {
-            console.error(err);
-            throw new Error(ERROR_MESSAGES[500]);
-        }
-    }
-    /**
-     * Get a menu by id and user id
-     * @param id 
-     * @param userId 
-     * @returns 
-     */
-    static async getMenuByIdAndUserId(id: string, userId: string) {
-        try {
-            await db.connectDB();
-            const menu = await MenuModel.findOne({
-                _id: id,
-                userId: userId
-            });
-            if (!menu) return null;
-            return new Menu(menu);
-        } catch (err) {
-            console.error(err);
-            throw new Error(ERROR_MESSAGES[500]);
-        }
-    }
-
-    static async getMenuByNameAndUserId(name: string, userId: string) {
-        try {
-            await db.connectDB();
-            const menu = await MenuModel.findOne({
-                name: name,
-                userId: userId
-            });
-            if (!menu) return null;
-            return new Menu(menu);
-        } catch (err) {
-            console.error(err);
-            throw new Error(ERROR_MESSAGES[500]);
-        }
+        return menus.map(menu => new Menu(menu));
     }
 }

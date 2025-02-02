@@ -1,5 +1,5 @@
 ---
-interface Props extends astroHTML.JSX.HTMLAttributes {
+interface Props extends astroHTML.JSX.InputHTMLAttributes {
     className?: string;
     addToClass?: boolean;
     type?: astroHTML.JSX.HTMLInputTypeAttribute;
@@ -14,12 +14,11 @@ interface Props extends astroHTML.JSX.HTMLAttributes {
 }
 
 const {
-    className = "p-3 bg-gray-100 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-0 focus:border-2 focus:border-orange-500 disabled:text-gray-400 disabled:bg-slate-200",
+    className = "p-3 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-0 focus:border-2 focus:border-orange-500 disabled:text-gray-400 disabled:bg-slate-200",
     addToClass = false,
     type,
     name = "input",
     placeholder,
-    autocomplete = "off",
     required = false,
     maxLength,
     minLength = 0,
@@ -29,7 +28,7 @@ const {
 } = Astro.props;
 
 const finalClassName = addToClass
-    ? `${className} p-3 bg-gray-100 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-0 focus:border-2 focus:border-orange-500 disabled:text-gray-400 disabled:bg-slate-200`
+    ? `${className} p-3 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-0 focus:border-2 focus:border-orange-500 disabled:text-gray-400 disabled:bg-slate-200`
     : className;
 ---
 
@@ -43,7 +42,6 @@ const finalClassName = addToClass
                         type={type}
                         name={name}
                         placeholder={placeholder}
-                        autocomplete={autocomplete}
                         required={required}
                         class={finalClassName}
                         maxlength={maxLength}
@@ -58,7 +56,6 @@ const finalClassName = addToClass
                         id={id}
                         name={name}
                         placeholder={placeholder}
-                        autocomplete={autocomplete}
                         required={required}
                         class={finalClassName}
                         maxlength={maxLength}

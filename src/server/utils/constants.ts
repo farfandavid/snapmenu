@@ -1,5 +1,23 @@
 export const ERROR_MESSAGES = {
     500: 'Error de Servidor Intentalo de nuevo mas tarde',
+    404: 'No se encontro la pagina',
+    403: 'No tienes permisos para acceder a esta pagina',
+    401: 'No estas autorizado para acceder a esta pagina',
+    400: 'Error en la solicitud',
+    MENU_ALREADY_EXISTS: 'El Nombre del menu ya existe',
+    MENU_NOT_FOUND: 'El menu no fue encontrado',
+    MENU_NOT_UPDATED: 'El menu no fue actualizado',
+    MENU_NOT_DELETED: 'El menu no fue eliminado',
+    CATEGORY_ALREADY_EXISTS: 'La categoria ya existe',
+    CATEGORY_NOT_FOUND: 'La categoria no fue encontrada',
+    CATEGORY_NOT_UPDATED: 'La categoria no fue actualizada',
+    CATEGORY_NOT_DELETED: 'La categoria no fue eliminada',
+    CATEGORY_NOT_ADDED: 'La categoria no fue agregada',
+    PRODUCT_ALREADY_EXISTS: 'El producto ya existe',
+    PRODUCT_NOT_FOUND: 'El producto no fue encontrado',
+    PRODUCT_NOT_UPDATED: 'El producto no fue actualizado',
+    PRODUCT_NOT_DELETED: 'El producto no fue eliminado',
+    PRODUCT_NOT_ADDED: 'El producto no fue agregado',
 };
 
 export const PRIVATE_ROUTES = [

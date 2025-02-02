@@ -1,21 +1,29 @@
-import type { IMenu, ICategories, IProduct, IHours } from "../interface/Menu";
+import type { IMenu, ICategories, IProduct, ISchedules } from "../interface/Menu";
 import mongoose, { Model, Schema } from "mongoose";
 
 interface IMenuModel extends IMenu, Document { }
 interface ICategoryModel extends ICategories, Document { }
 interface IProductModel extends IProduct, Document { }
-interface IHoursModel extends IHours, Document { }
+interface ISchedulesModel extends ISchedules, Document { }
 
-const HoursSchemaMongoose = new Schema<IHoursModel>({
-    openH: {
+const HoursSchemaMongoose = new Schema<ISchedulesModel>({
+    day: {
         type: String,
         required: true,
     },
-    closeH: {
-        type: String,
-        required: true,
-
-    }
+    openclose: {
+        type: [{
+            opening: {
+                type: String,
+                required: true,
+            },
+            closing: {
+                type: String,
+                required: true,
+            }
+        }],
+        required: false,
+    },
 }, {
     timestamps: false,
     _id: false,
@@ -32,6 +40,10 @@ const ProductSchemaMongoose = new Schema<IProductModel>({
         required: true,
     },
     description: {
+        type: String,
+        required: false,
+    },
+    url_image: {
         type: String,
         required: false,
     },
@@ -145,7 +157,7 @@ const MenuSchemaMongoose = new Schema<IMenuModel>({
             required: false,
         }
     },
-    openingHours: {
+    schedules: {
         type: [HoursSchemaMongoose],
         required: false,
     },
