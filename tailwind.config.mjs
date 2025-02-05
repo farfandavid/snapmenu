@@ -12,9 +12,14 @@ export default {
 					'50%': { background: '#1D4ED8', transform: 'scale(1.05)' },
 					'100%': { background: '#3B82F6', transform: 'scale(1)' },
 				},
-			}
+			},
+			textColor: {
+				warning: '#FFA500',
+				success: '#00FF00',
+				error: '#FF0000',
+				waiting: '#FFD700',
+			},
 		},
-
 	},
 	plugins: [],
 }

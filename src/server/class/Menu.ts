@@ -50,7 +50,6 @@ export class Product implements IProduct {
     }
 
     async update(menuId: string, categoryId: string, fields?: ProjectionFields<Product>) {
-        this.validate();
         await db.connectDB();
         const updateFields: { [key: string]: any } = {};
         if (fields) {
@@ -127,8 +126,9 @@ export class Category implements ICategories {
         this.products = data.products;
     }
 
-    validate(): Category | CategoriesError {
-        const validate = CategoriesSchema.safeParse(this);
+    validate(fields?: Partial<Record<keyof ICategories, true>>): Category | CategoriesError {
+        const myschema = fields ? CategoriesSchema.pick(fields) : CategoriesSchema;
+        const validate = myschema.safeParse(this);
         if (!validate.success) {
             throw new CategoriesError(validate.error?.flatten().fieldErrors)
         } else {
@@ -154,7 +154,6 @@ export class Category implements ICategories {
     }
 
     async update(menuId: string, fields?: ProjectionFields<Category>) {
-        this.validate();
         await db.connectDB();
         const updateFields: { [key: string]: any } = {};
         if (fields) {
@@ -268,7 +267,6 @@ export class Menu implements IMenu {
     }
 
     async save() {
-        this.validate();
         await db.connectDB();
         const isExist = await MenuModel.findOne({ name: this.name }, { _id: 1, name: 1 });
         if (isExist) {
@@ -281,7 +279,6 @@ export class Menu implements IMenu {
     }
 
     async update() {
-        this.validate();
         await db.connectDB();
         const menu = await MenuModel.findByIdAndUpdate(this._id, this, { new: true });
         if (!menu) {

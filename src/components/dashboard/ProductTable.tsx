@@ -14,7 +14,7 @@ interface IProps {
     handleDeleteCategory: (selectedItem: ISelectedItem) => void;
 }
 
-export default function CategoryTable({ children, index, data, setData, setShowProductForm, setSelectedItem, moveCategoryUp, moveCategoryDown, setShowCategoryForm, setShowDeleteCategoryModal, handleDeleteCategory }: IProps) {
+export default function CategoryTable({ children, index, data, setData, setShowProductForm, setSelectedItem, moveCategoryUp, moveCategoryDown, setShowCategoryForm, setShowDeleteCategoryModal }: IProps) {
 
     const moveProductUp = (index: number) => {
         if (index === 0) return;

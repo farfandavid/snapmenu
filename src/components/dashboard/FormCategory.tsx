@@ -1,15 +1,16 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { type ICategory, type ISelectedItem, type IProduct } from '../../client/types/Interfaces';
 
 interface FormCategoryProps {
     handleSave: (selectedItem: ISelectedItem) => void;
     selectedItem?: ISelectedItem;
     selectedCategory?: ICategory;
+    children?: React.ReactNode;
 }
 
-const FormCategory = ({ handleSave, selectedItem, selectedCategory }: FormCategoryProps) => {
+const FormCategory = ({ handleSave, selectedItem, selectedCategory, children }: FormCategoryProps) => {
 
-    const initialState: ICategory = {
+    const initialState: ICategory = selectedItem?.category || {
         _id: '',
         name: '',
         active: true,
@@ -57,13 +58,13 @@ const FormCategory = ({ handleSave, selectedItem, selectedCategory }: FormCatego
                         onChange={handleChange}
                     />
                 </div>
-
-                <button
+                {children ? children : <button
                     type="submit"
                     className='px-3 py-2 bg-orange-500 hover:bg-orange-400 rounded-md text-white disabled:opacity-50 disabled:hover:bg-orange-500 font-bold mt-2'
                 >
                     Guardar
-                </button>
+                </button>}
+
             </form>
         </>
     );

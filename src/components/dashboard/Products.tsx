@@ -4,11 +4,19 @@ import Modal from "./Modal";
 import FormProduct from "./FormProduct";
 import FormCategory from "./FormCategory";
 import { type ICategory, type ISelectedItem, type IProduct } from '../../client/types/Interfaces';
-import { addCategory, deleteCategory } from "../../client/services/products";
+import { addCategory, deleteCategory, saveAllCategories, updateCategory } from "../../client/services/products";
 
+interface IModalMessage {
+    show: boolean;
+    message: string;
+    type: "success" | "error" | "warning" | "waiting";
+    acceptAction?: () => void;
+    cancelAction?: () => void;
+}
 
 export default function ProductsMain() {
 
+    // Lista de menus disponibles id, name
     const [menus, setMenus] = useState([]);
     const [menuSelected, setMenuSelected] = useState<string>("");
     const [dataCategories, setDataCategories] = useState<ICategory[]>([]);
@@ -16,18 +24,26 @@ export default function ProductsMain() {
     const [showProductForm, setShowProductForm] = useState(false);
     const [showCategoryForm, setShowCategoryForm] = useState(false);
     const [showDeleteCategory, setShowDeleteCategory] = useState(false);
+    const [showModalMessage, setShowModalMessage] = useState<IModalMessage>({
+        show: false,
+        message: "",
+        type: "success"
+    });
 
     const [selectedItem, setSelectedItem] = useState<ISelectedItem>({ category: undefined, product: undefined });
-    const [isSaved, setIsSaved] = useState(false);
+    const [isSaved, setIsSaved] = useState(true);
     const [productsLoading, setProductsLoading] = useState(false);
 
     // Usamos useRef para controlar si es la primera vez que se monta el componente
     const isInitialMount = useRef(true);
     const isMenuChanged = useRef(false);
+    const acceptAction = () => setShowModalMessage({ show: false, message: "", type: "success" });
+
 
     // Primer useEffect: se ejecuta solo al comienzo
     useEffect(() => {
         setMenuSelected("");
+        setSelectedItem({ category: undefined, product: undefined, menuId: "" });
         const fetchMenus = async () => {
             const data = await fetch("/api/dashboard/users/menus");
             const menus = await data.json();
@@ -84,34 +100,121 @@ export default function ProductsMain() {
         setDataCategories(newData);
     }
 
-    async function addCategoryToDB(data: ISelectedItem) {
+    async function saveCategoryToDB(data: ISelectedItem) {
+        setShowCategoryForm(false);
         const formData = new FormData();
         formData.append("name", data.category?.name!);
         formData.append("active", data.category?.active! ? "true" : "false");
-        formData.append("_id", crypto.randomUUID());
         formData.append("description", data.category?.description || "");
-        formData.append("products", JSON.stringify([]));
-        await addCategory(data.menuId!, formData)
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("Error al agregar la categoría");
-                }
-                setDataCategories((prev) => {
-                    if (data.category) {
-                        return [...prev, { ...data.category, _id: crypto.randomUUID(), }];
-                    }
-                    return prev;
+
+        if (data.category?._id) {
+            formData.append("_id", data.category?._id);
+            setShowModalMessage({ show: true, message: "Actualizando categoría...", type: "waiting" });
+            await updateCategory(data.menuId!, formData)
+                .then(async (response) => {
+                    const res = await response.json();
+                    setDataCategories((prev) => {
+                        const newData = prev.map((category) => {
+                            if (category._id === res._id) {
+                                return res;
+                            }
+                            return category;
+                        });
+                        return newData;
+                    });
+                    setShowModalMessage({
+                        show: true, message: "Categoría actualizada correctamente", type: "success", acceptAction
+                    });
+                })
+                .catch((error) => {
+                    setShowModalMessage({
+                        message: error.message, show: true, type: "error", acceptAction
+                    })
+                })
+                .finally(() => {
+                    isMenuChanged.current = true;
+                })
+
+        } else {
+            formData.append("_id", crypto.randomUUID());
+            formData.append("products", JSON.stringify([]));
+            setShowModalMessage({ show: true, message: "Agregando categoría...", type: "waiting" });
+            await addCategory(data.menuId!, formData)
+                .then(async (response) => {
+                    const res = await response.json();
+                    setDataCategories((prev) => {
+                        if (data.category) {
+                            return [...prev, { ...data.category, _id: res._id, }];
+                        }
+                        return prev;
+                    });
+                    setShowModalMessage({
+                        show: true, message: "Categoría agregada correctamente", type: "success", acceptAction
+                    });
+                })
+                .catch((error) => {
+                    setShowModalMessage({
+                        show: true, message: error.message, type: "error", acceptAction
+                    });
+                })
+                .finally(() => {
+
                 });
-                //return response.json();
+        }
+    }
+
+    async function deleteCategoryToDB() {
+        setShowDeleteCategory(false)
+        setShowModalMessage({ show: true, message: "Eliminando categoría...", type: "waiting" });
+        await deleteCategory(selectedItem.menuId || "", selectedItem.category?._id!)
+            .then(() => {
+                setDataCategories((prev) => {
+                    const newData = prev.filter(category => category._id !== selectedItem.category?._id);
+                    return newData;
+                });
+                setShowModalMessage({
+                    show: true, message: "Categoría eliminada correctamente", type: "success", acceptAction
+                });
             })
             .catch((error) => {
                 console.error(error);
-                alert(error.message);
+                setShowModalMessage({
+                    show: true, message: "Error al eliminar la categoría", type: "error", acceptAction
+                });
             })
             .finally(() => {
-                setShowCategoryForm(false);
+
             });
     }
+
+    async function saveAllChanged() {
+        setShowModalMessage({ show: true, message: "Guardando cambios...", type: "waiting" });
+        await saveAllCategories(selectedItem.menuId || "", dataCategories)
+            .then(() => {
+                setShowModalMessage({
+                    show: true, message: "Cambios guardados correctamente", type: "success",
+                    acceptAction: () => {
+                        setShowModalMessage({ show: false, message: "", type: "success", acceptAction });
+                    }
+                });
+            })
+            .catch((error) => {
+                console.error(error);
+                setShowModalMessage({
+                    show: true, message: "Error al guardar los cambios", type: "error",
+                    acceptAction: () => {
+                        setShowModalMessage({ show: false, message: "", type: "success", acceptAction });
+                    }
+                });
+            })
+            .finally(() => {
+                setIsSaved(true);
+            }
+            );
+    }
+
+
+
 
     const styleSaved = isSaved ? "bg-green-500 hover:bg-green-400 disabled:hover:bg-green-500" : "bg-blue-500 hover:bg-blue-400 disabled:hover:bg-blue-500";
 
@@ -120,14 +223,23 @@ export default function ProductsMain() {
             <div className="border border-gray-300 p-3 rounded-md bg-slate-50 shadow sticky top-0 z-10">
                 <h2 className="text-3xl font-bold mb-3">Gestiona tus Productos</h2>
                 <div className="flex max-sm:flex-col gap-2">
-                    <select name="menus" id="slt-menus" required className="p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500`" defaultValue={menuSelected!}
+                    <select name="menus" id="slt-menus" required className="p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500`" defaultValue={menuSelected}
                         onChange={(e) => {
                             if (isSaved) {
                                 setMenuSelected(e.target.value)
                                 return
-                            };
-                            if (confirm("¿Estás seguro de cambiar de menú? Los cambios no guardados se perderán.")) {
-                                setMenuSelected(e.target.value)
+                            } else {
+                                setShowModalMessage({
+                                    show: true, message: "¿Estás seguro de cambiar de menú? Los cambios no guardados se perderán.", type: "warning"
+                                    , acceptAction: () => {
+                                        setMenuSelected(e.target.value);
+                                        setShowModalMessage({ show: false, message: "", type: "success" });
+                                    }
+                                    , cancelAction: () => {
+                                        e.target.value = menuSelected;
+                                        setShowModalMessage({ show: false, message: "", type: "success" });
+                                    }
+                                });
                             }
                         }}>
                         <option value="" disabled hidden>Selecciona tu Menú</option>
@@ -137,9 +249,15 @@ export default function ProductsMain() {
                     </select>
                     <div className="flex gap-1 max-sm:text-sm">
                         <button type="button" className="px-3 py-2 bg-orange-500 hover:bg-orange-400 rounded-md text-white disabled:opacity-50 disabled:hover:bg-orange-500 font-bold flex gap-2 items-center"
-                            onClick={(e) => setShowCategoryForm(true)}
-                            disabled={menuSelected === "" ? true : false}><i className="bi bi-plus-circle-fill"></i>Añadir Categoria</button>
-                        <button type="button" className={`px-3 py-2 rounded-md text-white font-bold flex gap-2 items-center ${styleSaved} ${isSaved ? '' : 'animate-oscillateGradient'}`} disabled={isSaved} onClick={() => setIsSaved(true)}>
+                            onClick={(e) => {
+                                setSelectedItem({ category: undefined, product: undefined, menuId: menuSelected });
+                                setShowCategoryForm(true)
+                            }}
+                            disabled={menuSelected === "" || false}><i className="bi bi-plus-circle-fill"></i>Añadir Categoria</button>
+                        <button type="button" className={`px-3 py-2 rounded-md text-white font-bold flex gap-2 items-center ${styleSaved} ${isSaved ? '' : 'animate-oscillateGradient'}`} disabled={isSaved}
+                            onClick={async () => {
+                                await saveAllChanged();
+                            }} >
                             {isSaved ?
                                 <>
                                     Sin Cambios<i className="bi bi-check-circle-fill"></i>
@@ -165,12 +283,13 @@ export default function ProductsMain() {
                             moveCategoryUp={moveCategoryUp}
                             moveCategoryDown={moveCategoryDown}
                             index={index}
+                            // FIXME: Cambiar menuSelected por selectedItem.menuId y usar una funcion para eleminar categoria
                             handleDeleteCategory={async (data) => {
                                 await deleteCategory(menuSelected, data.category?._id!)
                             }} />
                     ))
             }
-            <Modal show={showProductForm} handleClose={() => setShowProductForm(false)} >
+            <Modal key={"add-product"} show={showProductForm} handleClose={() => setShowProductForm(false)} >
                 <FormProduct
                     handleSave={(selectedItem) => {
                         console.log(selectedItem)
@@ -196,21 +315,42 @@ export default function ProductsMain() {
                     }} selectedItem={selectedItem} setData={setDataCategories} />
             </Modal>
 
-            <Modal show={showCategoryForm} handleClose={() => setShowCategoryForm(false)} >
-                <FormCategory handleSave={addCategoryToDB} selectedItem={selectedItem} ></FormCategory>
+            <Modal key={"add-category"} show={showCategoryForm} handleClose={() => setShowCategoryForm(false)} >
+                <FormCategory handleSave={saveCategoryToDB} selectedItem={selectedItem} >
+
+                </FormCategory>
+
             </Modal>
-            <Modal show={showDeleteCategory} handleClose={() => setShowDeleteCategory(false)} >
+            <Modal key={"delete-category"} show={showDeleteCategory} handleClose={() => setShowDeleteCategory(false)} >
                 <>
-                    <h2 className="text-xl font-bold mb-2">¿Estás seguro de eliminar la categoría?</h2>
+                    <h2 className="text-xl font-bold mb-2">¿Estás seguro de eliminar la categoría: {selectedItem.category?.name}?</h2>
                     <div className="flex justify-around gap-2">
                         <button type="button" className="px-3 py-2 bg-blue-500 hover:bg-blue-400 rounded-md text-white font-bold" onClick={() => setShowDeleteCategory(false)}>Cancelar</button>
                         <button type="button" className="px-3 py-2 bg-red-500 hover:bg-red-400 rounded-md text-white font-bold"
-                            onClick={() => {
-                                console.log(selectedItem)
-                                setShowDeleteCategory(false)
-                            }}>Eliminar</button>
+                            onClick={async () => await deleteCategoryToDB()}>Eliminar</button>
                     </div>
                 </>
+            </Modal>
+            <Modal key={"modal-message"} show={showModalMessage.show} handleClose={() => setShowModalMessage({ show: false, message: "", type: "success" })} >
+                <div className={`w-full flex flex-col gap-2 items-center`}>
+                    <h3 className={`text-xl font-bold`}>{showModalMessage.message}</h3>
+                    {showModalMessage.type === "waiting" && <div className="animate-spin rounded-full h-10 w-10 flex items-center justify-center"><i className="bi bi-opencollective"></i></div>}
+                    {showModalMessage.type === "error" && <i className="bi bi-x-circle-fill text-red-500 text-4xl"></i>}
+                    {showModalMessage.type === "success" && <i className="bi bi-check-circle-fill text-green-500 text-4xl"></i>}
+                    {showModalMessage.type === "warning" && <i className="bi bi-exclamation-triangle-fill text-yellow-500 text-4xl"></i>}
+                    <div className="flex gap-2 w-full">
+                        {showModalMessage.acceptAction &&
+                            <button
+                                className='px-3 py-2 bg-orange-500 hover:bg-orange-400 rounded-md text-white disabled:opacity-50 disabled:hover:bg-orange-500 font-bold mt-2 w-full'
+                                onClick={() => showModalMessage.acceptAction!()}>Aceptar</button>}
+                        {showModalMessage.cancelAction &&
+                            <button
+                                className='px-3 py-2 bg-red-500 hover:bg-red-400 rounded-md text-white disabled:opacity-50 disabled:hover:bg-rend-500 font-bold mt-2 w-full'
+                                onClick={() => showModalMessage.cancelAction!()}
+                            >Cancelar</button>}
+                    </div>
+
+                </div>
             </Modal>
         </div>
     );

@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 const connectDB = async () => {
-  await mongoose.connect(import.meta.env.MONGODB_URI,
+  await mongoose.connect(import.meta.env.MONGO_URI,
     {
       dbName: "menuonline",
     }
