@@ -4,11 +4,10 @@ import { type ICategory, type ISelectedItem, type IProduct } from '../../client/
 interface FormProductModalProps {
     handleSave: (selectedProduct: ISelectedItem) => void;
     selectedItem?: ISelectedItem;
-    setData: React.Dispatch<React.SetStateAction<ICategory[]>>;
 }
 
 
-const FormProduct = ({ handleSave, selectedItem, setData }: FormProductModalProps) => {
+const FormProduct = ({ handleSave, selectedItem }: FormProductModalProps) => {
 
     const { category, product } = selectedItem || {};
     const initialState: IProduct = {
@@ -30,7 +29,6 @@ const FormProduct = ({ handleSave, selectedItem, setData }: FormProductModalProp
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setFormProduct({
-
             ...formProduct,
             [name]: value,
         });
@@ -40,8 +38,13 @@ const FormProduct = ({ handleSave, selectedItem, setData }: FormProductModalProp
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         handleSave({
-            category: category,
-            product: { ...formProduct, _id: formProduct._id || crypto.randomUUID() },
+            category: {
+                _id: category?._id || '',
+                name: category?.name || '',
+                description: category?.description || '',
+                active: category?.active || true,
+            },
+            product: { ...formProduct, _id: formProduct._id || "" },
         });
     };
 

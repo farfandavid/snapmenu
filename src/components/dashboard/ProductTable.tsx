@@ -11,10 +11,10 @@ interface IProps {
     setSelectedItem: React.Dispatch<React.SetStateAction<ISelectedItem>>;
     moveCategoryUp: (index: number) => void;
     moveCategoryDown: (index: number) => void;
-    handleDeleteCategory: (selectedItem: ISelectedItem) => void;
+    handleDeleteProduct: (selectedItem: ISelectedItem) => void;
 }
 
-export default function CategoryTable({ children, index, data, setData, setShowProductForm, setSelectedItem, moveCategoryUp, moveCategoryDown, setShowCategoryForm, setShowDeleteCategoryModal }: IProps) {
+export default function CategoryTable({ children, index, data, setData, setShowProductForm, setSelectedItem, moveCategoryUp, moveCategoryDown, setShowCategoryForm, setShowDeleteCategoryModal, handleDeleteProduct }: IProps) {
 
     const moveProductUp = (index: number) => {
         if (index === 0) return;
@@ -81,7 +81,8 @@ export default function CategoryTable({ children, index, data, setData, setShowP
                         <i className="bi bi-trash-fill"></i>
                     </button>
                     <button id='add-category' className="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-md border border-gray-300 disabled:opacity-50 disabled:hover:bg-gray-100 font-bold" onClick={() => {
-                        setSelectedItem({ category: data })
+                        console.log('add product')
+                        setSelectedItem((prev) => { return { ...prev, category: data, product: undefined } })
                         setShowProductForm(true)
                     }}>
                         <i className="bi bi-plus-lg"></i>
@@ -144,12 +145,15 @@ export default function CategoryTable({ children, index, data, setData, setShowP
                                 </td>
                                 <td className="py-2 px-4 flex space-x-2 w-[10%]">
                                     <button className="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-md border border-gray-300 disabled:opacity-50 disabled:hover:bg-gray-100 font-bold" onClick={() => {
-                                        setSelectedItem({ category: data, product: product })
+                                        setSelectedItem((prev) => { return { ...prev, category: data, product: product } })
                                         setShowProductForm(true)
                                     }}>
                                         <i className="bi bi-pencil-fill"></i>
                                     </button>
-                                    <button className="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-md border border-gray-300 disabled:opacity-50 disabled:hover:bg-gray-100 font-bold">
+                                    <button className="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-md border border-gray-300 disabled:opacity-50 disabled:hover:bg-gray-100 font-bold" onClick={() => {
+                                        setSelectedItem((prev) => { return { ...prev, category: data, product: product } })
+                                        handleDeleteProduct({ category: data, product: product })
+                                    }}>
                                         <i className="bi bi-trash-fill"></i>
                                     </button>
 

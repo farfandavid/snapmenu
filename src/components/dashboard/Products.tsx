@@ -4,7 +4,7 @@ import Modal from "./Modal";
 import FormProduct from "./FormProduct";
 import FormCategory from "./FormCategory";
 import { type ICategory, type ISelectedItem, type IProduct } from '../../client/types/Interfaces';
-import { addCategory, deleteCategory, saveAllCategories, updateCategory } from "../../client/services/products";
+import { addCategory, addProduct, deleteCategory, deleteProduct, saveAllCategories, updateCategory, updateProduct } from "../../client/services/products";
 
 interface IModalMessage {
     show: boolean;
@@ -100,7 +100,7 @@ export default function ProductsMain() {
         setDataCategories(newData);
     }
 
-    async function saveCategoryToDB(data: ISelectedItem) {
+    async function handleSaveCategory(data: ISelectedItem) {
         setShowCategoryForm(false);
         const formData = new FormData();
         formData.append("name", data.category?.name!);
@@ -163,7 +163,7 @@ export default function ProductsMain() {
         }
     }
 
-    async function deleteCategoryToDB() {
+    async function handleDeleteCategory() {
         setShowDeleteCategory(false)
         setShowModalMessage({ show: true, message: "Eliminando categoría...", type: "waiting" });
         await deleteCategory(selectedItem.menuId || "", selectedItem.category?._id!)
@@ -187,7 +187,7 @@ export default function ProductsMain() {
             });
     }
 
-    async function saveAllChanged() {
+    async function handleSaveAll() {
         setShowModalMessage({ show: true, message: "Guardando cambios...", type: "waiting" });
         await saveAllCategories(selectedItem.menuId || "", dataCategories)
             .then(() => {
@@ -209,12 +209,81 @@ export default function ProductsMain() {
             })
             .finally(() => {
                 setIsSaved(true);
-            }
-            );
+            });
     }
 
+    async function handleAddProduct({ category, product }: ISelectedItem) {
+        setShowProductForm(false);
+        if (!category || !product) {
+            setShowModalMessage({
+                show: true, message: "No se ha seleccionado una categoría", type: "error", acceptAction
+            });
+            return;
+        }
+        await addProduct(menuSelected, { category, product })
+            .then(() => {
+                setDataCategories((prev) => {
+                    const newData = prev.map((cat) => {
+                        if (cat._id === category._id) {
+                            return { ...cat, products: [...(cat.products || []), product] };
+                        }
+                        return cat;
+                    });
+                    return newData;
+                });
+                setShowModalMessage({
+                    show: true, message: "Producto agregado correctamente", type: "success", acceptAction
+                });
+            })
+            .catch((error) => {
+                setShowModalMessage({
+                    show: true, message: error.message, type: "error", acceptAction
+                });
+            })
+            .finally(() => {
+                isMenuChanged.current = true;
+            });
+    }
 
-
+    async function handleUpdateProduct({ category, product }: ISelectedItem) {
+        setShowProductForm(false);
+        if (!category || !product) {
+            setShowModalMessage({
+                show: true, message: "No se ha seleccionado una categoría", type: "error", acceptAction
+            });
+            return;
+        }
+        setShowModalMessage({ show: true, message: "Actualizando producto...", type: "waiting" });
+        await updateProduct(menuSelected, { category, product })
+            .then(() => {
+                setDataCategories((prev) => {
+                    const newData = prev.map((cat) => {
+                        if (cat._id === category._id) {
+                            const newProducts = cat.products?.map((prod) => {
+                                if (prod._id === product._id) {
+                                    return product;
+                                }
+                                return prod;
+                            });
+                            return { ...cat, products: newProducts };
+                        }
+                        return cat;
+                    });
+                    return newData;
+                });
+                setShowModalMessage({
+                    show: true, message: "Producto Actualizado Correctamente", type: "success", acceptAction
+                });
+            })
+            .catch((error) => {
+                setShowModalMessage({
+                    show: true, message: error.message, type: "error", acceptAction
+                });
+            })
+            .finally(() => {
+                isMenuChanged.current = true;
+            });
+    }
 
     const styleSaved = isSaved ? "bg-green-500 hover:bg-green-400 disabled:hover:bg-green-500" : "bg-blue-500 hover:bg-blue-400 disabled:hover:bg-blue-500";
 
@@ -223,8 +292,9 @@ export default function ProductsMain() {
             <div className="border border-gray-300 p-3 rounded-md bg-slate-50 shadow sticky top-0 z-10">
                 <h2 className="text-3xl font-bold mb-3">Gestiona tus Productos</h2>
                 <div className="flex max-sm:flex-col gap-2">
-                    <select name="menus" id="slt-menus" required className="p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500`" defaultValue={menuSelected}
+                    <select name="menus" id="slt-menus" required className="p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500`" value={menuSelected}
                         onChange={(e) => {
+                            let toMenu = e.target.value;
                             if (isSaved) {
                                 setMenuSelected(e.target.value)
                                 return
@@ -232,8 +302,9 @@ export default function ProductsMain() {
                                 setShowModalMessage({
                                     show: true, message: "¿Estás seguro de cambiar de menú? Los cambios no guardados se perderán.", type: "warning"
                                     , acceptAction: () => {
-                                        setMenuSelected(e.target.value);
                                         setShowModalMessage({ show: false, message: "", type: "success" });
+                                        console.log("Cambiando de menú", toMenu);
+                                        setMenuSelected(toMenu);
                                     }
                                     , cancelAction: () => {
                                         e.target.value = menuSelected;
@@ -244,7 +315,7 @@ export default function ProductsMain() {
                         }}>
                         <option value="" disabled hidden>Selecciona tu Menú</option>
                         {menus.map((menu: any) => (
-                            <option key={menu._id} value={menu._id}>{menu.name}</option>
+                            <option key={menu._id} value={menu._id} >{menu.name}</option>
                         ))}
                     </select>
                     <div className="flex gap-1 max-sm:text-sm">
@@ -253,10 +324,10 @@ export default function ProductsMain() {
                                 setSelectedItem({ category: undefined, product: undefined, menuId: menuSelected });
                                 setShowCategoryForm(true)
                             }}
-                            disabled={menuSelected === "" || false}><i className="bi bi-plus-circle-fill"></i>Añadir Categoria</button>
+                            disabled={selectedItem.menuId === ""}><i className="bi bi-plus-circle-fill"></i>Añadir Categoria</button>
                         <button type="button" className={`px-3 py-2 rounded-md text-white font-bold flex gap-2 items-center ${styleSaved} ${isSaved ? '' : 'animate-oscillateGradient'}`} disabled={isSaved}
                             onClick={async () => {
-                                await saveAllChanged();
+                                await handleSaveAll();
                             }} >
                             {isSaved ?
                                 <>
@@ -283,40 +354,38 @@ export default function ProductsMain() {
                             moveCategoryUp={moveCategoryUp}
                             moveCategoryDown={moveCategoryDown}
                             index={index}
-                            // FIXME: Cambiar menuSelected por selectedItem.menuId y usar una funcion para eleminar categoria
-                            handleDeleteCategory={async (data) => {
-                                await deleteCategory(menuSelected, data.category?._id!)
-                            }} />
+                            handleDeleteProduct={async ({ category, product }) => {
+                                setShowModalMessage({
+                                    message: "¿Estás seguro de eliminar el producto?", show: true, type: "warning",
+                                    acceptAction: async () => {
+                                        console.log(selectedItem)
+                                        console.log("Eliminando producto", product?._id);
+                                        console.log("De la categoría", category?._id);
+                                    },
+                                    cancelAction: () => {
+                                        setShowModalMessage({ show: false, message: "", type: "success" });
+                                    }
+                                })
+                                /*  await deleteProduct(menuSelected, selectedItem.product?._id!, selectedItem.category?._id!) */
+                            }}
+                        />
                     ))
             }
             <Modal key={"add-product"} show={showProductForm} handleClose={() => setShowProductForm(false)} >
                 <FormProduct
-                    handleSave={(selectedItem) => {
-                        console.log(selectedItem)
-                        setDataCategories((prev) => {
-                            const newData = prev.map((category) => {
-                                console.log(selectedItem.category)
-                                if (category._id === selectedItem.category?._id) {
-                                    const existingProductIndex = category.products?.findIndex(product => product._id === selectedItem.product?._id);
-                                    if (existingProductIndex !== undefined && existingProductIndex !== -1) {
-                                        if (category.products) {
-                                            category.products[existingProductIndex] = selectedItem.product!;
-                                        }
-                                    } else {
-                                        category.products?.push(selectedItem.product!);
-                                    }
-                                }
-
-                                return category;
-                            })
-                            return newData;
-                        });
-                        setShowProductForm(false);
-                    }} selectedItem={selectedItem} setData={setDataCategories} />
+                    handleSave={async ({ category, product }) => {
+                        console.log(selectedItem);
+                        if (product?._id === "") {
+                            let newProduct: IProduct = { ...product!, _id: crypto.randomUUID() };
+                            await handleAddProduct({ category, product: newProduct });
+                            return;
+                        }
+                        await handleUpdateProduct({ category, product });
+                    }} selectedItem={selectedItem} />
             </Modal>
 
             <Modal key={"add-category"} show={showCategoryForm} handleClose={() => setShowCategoryForm(false)} >
-                <FormCategory handleSave={saveCategoryToDB} selectedItem={selectedItem} >
+                <FormCategory handleSave={handleSaveCategory} selectedItem={selectedItem} >
 
                 </FormCategory>
 
@@ -327,14 +396,14 @@ export default function ProductsMain() {
                     <div className="flex justify-around gap-2">
                         <button type="button" className="px-3 py-2 bg-blue-500 hover:bg-blue-400 rounded-md text-white font-bold" onClick={() => setShowDeleteCategory(false)}>Cancelar</button>
                         <button type="button" className="px-3 py-2 bg-red-500 hover:bg-red-400 rounded-md text-white font-bold"
-                            onClick={async () => await deleteCategoryToDB()}>Eliminar</button>
+                            onClick={async () => await handleDeleteCategory()}>Eliminar</button>
                     </div>
                 </>
             </Modal>
             <Modal key={"modal-message"} show={showModalMessage.show} handleClose={() => setShowModalMessage({ show: false, message: "", type: "success" })} >
                 <div className={`w-full flex flex-col gap-2 items-center`}>
                     <h3 className={`text-xl font-bold`}>{showModalMessage.message}</h3>
-                    {showModalMessage.type === "waiting" && <div className="animate-spin rounded-full h-10 w-10 flex items-center justify-center"><i className="bi bi-opencollective"></i></div>}
+                    {showModalMessage.type === "waiting" && <div className="text-2xl text-waiting animate-spin rounded-full h-10 w-10 flex items-center justify-center"><i className="bi bi-opencollective"></i></div>}
                     {showModalMessage.type === "error" && <i className="bi bi-x-circle-fill text-red-500 text-4xl"></i>}
                     {showModalMessage.type === "success" && <i className="bi bi-check-circle-fill text-green-500 text-4xl"></i>}
                     {showModalMessage.type === "warning" && <i className="bi bi-exclamation-triangle-fill text-yellow-500 text-4xl"></i>}

@@ -17,7 +17,7 @@ export default {
 				warning: '#FFA500',
 				success: '#00FF00',
 				error: '#FF0000',
-				waiting: '#FFD700',
+				waiting: '#61acf2',
 			},
 		},
 	},
