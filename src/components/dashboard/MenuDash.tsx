@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import Modal from "./Modal";
+import type { IModalMessage } from "../../client/types/Interfaces";
 interface Menu {
     _id?: string;
     name?: string;
@@ -20,291 +22,111 @@ interface Menu {
 }
 
 export default function MenuDash() {
-    const [menus, setMenus] = useState<Menu[]>([]);
-    const [menuSelected, setMenuSelected] = useState<Menu>();
-    const [logo, setLogo] = useState("");
-    const [banner, setBanner] = useState("");
-    const [toolTip, setToolTip] = useState({ show: false, message: "" });
-    const [error, setError] = useState("");
-    const [loading, setLoading] = useState(true);
-    const [trigger, setTrigger] = useState(false);
 
-    useEffect(() => {
-        const fetchMenus = async () => {
-            try {
-                const response = await fetch("/api/dashboard/infoMenu", {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json"
-                    }
-                }).then((response) => response.json())
-                    .then((data) => {
-                        if (data.error) {
-                            setError(data.error)
-                        }
-                        setMenus(data);
-                        setMenuSelected(data[0]);
-                        setLogo(data[0].logoUrl || "");
-                        setBanner(data[0].bannerUrl || "");
-                        return data
-                    });
-            } catch (error) {
+    const [showModalMessage, setShowModalMessage] = useState<IModalMessage>({
+        show: false,
+        message: "",
+        type: "success"
+    });
 
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchMenus();
-    }, []);
+    const [menus, setMenus] = useState([]);
+    const [menuSelected, setMenuSelected] = useState<string>("");
+    const [isSaved, setIsSaved] = useState(true);
 
-    const getSrcFromIFrame = (iframe: string) => {
-        if (!iframe.startsWith("<iframe")) return "";
-        let tempDiv = document.createElement("div");
-        tempDiv.innerHTML = iframe;
-        let iframeElement = tempDiv.firstChild as HTMLIFrameElement;
-        if (!iframeElement) return "";
-        if (!iframeElement.src) return "";
-        if (!iframeElement.src.startsWith("https://www.google.com/maps/embed")) return "";
-        return iframeElement.src;
-    }
+    const styleSaved = isSaved ? "bg-green-500 hover:bg-green-400 disabled:hover:bg-green-500" : "bg-blue-500 hover:bg-blue-400 disabled:hover:bg-blue-500";
 
-    const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        let changed = menus.filter((menu) => menu._id === e.target.value)[0]
-        setMenuSelected({
-            _id: changed._id,
-            name: changed.name,
-            description: changed.description || "",
-            logoUrl: changed.logoUrl || "",
-            bannerUrl: changed.bannerUrl || "",
-            mapUrl: changed.mapUrl || "",
-            address: changed.address || "",
-            city: changed.city || "",
-            state: changed.state || "",
-            postalCode: changed.postalCode || "",
-            country: changed.country || "",
-            phone: changed.phone || 0,
-            social: {
-                facebook: changed.social?.facebook || "",
-                instagram: changed.social?.instagram || "",
-                twitter: changed.social?.twitter || ""
-            }
-        });
-        setLogo(changed.logoUrl || "");
-        setBanner(changed.bannerUrl || "");
-        setTrigger(!trigger);
-    }
 
-    const showToolTip = (message: string) => {
-        setToolTip({ show: true, message });
-        setTimeout(() => {
-            setToolTip({ show: false, message: "" });
-        }, 3000);
-    }
-
-    const handleLogo = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-        if (!file.type.startsWith("image/")) {
-            showToolTip("El archivo no es una imagen");
-            return;
-        }
-        if (file.size > 1024 * 1024 * 3) {
-            showToolTip("El Logo debe ser menor a 3MB");
-            e.target.value = "";
-            return;
-        }
-
-        const reader = new FileReader();
-        reader.onload = () => {
-            setLogo(reader.result as string);
-        }
-        reader.readAsDataURL(file);
-        handleSaveLogo(file);
-    }
-
-    const handlePortrait = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-        if (!file.type.startsWith("image/")) {
-            showToolTip("El archivo no es una imagen");
-            return;
-        }
-        if (file.size > 1024 * 1024 * 3) {
-            showToolTip("El Logo debe ser menor a 3MB");
-            e.target.value = "";
-            return;
-        }
-
-        const reader = new FileReader();
-        reader.onload = () => {
-            setBanner(reader.result as string);
-        }
-        reader.readAsDataURL(file);
-        handleSavePortrait(file);
-    }
-
-    const handleSaveLogo = async (file: File) => {
-        if (!file) {
-            showToolTip("No se ha proporcionado una imagen");
-            return;
-        }
-        const formData = new FormData();
-        formData.append("menu", menuSelected?._id || "");
-        formData.append("logo", file);
-        setToolTip({ show: true, message: "Subiendo imagen..." });
-        const response = await fetch("/api/dashboard/logo", {
-            method: "POST",
-            body: formData
-        });
-        const data = await response.json();
-        if (data.error) {
-            showToolTip(data.error);
-            return;
-        }
-        if (data.success) {
-            showToolTip("Imagen subida correctamente");
-            //setImage(data.logoUrl);
-        }
-    }
-
-    const handleSavePortrait = async (file: File) => {
-        if (!file) {
-            showToolTip("No se ha proporcionado una imagen");
-            return;
-        }
-        const formData = new FormData();
-        formData.append("menu", menuSelected?._id || "");
-        formData.append("portrait", file);
-        setToolTip({ show: true, message: "Subiendo imagen..." });
-        const response = await fetch("/api/dashboard/portrait", {
-            method: "POST",
-            body: formData
-        });
-        const data = await response.json();
-        if (data.error) {
-            showToolTip(data.error);
-            return;
-        }
-        if (data.success) {
-            showToolTip("Imagen subida correctamente");
-        }
-    }
-
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        const form = e.currentTarget;
-        const formData = new FormData();
-        setToolTip({ show: true, message: "Guardando datos..." });
-        formData.append("menu", menuSelected?._id || "");
-        formData.append("description", form.description.value);
-        formData.append("address", form.address.value);
-        formData.append("city", form.city.value);
-        formData.append("state", form.state.value);
-        formData.append("postalCode", form.postalCode.value);
-        formData.append("country", form.country.value);
-        formData.append("mapUrl", form.mapUrl.value);
-        formData.append("phone", form.phone.value);
-        formData.append("facebook", form.facebook.value);
-        formData.append("instagram", form.instagram.value);
-        formData.append("twitter", form.twitter.value);
-        const res = await fetch("/api/dashboard/infoMenu", {
-            method: "PUT",
-            body: formData
-        })
-        const data = await res.json();
-        if (data.error) {
-            showToolTip(data.error);
-            return;
-        }
-        if (data.success) {
-            showToolTip("Datos Guardados");
-        }
-    }
-    if (loading) return <h1>Cargando...</h1>
     return (
-        <div className="flex flex-col gap-1 p-2 relative overflow-x-hidden">
-            <div className="flex items-center gap-1">
-                <h1>Selecciona un Menu:</h1>
-                <select name="menus" id="slt-menu" onChange={handleChange} className="px-2 py-1 rounded shadow border">
-                    {menus.map((menu) => (
-                        <option key={menu._id} value={menu._id}>{menu.name}</option>
-                    ))}
-                </select>
-            </div>
-            <div id="form-image" className="flex flex-col justify-center border-dotted border-2 relative border-orange-500 min-h-52 max-h-52 overflow-hidden" >
-                <img src={banner !== "" ? banner : `https://placehold.co/380x256/FAFAFA/FAFAFA`} alt="" className="object-contain absolute left-1/2 -translate-x-1/2 z-0" />
-                <img src={logo !== "" ? logo : `https://placehold.co/250x250?text=${menuSelected?.name?.at(0)}`} alt="" className="h-32 object-contain absolute left-1/2 -translate-x-1/2" />
-                <label className="absolute left-1/2 bottom-0 -translate-x-1/2 origin-center bg-orange-500 text-white rounded-full aspect-square flex items-center justify-center h-12 border-2 gap-1 font-bold px-2">
-                    <input type="file" hidden accept="image/jpg, image/jpeg, image/png, iamge/webp" onChange={handleLogo} name="portrait" />
-                    <i className="bi bi-camera-fill text-2xl"></i>
-                    <p>Logo</p>
-                </label>
-                <label className="absolute right-0 top-0 origin-center bg-orange-500 text-white rounded-full aspect-square flex items-center justify-center h-12 border-2 gap-1 font-bold px-2 text-base">
-                    <input type="file" hidden accept="image/jpg, image/jpeg, image/png, iamge/webp" onChange={handlePortrait} name="logo" />
-                    <i className="bi bi-image "></i>
-                    <p>Portada</p>
-                </label>
-            </div>
-            <form className="flex flex-col gap-1" action="/api/menu/update" method="put" onSubmit={handleSubmit}>
-                <label htmlFor="description" className="font-semibold">Descripcion</label>
-                <input type="text" value={menuSelected?.description} onChange={(e) => setMenuSelected({ ...menuSelected, description: e.target.value })} name="description" required maxLength={150} autoComplete="off" className="px-2 py-1 rounded shadow border" />
-                <label htmlFor="" className="font-semibold">Direccion</label>
-                <label htmlFor="address" className="font-semibold">Calle</label>
-                <input type="text" value={menuSelected?.address} onChange={(e) => setMenuSelected({ ...menuSelected, address: e.target.value })} name="address" required maxLength={50} className="px-2 py-1 rounded shadow border" />
-                <label htmlFor="city" className="font-semibold">Ciudad</label>
-                <input type="text" value={menuSelected?.city} onChange={(e) => setMenuSelected({ ...menuSelected, city: e.target.value })} name="city" required maxLength={50} className="px-2 py-1 rounded shadow border" />
-                <label htmlFor="state" className="font-semibold">Provincia</label>
-                <input type="text" value={menuSelected?.state} onChange={(e) => setMenuSelected({ ...menuSelected, state: e.target.value })} name="state" required maxLength={50} className="px-2 py-1 rounded shadow border" />
-                <label htmlFor="postalCode" className="font-semibold">Codigo Postal</label>
-                <input type="text" value={menuSelected?.postalCode} onChange={(e) => setMenuSelected({ ...menuSelected, postalCode: e.target.value })} name="postalCode" required maxLength={10} className="px-2 py-1 rounded shadow border" />
-                <label htmlFor="country" className="font-semibold">Pais</label>
-                <input type="text" value={menuSelected?.country} onChange={(e) => setMenuSelected({ ...menuSelected, country: e.target.value })} name="country" required maxLength={50} className="px-2 py-1 rounded shadow border" />
-                <label htmlFor="mapUrl" className="font-semibold">Mapa <br />
-                    <span className="text-xs">Copie y Pegue el IFrame desde Google Maps</span>
-                </label>
-                <input type="text" name="mapUrl" required autoComplete="off" className="px-2 py-1 rounded shadow border" value={menuSelected?.mapUrl} onChange={(e) => setMenuSelected({ ...menuSelected, mapUrl: getSrcFromIFrame(e.target.value) })} />
-                <label htmlFor="phone" className="font-semibold">Whatsapp <br /> <span className="text-xs">ej: (Cod país) 549 (Cod Area) 3886 (Num) 112233</span></label>
-                <div className="w-full flex items-center gap-1 relative">
-                    <span className="font-bold absolute left-1">+</span>
-                    <input type="number" value={menuSelected?.phone} onChange={(e) => setMenuSelected({ ...menuSelected, phone: parseInt(e.target.value) })} name="phone" required className="px-2 py-1 rounded shadow border w-full pl-4" />
-                </div>
+        <div className="w-full flex flex-col relative p-2 gap-2">
+            <div className="border border-gray-300 p-3 rounded-md bg-slate-50 shadow sticky top-0 z-10">
+                <h2 className="text-3xl font-bold mb-3">Edita tu información</h2>
+                <div className="flex max-sm:flex-col gap-2">
+                    <select name="menus" id="slt-menus" required className="p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500`" value={menuSelected}
+                        onChange={(e) => {
+                            let toMenu = e.target.value;
+                            if (isSaved) {
+                                setMenuSelected(e.target.value)
+                                return
+                            } else {
+                                setShowModalMessage({
+                                    show: true, message: "¿Estás seguro de cambiar de menú? Los cambios no guardados se perderán.", type: "warning"
+                                    , acceptAction: () => {
+                                        setShowModalMessage({ show: false, message: "", type: "success" });
+                                        setMenuSelected(toMenu);
+                                    }
+                                    , cancelAction: () => {
+                                        e.target.value = menuSelected;
+                                        setShowModalMessage({ show: false, message: "", type: "success" });
+                                    }
+                                });
+                            }
+                        }}>
+                        <option value="" disabled hidden>Selecciona tu Menú</option>
+                        {menus.map((menu: any) => (
+                            <option key={menu._id} value={menu._id} >{menu.name}</option>
+                        ))}
+                    </select>
+                    <div className="flex gap-1 max-sm:text-sm">
+                        <button type="button" className={`px-3 py-2 rounded-md text-white font-bold flex gap-2 items-center ${styleSaved} ${isSaved ? '' : 'animate-oscillateGradient'}`} disabled={isSaved}
+                            onClick={async () => {
 
-                <div className="grid grid-cols-1 gap-1">
-                    <div className="col-span-1">
-                        <h1 className="font-semibold">Facebook</h1>
-                        <input className="w-full px-2 py-1 rounded shadow border" type="text" value={menuSelected?.social?.facebook} onChange={(e) => setMenuSelected({
-                            ...menuSelected, social: {
-                                ...menuSelected?.social,
-                                facebook: e.target.value
-                            }
-                        })} name="facebook" maxLength={50} autoComplete="off" />
+                            }} >
+                            {isSaved ?
+                                <>
+                                    Sin Cambios<i className="bi bi-check-circle-fill"></i>
+                                </> :
+                                <>
+                                    <i className="bi bi-floppy-fill"></i>Guardar Cambios!
+                                </>}
+                        </button>
                     </div>
-                    <div className="col-span-1">
-                        <h1 className="font-semibold">Instagram</h1>
-                        <input className="w-full px-2 py-1 rounded shadow border" type="text" value={menuSelected?.social?.instagram} onChange={(e) => setMenuSelected({
-                            ...menuSelected, social: {
-                                ...menuSelected?.social,
-                                instagram: e.target.value
-                            }
-                        })} name="instagram" maxLength={50} autoComplete="off" />
+
+                </div>
+            </div>
+            <div className="border border-gray-300 p-3 rounded-md bg-slate-50">
+                <h3 className="text-2xl font-bold mb-3">Imágenes de Perfil</h3>
+                <div className="relative">
+                    <div id="img-portrait" className="relative">
+                        <img src="https://placehold.co/1280x480" className="rounded-t-xl w-full" alt="Profile Placeholder" />
+                        <label htmlFor="portrait" className="w-full h-full hover:bg-black/40 opacity-0 hover:opacity-100 absolute top-0 rounded-t-xl">
+                            <span className="text-xl font-bold text-slate-50 absolute top-1/2 left-1/2 transform -translate-x-1/2">Cambiar Portada</span>
+                            <input type="file" name="portrait" id="portrait" className="opacity-0" />
+                        </label>
                     </div>
-                    <div className="col-span-1">
-                        <h1 className="font-semibold">Twitter</h1>
-                        <input className="w-full px-2 py-1 rounded shadow border" type="text" value={menuSelected?.social?.twitter} onChange={(e) => setMenuSelected({
-                            ...menuSelected, social: {
-                                ...menuSelected?.social,
-                                twitter: e.target.value
-                            }
-                        })} name="twitter" maxLength={50} autoComplete="off" />
+                    <div id="img-logo" className="w-1/5 max-w-40 absolute bottom-4 left-5 z-10 transform translate-y-1/2 border-4 border-slate-50 rounded-full">
+                        <img src="https://placehold.co/480x480" alt="" className="rounded-full" />
+                        <label htmlFor="logo" className="w-full h-full hover:bg-black/40 opacity-0 hover:opacity-100 absolute top-0 rounded-full">
+                            <span className="text-base font-bold text-slate-50 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-nowrap">Cambiar Logo</span>
+                            <input type="file" name="logo" id="logo" className="opacity-0" />
+                        </label>
                     </div>
                 </div>
-                <input type="submit" value="Guardar" className="bg-orange-500 rounded p-2 text-white font-bold cursor-pointer hover:ring-1 hover:ring-orange-500 hover:bg-white hover:text-orange-500" />
-
-            </form>
-            <div id="tool-tip" className={`bg-blue-500 p-2 fixed z-10 text-white rounded transition-all duration-300 ease-in-out flex gap-1 ${toolTip.show ? "right-3" : "-right-full"}`}>
-                <p>{toolTip.message}</p>
-                <i className="bi bi-info-circle-fill"></i>
+                <h2 className="text-3xl font-bold pt-16 px-5">Restaurant Name</h2>
             </div>
+            <div className="border border-gray-300 p-3 rounded-md bg-slate-50">
+                <h3 className="text-2xl font-bold mb-3">Información del Resturante</h3>
+            </div>
+            <Modal key={"modal-message"} show={showModalMessage.show} handleClose={() => setShowModalMessage({ show: false, message: "", type: "success" })} >
+                <div className={`w-full flex flex-col gap-2 items-center`}>
+                    <h3 className={`text-xl font-bold`}>{showModalMessage.message}</h3>
+                    {showModalMessage.type === "waiting" && <div className="text-2xl text-waiting animate-spin rounded-full h-10 w-10 flex items-center justify-center"><i className="bi bi-opencollective"></i></div>}
+                    {showModalMessage.type === "error" && <i className="bi bi-x-circle-fill text-red-500 text-4xl"></i>}
+                    {showModalMessage.type === "success" && <i className="bi bi-check-circle-fill text-green-500 text-4xl"></i>}
+                    {showModalMessage.type === "warning" && <i className="bi bi-exclamation-triangle-fill text-yellow-500 text-4xl"></i>}
+                    <div className="flex gap-2 w-full">
+                        {showModalMessage.acceptAction &&
+                            <button
+                                className='px-3 py-2 bg-orange-500 hover:bg-orange-400 rounded-md text-white disabled:opacity-50 disabled:hover:bg-orange-500 font-bold mt-2 w-full'
+                                onClick={() => showModalMessage.acceptAction!()}>Aceptar</button>}
+                        {showModalMessage.cancelAction &&
+                            <button
+                                className='px-3 py-2 bg-red-500 hover:bg-red-400 rounded-md text-white disabled:opacity-50 disabled:hover:bg-rend-500 font-bold mt-2 w-full'
+                                onClick={() => showModalMessage.cancelAction!()}
+                            >Cancelar</button>}
+                    </div>
+
+                </div>
+            </Modal>
         </div >
     )
 }

@@ -23,7 +23,6 @@ export default function ProductsMain() {
 
     const [showProductForm, setShowProductForm] = useState(false);
     const [showCategoryForm, setShowCategoryForm] = useState(false);
-    const [showDeleteCategory, setShowDeleteCategory] = useState(false);
     const [showModalMessage, setShowModalMessage] = useState<IModalMessage>({
         show: false,
         message: "",
@@ -68,7 +67,6 @@ export default function ProductsMain() {
 
     // TODO: Handle Errors
     useEffect(() => {
-        console.log("Menu seleccionado: ", menuSelected);
         const fetchMenuData = async () => {
             const data = await fetch(`/api/dashboard/menu/${menuSelected}`);
             const menuData = await data.json();
@@ -158,33 +156,37 @@ export default function ProductsMain() {
                     });
                 })
                 .finally(() => {
-
+                    isMenuChanged.current = true;
                 });
         }
     }
 
-    async function handleDeleteCategory() {
-        setShowDeleteCategory(false)
-        setShowModalMessage({ show: true, message: "Eliminando categoría...", type: "waiting" });
-        await deleteCategory(selectedItem.menuId || "", selectedItem.category?._id!)
-            .then(() => {
-                setDataCategories((prev) => {
-                    const newData = prev.filter(category => category._id !== selectedItem.category?._id);
-                    return newData;
-                });
-                setShowModalMessage({
-                    show: true, message: "Categoría eliminada correctamente", type: "success", acceptAction
-                });
-            })
-            .catch((error) => {
-                console.error(error);
-                setShowModalMessage({
-                    show: true, message: "Error al eliminar la categoría", type: "error", acceptAction
-                });
-            })
-            .finally(() => {
-
-            });
+    async function handleDeleteCategory(selectedItem: ISelectedItem) {
+        setShowModalMessage({
+            show: true, message: "¿Estás seguro de eliminar la categoría?", type: "warning", acceptAction: async () => {
+                setShowModalMessage({ show: true, message: "Eliminando categoría...", type: "waiting" });
+                await deleteCategory(menuSelected, selectedItem.category?._id!)
+                    .then(() => {
+                        setDataCategories((prev) => {
+                            const newData = prev.filter(category => category._id !== selectedItem.category?._id);
+                            return newData;
+                        });
+                        setShowModalMessage({
+                            show: true, message: "Categoría eliminada correctamente", type: "success", acceptAction
+                        });
+                    })
+                    .catch((error) => {
+                        setShowModalMessage({
+                            show: true, message: "Error al eliminar la categoría", type: "error", acceptAction
+                        });
+                    })
+                    .finally(() => {
+                        isMenuChanged.current = true;
+                    });
+            }, cancelAction: () => {
+                setShowModalMessage({ show: false, message: "", type: "success", acceptAction });
+            }
+        })
     }
 
     async function handleSaveAll() {
@@ -199,7 +201,6 @@ export default function ProductsMain() {
                 });
             })
             .catch((error) => {
-                console.error(error);
                 setShowModalMessage({
                     show: true, message: "Error al guardar los cambios", type: "error",
                     acceptAction: () => {
@@ -220,6 +221,7 @@ export default function ProductsMain() {
             });
             return;
         }
+        setShowModalMessage({ show: true, message: "Agregando producto...", type: "waiting" });
         await addProduct(menuSelected, { category, product })
             .then(() => {
                 setDataCategories((prev) => {
@@ -303,7 +305,6 @@ export default function ProductsMain() {
                                     show: true, message: "¿Estás seguro de cambiar de menú? Los cambios no guardados se perderán.", type: "warning"
                                     , acceptAction: () => {
                                         setShowModalMessage({ show: false, message: "", type: "success" });
-                                        console.log("Cambiando de menú", toMenu);
                                         setMenuSelected(toMenu);
                                     }
                                     , cancelAction: () => {
@@ -349,7 +350,7 @@ export default function ProductsMain() {
                         <CategoryTable key={category._id} data={category} setData={setDataCategories}
                             setShowProductForm={setShowProductForm}
                             setShowCategoryForm={setShowCategoryForm}
-                            setShowDeleteCategoryModal={setShowDeleteCategory}
+                            handleDeleteCategory={handleDeleteCategory}
                             setSelectedItem={setSelectedItem}
                             moveCategoryUp={moveCategoryUp}
                             moveCategoryDown={moveCategoryDown}
@@ -358,9 +359,32 @@ export default function ProductsMain() {
                                 setShowModalMessage({
                                     message: "¿Estás seguro de eliminar el producto?", show: true, type: "warning",
                                     acceptAction: async () => {
-                                        console.log(selectedItem)
-                                        console.log("Eliminando producto", product?._id);
-                                        console.log("De la categoría", category?._id);
+                                        setShowProductForm(false);
+                                        setShowModalMessage({ show: true, message: "Eliminando producto...", type: "waiting" });
+                                        await deleteProduct(menuSelected, product?._id!, category?._id!)
+                                            .then(() => {
+                                                setDataCategories((prev) => {
+                                                    const newData = prev.map((cat) => {
+                                                        if (cat._id === category?._id) {
+                                                            const newProducts = cat.products?.filter((prod) => prod._id !== product?._id);
+                                                            return { ...cat, products: newProducts };
+                                                        }
+                                                        return cat;
+                                                    });
+                                                    return newData;
+                                                });
+                                                setShowModalMessage({
+                                                    show: true, message: "Producto eliminado correctamente", type: "success", acceptAction
+                                                });
+                                            })
+                                            .catch((error) => {
+                                                setShowModalMessage({
+                                                    show: true, message: error.message, type: "error", acceptAction
+                                                });
+                                            })
+                                            .finally(() => {
+                                                isMenuChanged.current = true;
+                                            });
                                     },
                                     cancelAction: () => {
                                         setShowModalMessage({ show: false, message: "", type: "success" });
@@ -374,7 +398,6 @@ export default function ProductsMain() {
             <Modal key={"add-product"} show={showProductForm} handleClose={() => setShowProductForm(false)} >
                 <FormProduct
                     handleSave={async ({ category, product }) => {
-                        console.log(selectedItem);
                         if (product?._id === "") {
                             let newProduct: IProduct = { ...product!, _id: crypto.randomUUID() };
                             await handleAddProduct({ category, product: newProduct });
@@ -389,16 +412,6 @@ export default function ProductsMain() {
 
                 </FormCategory>
 
-            </Modal>
-            <Modal key={"delete-category"} show={showDeleteCategory} handleClose={() => setShowDeleteCategory(false)} >
-                <>
-                    <h2 className="text-xl font-bold mb-2">¿Estás seguro de eliminar la categoría: {selectedItem.category?.name}?</h2>
-                    <div className="flex justify-around gap-2">
-                        <button type="button" className="px-3 py-2 bg-blue-500 hover:bg-blue-400 rounded-md text-white font-bold" onClick={() => setShowDeleteCategory(false)}>Cancelar</button>
-                        <button type="button" className="px-3 py-2 bg-red-500 hover:bg-red-400 rounded-md text-white font-bold"
-                            onClick={async () => await handleDeleteCategory()}>Eliminar</button>
-                    </div>
-                </>
             </Modal>
             <Modal key={"modal-message"} show={showModalMessage.show} handleClose={() => setShowModalMessage({ show: false, message: "", type: "success" })} >
                 <div className={`w-full flex flex-col gap-2 items-center`}>

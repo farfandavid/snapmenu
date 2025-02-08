@@ -7,14 +7,14 @@ interface IProps {
     setData: React.Dispatch<React.SetStateAction<ICategory[]>>;
     setShowProductForm: React.Dispatch<React.SetStateAction<boolean>>;
     setShowCategoryForm: React.Dispatch<React.SetStateAction<boolean>>;
-    setShowDeleteCategoryModal: React.Dispatch<React.SetStateAction<boolean>>;
     setSelectedItem: React.Dispatch<React.SetStateAction<ISelectedItem>>;
     moveCategoryUp: (index: number) => void;
     moveCategoryDown: (index: number) => void;
     handleDeleteProduct: (selectedItem: ISelectedItem) => void;
+    handleDeleteCategory: (selectedItem: ISelectedItem) => void;
 }
 
-export default function CategoryTable({ children, index, data, setData, setShowProductForm, setSelectedItem, moveCategoryUp, moveCategoryDown, setShowCategoryForm, setShowDeleteCategoryModal, handleDeleteProduct }: IProps) {
+export default function CategoryTable({ children, index, data, setData, setShowProductForm, setSelectedItem, moveCategoryUp, moveCategoryDown, setShowCategoryForm, handleDeleteProduct, handleDeleteCategory }: IProps) {
 
     const moveProductUp = (index: number) => {
         if (index === 0) return;
@@ -76,12 +76,11 @@ export default function CategoryTable({ children, index, data, setData, setShowP
                             setSelectedItem((prev) => {
                                 return { ...prev, category: data }
                             })
-                            setShowDeleteCategoryModal(true)
+                            handleDeleteCategory({ category: data })
                         }}>
                         <i className="bi bi-trash-fill"></i>
                     </button>
-                    <button id='add-category' className="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-md border border-gray-300 disabled:opacity-50 disabled:hover:bg-gray-100 font-bold" onClick={() => {
-                        console.log('add product')
+                    <button id='add-product' className="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-md border border-gray-300 disabled:opacity-50 disabled:hover:bg-gray-100 font-bold" onClick={() => {
                         setSelectedItem((prev) => { return { ...prev, category: data, product: undefined } })
                         setShowProductForm(true)
                     }}>

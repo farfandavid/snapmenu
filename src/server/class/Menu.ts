@@ -109,6 +109,31 @@ export class Product implements IProduct {
         }
         return products.map(product => new Product(product));
     }
+
+    static async getProductById(menuId: string, categoryId: string, productId: string, fields?: ProjectionFields<Product>) {
+        await db.connectDB();
+        const menu = await MenuModel.findOne({ _id: menuId, "categories._id": categoryId, "categories.products._id": productId }, fields);
+        if (!menu) {
+            throw new ProductError({ _id: [ERROR_MESSAGES.PRODUCT_NOT_FOUND] });
+        }
+        if (!menu.categories) {
+            throw new ProductError({ _id: [ERROR_MESSAGES.CATEGORY_NOT_FOUND] });
+        }
+        const category = menu.categories.find(category => category._id === categoryId);
+        if (!category?.products) {
+            throw new ProductError({ _id: [ERROR_MESSAGES.CATEGORY_NOT_FOUND] });
+        }
+        const product = category.products.find(product => product._id === productId);
+        return new Product({
+            _id: product?._id || '',
+            name: product?.name || '',
+            description: product?.description,
+            active: product?.active || true,
+            price: product?.price,
+            quantity: product?.quantity,
+            url_image: product?.url_image,
+        });
+    }
 }
 
 export class Category implements ICategories {

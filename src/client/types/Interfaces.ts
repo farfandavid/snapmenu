@@ -1,7 +1,7 @@
 interface IProduct {
     _id: string;
     name: string;
-    price: number;
+    price: number | string;
     description?: string;
     url_image?: string;
     active: boolean;
@@ -22,4 +22,12 @@ interface ISelectedItem {
     menuId?: string;
 }
 
-export type { IProduct, ICategory, ISelectedItem };
+interface IModalMessage {
+    show: boolean;
+    message: string;
+    type: "success" | "error" | "warning" | "waiting";
+    acceptAction?: () => void;
+    cancelAction?: () => void;
+}
+
+export type { IProduct, ICategory, ISelectedItem, IModalMessage };

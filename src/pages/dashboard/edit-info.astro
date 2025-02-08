@@ -4,9 +4,10 @@ import MenuDash from "../../components/dashboard/MenuDash.tsx";
 import { Menu as MenuClass } from "../../server/class/Menu";
 const user = Astro.locals.user;
 
-const menus = await MenuClass.getMenusByUserId(
-    Astro.locals.user.id || "",
-).catch((err) => {
+const menus = await MenuClass.getMenusByUserId(Astro.locals.user.id || "", {
+    _id: 1,
+    name: 1,
+}).catch((err) => {
     console.error(err);
     return null;
 });

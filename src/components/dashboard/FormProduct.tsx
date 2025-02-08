@@ -28,10 +28,36 @@ const FormProduct = ({ handleSave, selectedItem }: FormProductModalProps) => {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
-        setFormProduct({
-            ...formProduct,
-            [name]: value,
-        });
+
+        if (name === "price") {
+            if (value.length > 11) return;
+
+            // Permitir solo números, puntos o comas (mientras se escribe)
+            if (!/^[\d.,]*$/.test(value)) return;
+
+            // Remplazar coma por punto (para consistencia)
+            let cleanedValue = value.replace(",", ".");
+
+            // Validar número con hasta dos decimales
+            if (cleanedValue !== "" && !/^\d+(\.\d{0,2})?$/.test(cleanedValue)) return;
+
+            if (parseFloat(cleanedValue) > 0.999 && cleanedValue.startsWith("0")) {
+                cleanedValue = cleanedValue.slice(1);
+            }
+            if (cleanedValue.startsWith("00")) {
+                cleanedValue = cleanedValue.slice(1);
+            }
+            setFormProduct(prev => ({
+                ...prev,
+                [name]: cleanedValue,
+            }));
+        } else {
+            setFormProduct(prev => ({
+                ...prev,
+                [name]: value,
+            }));
+            return;
+        }
 
     };
 
@@ -75,7 +101,6 @@ const FormProduct = ({ handleSave, selectedItem }: FormProductModalProps) => {
                 <div className="flex flex-col gap-2">
                     <label htmlFor="formProductPrice">Precio</label>
                     <input
-                        type="number"
                         id="formProductPrice"
                         name="price"
                         value={formProduct?.price}

@@ -7,7 +7,7 @@ import { verifyMPWebhook } from "../utils/mercadopagoValidator";
 
 export const onRequest = defineMiddleware(async (context, next,) => {
     if (import.meta.env.SSR) {
-        //console.log(context.clientAddress + ";" + context.url.pathname);
+        console.log(context.clientAddress + ";" + context.url.pathname);
     }
     if (context.url.pathname === "/api/payment/webhook" && context.request.method === "POST" && context.request.headers.get("Referer") === "https://mercadopago.com.ar") {
         const dataID = context.url.searchParams.get("data.id");

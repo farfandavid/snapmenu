@@ -8,7 +8,7 @@ const MAX_MENU_NAME_LENGTH = 50;
 const MAX_LENGTH_DESCRIPTION = 250;
 const MAX_LENGTH_NAME = 150;
 const MAX_LENGTH_URL = 512;
-const MAX_NUMBER = 99999999;
+const MAX_NUMBER = 99999999999;
 
 const maxDecimalPlaces = (value: number, max: number) => {
     const decimalPart = value.toString().split(".")[1];
