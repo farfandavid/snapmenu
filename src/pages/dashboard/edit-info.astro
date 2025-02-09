@@ -17,7 +17,7 @@ const menus = await MenuClass.getMenusByUserId(Astro.locals.user.id || "", {
     {
         () => {
             if (menus !== null && menus.length > 0) {
-                return <MenuDash client:load />;
+                return <MenuDash client:only />;
             } else {
                 return (
                     <div class="flex justify-center items-center h-96">

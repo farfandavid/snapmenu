@@ -7,6 +7,4 @@ export const GET: APIRoute = async ({ params, redirect, locals }) => {
     return new Response(JSON.stringify(
         menus.map(({ _id, name }) => ({ _id, name }))
     ), { status: 200, headers: { "Content-Type": "application/json" } });
-
-
 }

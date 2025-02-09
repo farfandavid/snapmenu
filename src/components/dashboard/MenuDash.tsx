@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import Modal from "./Modal";
 import type { IModalMessage } from "../../client/types/Interfaces";
-interface Menu {
+import Map from "./Map";
+
+interface IMenuInfo {
     _id?: string;
     name?: string;
     description?: string;
@@ -32,14 +34,55 @@ export default function MenuDash() {
     const [menus, setMenus] = useState([]);
     const [menuSelected, setMenuSelected] = useState<string>("");
     const [isSaved, setIsSaved] = useState(true);
+    const [coords, setCoords] = useState({ lat: 0, lng: 0 });
+    const [menuInfo, setMenuInfo] = useState<IMenuInfo>({});
+    const acceptAction = () => setShowModalMessage({ show: false, message: "", type: "success" });
 
+    useEffect(() => {
+        setMenuSelected("");
+        const fetchMenus = async () => {
+            const data = await fetch("/api/dashboard/users/menus");
+            const menus = await data.json();
+            setMenus(menus);
+            setIsSaved(true);
+        };
+        fetchMenus();
+        setIsSaved(true);
+    }, []);
+
+    const handleChangeImages = (e: React.ChangeEvent<HTMLInputElement>) => {
+        e.preventDefault();
+        const file = e.target.files ? e.target.files[0] as File : null;
+        if (!file) return;
+        if (file.type.split("/")[0] !== "image") {
+            setShowModalMessage({ show: true, message: "El archivo seleccionado no es una imagen", type: "error", acceptAction });
+            return;
+        }
+        if (file.size > 1024 * 1024 * 2) {
+            setShowModalMessage({ show: true, message: "El archivo seleccionado es muy grande. Debe ser menor a 2MB", type: "error", acceptAction });
+            return;
+        }
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                if (e.target.name === "bannerUrl") {
+                    setMenuInfo({ ...menuInfo, bannerUrl: reader.result as string });
+                } else if (e.target.name === "logoUrl") {
+                    setMenuInfo({ ...menuInfo, logoUrl: reader.result as string });
+                }
+                setIsSaved(false);
+            };
+            reader.readAsDataURL(file);
+        }
+    }
     const styleSaved = isSaved ? "bg-green-500 hover:bg-green-400 disabled:hover:bg-green-500" : "bg-blue-500 hover:bg-blue-400 disabled:hover:bg-blue-500";
 
 
     return (
         <div className="w-full flex flex-col relative p-2 gap-2">
-            <div className="border border-gray-300 p-3 rounded-md bg-slate-50 shadow sticky top-0 z-10">
-                <h2 className="text-3xl font-bold mb-3">Edita tu información</h2>
+            <div className="border border-gray-300 p-3 rounded-md bg-slate-50 shadow sticky top-0 z-40">
+                <h2 className="text-3xl font-bold mb-3">Edita la información del Restaurante</h2>
                 <div className="flex max-sm:flex-col gap-2">
                     <select name="menus" id="slt-menus" required className="p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500`" value={menuSelected}
                         onChange={(e) => {
@@ -83,29 +126,85 @@ export default function MenuDash() {
 
                 </div>
             </div>
-            <div className="border border-gray-300 p-3 rounded-md bg-slate-50">
-                <h3 className="text-2xl font-bold mb-3">Imágenes de Perfil</h3>
-                <div className="relative">
-                    <div id="img-portrait" className="relative">
-                        <img src="https://placehold.co/1280x480" className="rounded-t-xl w-full" alt="Profile Placeholder" />
-                        <label htmlFor="portrait" className="w-full h-full hover:bg-black/40 opacity-0 hover:opacity-100 absolute top-0 rounded-t-xl">
-                            <span className="text-xl font-bold text-slate-50 absolute top-1/2 left-1/2 transform -translate-x-1/2">Cambiar Portada</span>
-                            <input type="file" name="portrait" id="portrait" className="opacity-0" />
-                        </label>
+            {menuSelected === "" ||
+                <>
+                    <div className="border border-gray-300 p-3 rounded-md bg-slate-50">
+                        <h3 className="text-2xl font-bold mb-3">Imágenes de Perfil</h3>
+                        <div className="relative">
+                            <div id="img-portrait" className="relative">
+                                <img src={menuInfo.bannerUrl || "https://placehold.co/1280x480"} className="rounded-t-xl w-full h-auto object-cover aspect-[8/3]" alt="Profile Placeholder" />
+                                <label htmlFor="bannerUrl" className="w-full h-full hover:bg-black/40 opacity-0 hover:opacity-100 absolute top-0 rounded-t-xl">
+                                    <span className="text-xl font-bold text-slate-50 absolute top-1/2 left-1/2 transform -translate-x-1/2">Cambiar Portada</span>
+                                    <input type="file" name="bannerUrl" id="bannerUrl" className="opacity-0" onChange={handleChangeImages} accept="image/*" />
+                                </label>
+                            </div>
+                            <div id="img-logo" className="w-1/5 max-w-40 absolute bottom-4 left-5 z-10 transform translate-y-1/2 border-4 border-slate-50 rounded-full">
+                                <img src={menuInfo.logoUrl || "https://placehold.co/480x480"} alt="" className="rounded-full w-full h-auto object-cover aspect-square" />
+                                <label htmlFor="logoUrl" className="w-full h-full hover:bg-black/40 opacity-0 hover:opacity-100 absolute top-0 rounded-full">
+                                    <span className="text-base font-bold text-slate-50 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-nowrap">Cambiar Logo</span>
+                                    <input type="file" name="logoUrl" id="logoUrl" className="opacity-0" onChange={handleChangeImages} accept="image/*" />
+                                </label>
+                            </div>
+                        </div>
+                        <h2 className="text-3xl font-bold pt-16 px-5">Restaurant Name</h2>
                     </div>
-                    <div id="img-logo" className="w-1/5 max-w-40 absolute bottom-4 left-5 z-10 transform translate-y-1/2 border-4 border-slate-50 rounded-full">
-                        <img src="https://placehold.co/480x480" alt="" className="rounded-full" />
-                        <label htmlFor="logo" className="w-full h-full hover:bg-black/40 opacity-0 hover:opacity-100 absolute top-0 rounded-full">
-                            <span className="text-base font-bold text-slate-50 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-nowrap">Cambiar Logo</span>
-                            <input type="file" name="logo" id="logo" className="opacity-0" />
-                        </label>
+                    <div className="border border-gray-300 p-3 rounded-md bg-slate-50">
+                        <h3 className="text-2xl font-bold mb-3">Información del Resturante</h3>
+                        <form action="">
+                            <div className="py-2 flex flex-col gap-2">
+                                <label htmlFor="description" className="font-bold">Descripción</label>
+                                <textarea name="description" id="description" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500" placeholder="Descripción del Restaurante"></textarea>
+                            </div>
+                            <div className="py-2 flex flex-col gap-2">
+                                <label htmlFor="address" className="font-bold">Dirección</label>
+                                <input type="text" name="address" id="address" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500" placeholder="Dirección" />
+                            </div>
+                            <div className="flex gap-2 max-sm:flex-col">
+                                <div className="py-2 flex flex-col gap-2 w-full">
+                                    <label htmlFor="city" className="font-bold">Ciudad</label>
+                                    <input type="text" name="city" id="city" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1" placeholder="Ciudad" />
+                                </div>
+                                <div className="py-2 flex flex-col gap-2 w-full">
+                                    <label htmlFor="state" className="font-bold">Provincia</label>
+                                    <input type="text" name="state" id="state" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1" placeholder="Estado" />
+                                </div>
+                                <div className="py-2 flex flex-col gap-2 w-full">
+                                    <label htmlFor="postalCode" className="font-bold">Código Postal</label>
+                                    <input type="text" name="postalCode" id="postalCode" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1" placeholder="Código Postal" />
+                                </div>
+                            </div>
+                            <div className="py-2 flex flex-col gap-2">
+                                <label htmlFor="country" className="font-bold">País</label>
+                                <input type="text" name="country" id="country" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500" placeholder="País" />
+                            </div>
+                            <div className="py-2 flex flex-col gap-2">
+                                <label htmlFor="mapUrl" className="font-bold">Mapa</label>
+                                <input type="text" name="mapUrl" id="mapUrl" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500 hidden" placeholder="URL del Mapa" />
+                                <Map onSelectedCoordinates={setCoords}></Map>
+                            </div>
+                            <h3 className="text-2xl font-bold my-3">Contacto</h3>
+                            <div className="flex flex-col gap-2 py-2">
+                                <label htmlFor="phone" className="font-bold">Whatsapp</label>
+                                <input type="tel" name="phone" id="phone" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500" placeholder="Whatsapp" />
+                            </div>
+                            <h3 className="text-2xl font-bold my-3">Redes Sociales</h3>
+                            <div className="flex flex-col gap-2 py-2">
+                                <label htmlFor="facebook" className="font-bold">Facebook</label>
+                                <input type="text" name="facebook" id="facebook" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500" placeholder="Facebook" />
+                            </div>
+                            <div className="flex flex-col gap-2 py-2">
+                                <label htmlFor="instagram" className="font-bold">Instagram</label>
+                                <input type="text" name="instagram" id="instagram" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500" placeholder="Instagram" />
+                            </div>
+                            <div className="flex flex-col gap-2 py-2">
+                                <label htmlFor="twitter" className="font-bold">Twitter</label>
+                                <input type="text" name="twitter" id="twitter" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500" placeholder="Twitter" />
+                            </div>
+                        </form>
+
                     </div>
-                </div>
-                <h2 className="text-3xl font-bold pt-16 px-5">Restaurant Name</h2>
-            </div>
-            <div className="border border-gray-300 p-3 rounded-md bg-slate-50">
-                <h3 className="text-2xl font-bold mb-3">Información del Resturante</h3>
-            </div>
+                </>
+            }
             <Modal key={"modal-message"} show={showModalMessage.show} handleClose={() => setShowModalMessage({ show: false, message: "", type: "success" })} >
                 <div className={`w-full flex flex-col gap-2 items-center`}>
                     <h3 className={`text-xl font-bold`}>{showModalMessage.message}</h3>
