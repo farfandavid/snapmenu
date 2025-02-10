@@ -127,8 +127,17 @@ const MenuSchemaMongoose = new Schema<IMenuModel>({
         type: String,
         required: false
     },
-    mapUrl: {
-        type: String,
+    map: {
+        type: {
+            lat: {
+                type: Number,
+                required: true,
+            },
+            lng: {
+                type: Number,
+                required: true,
+            }
+        },
         required: false,
     },
     phone: {

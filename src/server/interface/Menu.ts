@@ -68,7 +68,10 @@ const MenuSchema = z.object({
     state: z.string().max(MAX_LENGTH_DESCRIPTION).optional(),
     postalCode: z.string().max(MAX_LENGTH_DESCRIPTION).optional(),
     country: z.string().max(MAX_LENGTH_DESCRIPTION).optional(),
-    mapUrl: z.string().max(MAX_LENGTH_URL).optional(),
+    map: z.object({
+        lat: z.number().optional(),
+        lng: z.number().optional(),
+    }).optional(),
     phone: z.string().max(MAX_LENGTH_DESCRIPTION).optional(),
     logoUrl: z.string().max(MAX_LENGTH_URL).optional(),
     bannerUrl: z.string().max(MAX_LENGTH_URL).optional(),
@@ -148,7 +151,7 @@ export interface IMenuErrors {
     active?: string[] | undefined;
     categories?: string[] | undefined;
     address?: string[] | undefined;
-    mapUrl?: string[] | undefined;
+    map?: string[] | undefined;
     phone?: string[] | undefined;
     logoUrl?: string[] | undefined;
     bannerUrl?: string[] | undefined;
@@ -169,7 +172,7 @@ export class MenuError implements IMenuErrors {
     state?: string[] | undefined;
     postalCode?: string[] | undefined;
     country?: string[] | undefined;
-    mapUrl?: string[] | undefined;
+    map?: string[] | undefined;
     phone?: string[] | undefined;
     logoUrl?: string[] | undefined;
     bannerUrl?: string[] | undefined;
@@ -185,7 +188,7 @@ export class MenuError implements IMenuErrors {
         this.active = error.active;
         this.categories = error.categories;
         this.address = error.address;
-        this.mapUrl = error.mapUrl;
+        this.map = error.map;
         this.phone = error.phone;
         this.logoUrl = error.logoUrl;
         this.bannerUrl = error.bannerUrl;

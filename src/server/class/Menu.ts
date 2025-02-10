@@ -248,7 +248,7 @@ export class Menu implements IMenu {
     state?: string;
     postalCode?: string;
     country?: string;
-    mapUrl?: string;
+    map?: {};
     phone?: string;
     logoUrl?: string;
     bannerUrl?: string;
@@ -272,7 +272,7 @@ export class Menu implements IMenu {
         this.state = data.state;
         this.postalCode = data.postalCode;
         this.country = data.country;
-        this.mapUrl = data.mapUrl;
+        this.map = data.map;
         this.phone = data.phone;
         this.logoUrl = data.logoUrl;
         this.bannerUrl = data.bannerUrl;
@@ -339,7 +339,7 @@ export class Menu implements IMenu {
             state: data.get('state') as string,
             postalCode: data.get('postalCode') as string,
             country: data.get('country') as string,
-            mapUrl: data.get('mapUrl') as string,
+            map: JSON.parse(data.get('map') as string),
             phone: data.get('phone') as string,
             logoUrl: data.get('logoUrl') as string,
             bannerUrl: data.get('bannerUrl') as string,

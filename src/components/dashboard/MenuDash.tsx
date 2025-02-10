@@ -14,8 +14,11 @@ interface IMenuInfo {
     state?: string;
     postalCode?: string;
     country?: string;
-    phone?: number;
-    mapUrl?: string;
+    phone?: string;
+    map?: {
+        lat: number;
+        lng: number;
+    };
     social?: {
         facebook?: string;
         instagram?: string;
@@ -35,7 +38,29 @@ export default function MenuDash() {
     const [menuSelected, setMenuSelected] = useState<string>("");
     const [isSaved, setIsSaved] = useState(true);
     const [coords, setCoords] = useState({ lat: 0, lng: 0 });
-    const [menuInfo, setMenuInfo] = useState<IMenuInfo>({});
+    const [menuLoading, setMenuLoading] = useState(false);
+    const [menuInfo, setMenuInfo] = useState<IMenuInfo>({
+        _id: "",
+        name: "",
+        description: "",
+        logoUrl: "",
+        bannerUrl: "",
+        address: "",
+        city: "",
+        state: "",
+        postalCode: "",
+        country: "",
+        phone: "",
+        map: {
+            lat: 0,
+            lng: 0
+        },
+        social: {
+            facebook: "",
+            instagram: "",
+            twitter: ""
+        }
+    });
     const acceptAction = () => setShowModalMessage({ show: false, message: "", type: "success" });
 
     useEffect(() => {
@@ -49,6 +74,23 @@ export default function MenuDash() {
         fetchMenus();
         setIsSaved(true);
     }, []);
+
+    useEffect(() => {
+        if (menuSelected === "") return;
+        setMenuLoading(true);
+        const fetchMenuInfo = async () => {
+            const data = await fetch(`/api/dashboard/menu/${menuSelected}/info-menu`);
+            const menuInfo = await data.json();
+            console.log(menuInfo);
+            setMenuInfo(menuInfo);
+        };
+        fetchMenuInfo()
+            .then(() => setMenuLoading(false))
+            .catch((error) => {
+                console.error(error);
+                setMenuLoading(false);
+            });
+    }, [menuSelected]);
 
     const handleChangeImages = (e: React.ChangeEvent<HTMLInputElement>) => {
         e.preventDefault();
@@ -126,7 +168,11 @@ export default function MenuDash() {
 
                 </div>
             </div>
-            {menuSelected === "" ||
+            {menuLoading ? <div className="border border-gray-300 p-3 rounded-md bg-slate-50">
+                <h3 className="bg-blue-100 border border-blue-400 text-blue-700 p-3 rounded-md mb-4">Cargando Información...</h3>
+            </div> : menuSelected === "" ? <div className="border border-gray-300 p-3 rounded-md bg-slate-50">
+                <h3 className="bg-red-100 border border-red-400 text-red-700 p-3 rounded-md mb-4">Selecciona un Menú para Editar</h3>
+            </div> :
                 <>
                     <div className="border border-gray-300 p-3 rounded-md bg-slate-50">
                         <h3 className="text-2xl font-bold mb-3">Imágenes de Perfil</h3>
@@ -146,36 +192,42 @@ export default function MenuDash() {
                                 </label>
                             </div>
                         </div>
-                        <h2 className="text-3xl font-bold pt-16 px-5">Restaurant Name</h2>
+                        <h2 className="text-3xl font-bold pt-16 px-5">{menuInfo.name}</h2>
                     </div>
                     <div className="border border-gray-300 p-3 rounded-md bg-slate-50">
                         <h3 className="text-2xl font-bold mb-3">Información del Resturante</h3>
                         <form action="">
                             <div className="py-2 flex flex-col gap-2">
                                 <label htmlFor="description" className="font-bold">Descripción</label>
-                                <textarea name="description" id="description" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500" placeholder="Descripción del Restaurante"></textarea>
+                                <textarea name="description" id="description" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500" placeholder="Descripción del Restaurante"
+                                    value={menuInfo.description}></textarea>
                             </div>
                             <div className="py-2 flex flex-col gap-2">
                                 <label htmlFor="address" className="font-bold">Dirección</label>
-                                <input type="text" name="address" id="address" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500" placeholder="Dirección" />
+                                <input type="text" name="address" id="address" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500" placeholder="Dirección"
+                                    value={menuInfo.address} />
                             </div>
                             <div className="flex gap-2 max-sm:flex-col">
                                 <div className="py-2 flex flex-col gap-2 w-full">
                                     <label htmlFor="city" className="font-bold">Ciudad</label>
-                                    <input type="text" name="city" id="city" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1" placeholder="Ciudad" />
+                                    <input type="text" name="city" id="city" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1" placeholder="Ciudad"
+                                        value={menuInfo.city} />
                                 </div>
                                 <div className="py-2 flex flex-col gap-2 w-full">
                                     <label htmlFor="state" className="font-bold">Provincia</label>
-                                    <input type="text" name="state" id="state" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1" placeholder="Estado" />
+                                    <input type="text" name="state" id="state" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1" placeholder="Estado"
+                                        value={menuInfo.state} />
                                 </div>
                                 <div className="py-2 flex flex-col gap-2 w-full">
                                     <label htmlFor="postalCode" className="font-bold">Código Postal</label>
-                                    <input type="text" name="postalCode" id="postalCode" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1" placeholder="Código Postal" />
+                                    <input type="text" name="postalCode" id="postalCode" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1" placeholder="Código Postal"
+                                        value={menuInfo.postalCode} />
                                 </div>
                             </div>
                             <div className="py-2 flex flex-col gap-2">
                                 <label htmlFor="country" className="font-bold">País</label>
-                                <input type="text" name="country" id="country" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500" placeholder="País" />
+                                <input type="text" name="country" id="country" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500" placeholder="País"
+                                    value={menuInfo.country} />
                             </div>
                             <div className="py-2 flex flex-col gap-2">
                                 <label htmlFor="mapUrl" className="font-bold">Mapa</label>
@@ -185,20 +237,24 @@ export default function MenuDash() {
                             <h3 className="text-2xl font-bold my-3">Contacto</h3>
                             <div className="flex flex-col gap-2 py-2">
                                 <label htmlFor="phone" className="font-bold">Whatsapp</label>
-                                <input type="tel" name="phone" id="phone" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500" placeholder="Whatsapp" />
+                                <input type="text" name="phone" id="phone" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500" placeholder="Whatsapp"
+                                    value={menuInfo.phone} />
                             </div>
                             <h3 className="text-2xl font-bold my-3">Redes Sociales</h3>
                             <div className="flex flex-col gap-2 py-2">
                                 <label htmlFor="facebook" className="font-bold">Facebook</label>
-                                <input type="text" name="facebook" id="facebook" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500" placeholder="Facebook" />
+                                <input type="text" name="facebook" id="facebook" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500" placeholder="Facebook"
+                                    value={menuInfo.social?.facebook} />
                             </div>
                             <div className="flex flex-col gap-2 py-2">
                                 <label htmlFor="instagram" className="font-bold">Instagram</label>
-                                <input type="text" name="instagram" id="instagram" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500" placeholder="Instagram" />
+                                <input type="text" name="instagram" id="instagram" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500" placeholder="Instagram"
+                                    value={menuInfo.social?.instagram} />
                             </div>
                             <div className="flex flex-col gap-2 py-2">
                                 <label htmlFor="twitter" className="font-bold">Twitter</label>
-                                <input type="text" name="twitter" id="twitter" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500" placeholder="Twitter" />
+                                <input type="text" name="twitter" id="twitter" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500" placeholder="Twitter"
+                                    value={menuInfo.social?.twitter} />
                             </div>
                         </form>
 
