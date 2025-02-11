@@ -1,71 +1,89 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
-interface ICoordinates {
-    lat: number;
-    lng: number;
+interface MapProps {
+    initialCoordinates?: { lat: number; lng: number } | null;
+    onSelectedCoordinates?: (coordinates: { lat: number; lng: number }) => void;
+    viewOnly?: boolean;
 }
 
-interface IProps {
-    onSelectedCoordinates: (coordinates: { lat: number; lng: number }) => void;
-}
-const Map = ({ onSelectedCoordinates }: IProps) => {
-    const [coordenadas, setCoordenadas] = useState<ICoordinates | null>(null); // Estado para almacenar las coordenadas
-    // Creamos una referencia para el contenedor del mapa
-    const mapRef = useRef(null);
+const Map = ({
+    initialCoordinates = null,
+    onSelectedCoordinates,
+    viewOnly = false
+}: MapProps) => {
+    const mapRef = useRef<HTMLDivElement>(null);
+    const mapInstanceRef = useRef<L.Map | null>(null);
     const markerRef = useRef<L.Marker | null>(null);
+    const zoomRef = useRef<number>(initialCoordinates ? 13 : 5);
 
     useEffect(() => {
-        if (mapRef.current) {
-            // Inicializar el mapa
-            const map = L.map(mapRef.current).setView([-34, -65], 5);
-            // Agregar una capa de mosaico
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors',
-            }).addTo(map);
+        if (!mapRef.current) return;
 
+        const initialView = initialCoordinates
+            ? [initialCoordinates.lat, initialCoordinates.lng]
+            : [-35, -65];
 
-            // Manejar clics en el mapa
+        // Crear instancia del mapa
+        const map = L.map(mapRef.current).setView(
+            initialView as [number, number],
+            zoomRef.current
+        );
+
+        mapInstanceRef.current = map;
+
+        // Guardar el nivel de zoom cuando cambie
+        map.on('zoomend', () => {
+            zoomRef.current = map.getZoom();
+        });
+
+        // Agregar capa de mosaico
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+        }).addTo(map);
+
+        // Crear marcador inicial si hay coordenadas
+        if (initialCoordinates) {
+            markerRef.current = L.marker([initialCoordinates.lat, initialCoordinates.lng])
+                .addTo(map)
+                .bindPopup(`Ubicación: ${initialCoordinates.lat.toFixed(4)}, ${initialCoordinates.lng.toFixed(4)}`)
+                .openPopup();
+        }
+
+        // Manejar clicks si no es modo vista
+        if (!viewOnly && onSelectedCoordinates) {
             map.on('click', (e) => {
-                const { lat, lng } = e.latlng; // Obtener las coordenadas del clic
-                setCoordenadas({ lat, lng }); // Actualizar el estado con las coordenadas
-                onSelectedCoordinates({ lat, lng });
-                // Eliminar el marcador anterior si existe
+                const { lat, lng } = e.latlng;
+
+                // Eliminar marcador anterior si existe
                 if (markerRef.current) {
-                    map.removeLayer(markerRef.current); // Eliminar el marcador del mapa
+                    markerRef.current.remove();
                 }
 
-                // Crear un nuevo marcador y guardarlo en la referencia
+                // Crear nuevo marcador
                 markerRef.current = L.marker([lat, lng])
                     .addTo(map)
-                    .bindPopup(`Ubicación: ${lat}, ${lng}`)
+                    .bindPopup(`Ubicación: ${lat.toFixed(4)}, ${lng.toFixed(4)}`)
                     .openPopup();
-            });
 
-            // Limpiar el mapa cuando el componente se desmonte
-            return () => {
-                map.remove();
-            };
+                onSelectedCoordinates({ lat, lng });
+            });
         }
-    }, [onSelectedCoordinates]);
+
+        // Cleanup
+        return () => {
+            map.remove();
+            mapInstanceRef.current = null;
+        };
+    }, [initialCoordinates, onSelectedCoordinates, viewOnly]);
 
     return (
-        <div className='relative'>
-            <div
-                ref={mapRef}
-                style={{ height: '500px', width: '100%' }}
-                className='cursor-pointer z-10'
-            ></div>
-            {coordenadas && (
-                <div className='absolute bg-white p-2 rounded-lg shadow-md top-1 right-1 z-20'>
-                    <h3>Coordenadas:</h3>
-                    <p>Lat: {coordenadas.lat}</p>
-                    <p>Long: {coordenadas.lng}</p>
-                </div>
-            )}
-        </div>
-    )
+        <div
+            ref={mapRef}
+            className={`h-[500px] w-full ${!viewOnly ? 'cursor-pointer' : ''}`}
+        />
+    );
 };
 
 export default Map;

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Modal from "./Modal";
 import type { IModalMessage } from "../../client/types/Interfaces";
 import Map from "./Map";
+import { base64toFile, isBase64 } from "../../client/utils/convert";
 
 interface IMenuInfo {
     _id?: string;
@@ -37,7 +38,7 @@ export default function MenuDash() {
     const [menus, setMenus] = useState([]);
     const [menuSelected, setMenuSelected] = useState<string>("");
     const [isSaved, setIsSaved] = useState(true);
-    const [coords, setCoords] = useState({ lat: 0, lng: 0 });
+    const [coords, setCoords] = useState<{ lat: number, lng: number } | null>(null);
     const [menuLoading, setMenuLoading] = useState(false);
     const [menuInfo, setMenuInfo] = useState<IMenuInfo>({
         _id: "",
@@ -81,8 +82,9 @@ export default function MenuDash() {
         const fetchMenuInfo = async () => {
             const data = await fetch(`/api/dashboard/menu/${menuSelected}/info-menu`);
             const menuInfo = await data.json();
-            console.log(menuInfo);
             setMenuInfo(menuInfo);
+            setCoords(menuInfo.map);
+            console.log(menuInfo);
         };
         fetchMenuInfo()
             .then(() => setMenuLoading(false))
@@ -117,6 +119,56 @@ export default function MenuDash() {
             };
             reader.readAsDataURL(file);
         }
+    }
+
+    const uploadImages = async (logoFile?: File, bannerFile?: File) => {
+        const promises = [];
+        if (logoFile) {
+            promises.push(fetch("/api/dashboard/upload", {
+                method: "POST",
+                body: JSON.stringify({ file: logoFile }),
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }));
+        }
+        if (bannerFile) {
+            promises.push(fetch("/api/dashboard/upload", {
+                method: "POST",
+                body: JSON.stringify({ file: bannerFile }),
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }));
+        }
+        if (promises.length === 0) return {}
+        const responses = await Promise.all(promises);
+        const [logData, banData] = await Promise.all(responses.map(res => res.json()));
+
+        return { logoUrl: logData.url, bannerUrl: banData.url };
+    }
+    const handleSaveChanges = async () => {
+        if (menuSelected === "") {
+            setShowModalMessage({ show: true, message: "Selecciona un Menú para Guardar los Cambios", type: "error", acceptAction });
+            return;
+        }
+        /* const logoFile = base64toFile(menuInfo.logoUrl || "", "logo.png");
+        const bannerFile = base64toFile(menuInfo.bannerUrl || "", "banner.png"); */
+        const res = await fetch(`/api/dashboard/menu/${menuSelected}/info-menu`, {
+            method: "PUT",
+            body: JSON.stringify({ ...menuInfo, map: coords }),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+        const data = await res.json();
+        if (data.error) {
+            setShowModalMessage({ show: true, message: "Error al guardar los cambios", type: "error", acceptAction });
+            return;
+        }
+        setShowModalMessage({ show: true, message: "Cambios Guardados Exitosamente", type: "success", acceptAction });
+        setIsSaved(true);
+        console.log(data);
     }
     const styleSaved = isSaved ? "bg-green-500 hover:bg-green-400 disabled:hover:bg-green-500" : "bg-blue-500 hover:bg-blue-400 disabled:hover:bg-blue-500";
 
@@ -153,9 +205,7 @@ export default function MenuDash() {
                     </select>
                     <div className="flex gap-1 max-sm:text-sm">
                         <button type="button" className={`px-3 py-2 rounded-md text-white font-bold flex gap-2 items-center ${styleSaved} ${isSaved ? '' : 'animate-oscillateGradient'}`} disabled={isSaved}
-                            onClick={async () => {
-
-                            }} >
+                            onClick={handleSaveChanges} >
                             {isSaved ?
                                 <>
                                     Sin Cambios<i className="bi bi-check-circle-fill"></i>
@@ -196,65 +246,125 @@ export default function MenuDash() {
                     </div>
                     <div className="border border-gray-300 p-3 rounded-md bg-slate-50">
                         <h3 className="text-2xl font-bold mb-3">Información del Resturante</h3>
-                        <form action="">
+                        <form>
                             <div className="py-2 flex flex-col gap-2">
                                 <label htmlFor="description" className="font-bold">Descripción</label>
                                 <textarea name="description" id="description" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500" placeholder="Descripción del Restaurante"
-                                    value={menuInfo.description}></textarea>
+                                    value={menuInfo.description}
+                                    onChange={
+                                        (e) => {
+                                            setMenuInfo({ ...menuInfo, description: e.target.value });
+                                            setIsSaved(false);
+                                        }
+                                    }></textarea>
                             </div>
                             <div className="py-2 flex flex-col gap-2">
                                 <label htmlFor="address" className="font-bold">Dirección</label>
                                 <input type="text" name="address" id="address" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500" placeholder="Dirección"
-                                    value={menuInfo.address} />
+                                    value={menuInfo.address}
+                                    onChange={
+                                        (e) => {
+                                            setMenuInfo({ ...menuInfo, address: e.target.value });
+                                            setIsSaved(false);
+                                        }
+                                    } />
                             </div>
                             <div className="flex gap-2 max-sm:flex-col">
                                 <div className="py-2 flex flex-col gap-2 w-full">
                                     <label htmlFor="city" className="font-bold">Ciudad</label>
                                     <input type="text" name="city" id="city" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1" placeholder="Ciudad"
-                                        value={menuInfo.city} />
+                                        value={menuInfo.city}
+                                        onChange={
+                                            (e) => {
+                                                setMenuInfo({ ...menuInfo, city: e.target.value });
+                                                setIsSaved(false);
+                                            }
+                                        } />
                                 </div>
                                 <div className="py-2 flex flex-col gap-2 w-full">
                                     <label htmlFor="state" className="font-bold">Provincia</label>
                                     <input type="text" name="state" id="state" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1" placeholder="Estado"
-                                        value={menuInfo.state} />
+                                        value={menuInfo.state}
+                                        onChange={
+                                            (e) => {
+                                                setMenuInfo({ ...menuInfo, state: e.target.value });
+                                                setIsSaved(false);
+                                            }
+                                        } />
                                 </div>
                                 <div className="py-2 flex flex-col gap-2 w-full">
                                     <label htmlFor="postalCode" className="font-bold">Código Postal</label>
                                     <input type="text" name="postalCode" id="postalCode" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1" placeholder="Código Postal"
-                                        value={menuInfo.postalCode} />
+                                        value={menuInfo.postalCode}
+                                        onChange={
+                                            (e) => {
+                                                setMenuInfo({ ...menuInfo, postalCode: e.target.value });
+                                                setIsSaved(false);
+                                            }
+                                        } />
                                 </div>
                             </div>
                             <div className="py-2 flex flex-col gap-2">
                                 <label htmlFor="country" className="font-bold">País</label>
                                 <input type="text" name="country" id="country" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500" placeholder="País"
-                                    value={menuInfo.country} />
+                                    value={menuInfo.country}
+                                    onChange={
+                                        (e) => {
+                                            setMenuInfo({ ...menuInfo, country: e.target.value });
+                                            setIsSaved(false);
+                                        }
+                                    } />
                             </div>
                             <div className="py-2 flex flex-col gap-2">
                                 <label htmlFor="mapUrl" className="font-bold">Mapa</label>
                                 <input type="text" name="mapUrl" id="mapUrl" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500 hidden" placeholder="URL del Mapa" />
-                                <Map onSelectedCoordinates={setCoords}></Map>
+                                <Map onSelectedCoordinates={setCoords} initialCoordinates={coords}></Map>
                             </div>
                             <h3 className="text-2xl font-bold my-3">Contacto</h3>
                             <div className="flex flex-col gap-2 py-2">
                                 <label htmlFor="phone" className="font-bold">Whatsapp</label>
                                 <input type="text" name="phone" id="phone" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500" placeholder="Whatsapp"
-                                    value={menuInfo.phone} />
+                                    value={menuInfo.phone}
+                                    onChange={
+                                        (e) => {
+                                            setMenuInfo({ ...menuInfo, phone: e.target.value });
+                                            setIsSaved(false);
+                                        }
+                                    } />
                             </div>
                             <h3 className="text-2xl font-bold my-3">Redes Sociales</h3>
                             <div className="flex flex-col gap-2 py-2">
                                 <label htmlFor="facebook" className="font-bold">Facebook</label>
                                 <input type="text" name="facebook" id="facebook" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500" placeholder="Facebook"
-                                    value={menuInfo.social?.facebook} />
+                                    value={menuInfo.social?.facebook}
+                                    onChange={
+                                        (e) => {
+                                            setMenuInfo({ ...menuInfo, social: { ...menuInfo.social, facebook: e.target.value } });
+                                            setIsSaved(false);
+                                        }
+                                    } />
                             </div>
                             <div className="flex flex-col gap-2 py-2">
                                 <label htmlFor="instagram" className="font-bold">Instagram</label>
                                 <input type="text" name="instagram" id="instagram" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500" placeholder="Instagram"
-                                    value={menuInfo.social?.instagram} />
+                                    value={menuInfo.social?.instagram}
+                                    onChange={
+                                        (e) => {
+                                            setMenuInfo({ ...menuInfo, social: { ...menuInfo.social, instagram: e.target.value } });
+                                            setIsSaved(false);
+                                        }
+                                    } />
                             </div>
                             <div className="flex flex-col gap-2 py-2">
                                 <label htmlFor="twitter" className="font-bold">Twitter</label>
                                 <input type="text" name="twitter" id="twitter" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500" placeholder="Twitter"
-                                    value={menuInfo.social?.twitter} />
+                                    value={menuInfo.social?.twitter}
+                                    onChange={
+                                        (e) => {
+                                            setMenuInfo({ ...menuInfo, social: { ...menuInfo.social, twitter: e.target.value } });
+                                            setIsSaved(false);
+                                        }
+                                    } />
                             </div>
                         </form>
 

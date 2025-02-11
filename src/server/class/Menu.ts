@@ -282,8 +282,9 @@ export class Menu implements IMenu {
         this.maxProducts = data.maxProducts ?? 100;
     }
 
-    validate(): Menu | MenuError {
-        const validate = MenuSchema.safeParse(this);
+    validate(fields?: Partial<Record<keyof IMenu, true>>): Menu | MenuError {
+        const myschema = fields ? MenuSchema.pick(fields) : MenuSchema;
+        const validate = myschema.safeParse(this);
         if (!validate.success) {
             throw new MenuError(validate.error?.flatten().fieldErrors)
         } else {
@@ -303,9 +304,20 @@ export class Menu implements IMenu {
         return new Menu(menu);
     }
 
-    async update() {
+    async update(fields?: ProjectionFields<Menu>) {
         await db.connectDB();
-        const menu = await MenuModel.findByIdAndUpdate(this._id, this, { new: true });
+        const updateFields: { [key: string]: any } = {};
+        if (fields) {
+            Object.keys(fields).forEach(field => {
+                updateFields[field] = (this as any)[field];
+            });
+        } else {
+            // Si no hay fields específicos, actualizamos todo el menú
+            Object.assign(updateFields, this);
+        }
+        const menu = await MenuModel.findByIdAndUpdate(this
+            ._id, updateFields, { new: true, runValidators: true });
+
         if (!menu) {
             throw new MenuError({ _id: [ERROR_MESSAGES.MENU_NOT_FOUND] });
         }
