@@ -236,6 +236,7 @@ export class Category implements ICategories {
 export class Menu implements IMenu {
     _id?: Types.ObjectId;
     name: string;
+    urlMenu: string;
     userId: string;
     expDate: Date;
     maxProducts: number;
@@ -263,6 +264,7 @@ export class Menu implements IMenu {
     constructor(data: IMenu) {
         this._id = data._id;
         this.name = data.name;
+        this.urlMenu = data.urlMenu;
         this.userId = data.userId;
         this.description = data.description;
         this.active = data.active;
@@ -339,6 +341,7 @@ export class Menu implements IMenu {
 
     static fromFormData(data: FormData) {
         return new Menu({
+            urlMenu: data.get('urlMenu') as string,
             name: data.get('name') as string,
             userId: data.get('userId') as string,
             expDate: new Date(data.get('expDate') as string),
@@ -374,6 +377,15 @@ export class Menu implements IMenu {
         const menu = await MenuModel.findOne({ name }, fields);
         if (!menu) {
             throw new MenuError({ name: [ERROR_MESSAGES.MENU_NOT_FOUND] });
+        }
+        return new Menu(menu);
+    }
+
+    static async getMenuByUrl(urlMenu: string, fields?: ProjectionFields<Menu>) {
+        await db.connectDB();
+        const menu = await MenuModel.findOne({ urlMenu }, fields);
+        if (!menu) {
+            throw new MenuError({ urlMenu: [ERROR_MESSAGES.MENU_NOT_FOUND] });
         }
         return new Menu(menu);
     }

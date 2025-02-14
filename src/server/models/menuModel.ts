@@ -89,6 +89,10 @@ const MenuSchemaMongoose = new Schema<IMenuModel>({
     name: {
         type: String,
         required: true,
+    },
+    urlMenu: {
+        type: String,
+        required: true,
         unique: true,
     },
     userId: {

@@ -1,4 +1,6 @@
 ---
+import { CDN_URL } from "../../client/utils/constant";
+
 const CONTENT = {
     title: "SnapMenu",
     description: "Crea tu SnapMenu y Compártelo con tus clientes.",
@@ -20,7 +22,7 @@ const CONTENT = {
         </h1>
         <span class="flex w-1/2">
             <img
-                src="https://cdn.snapmenu.online/qr-code.webp"
+                src={`${CDN_URL}qr-code.webp`}
                 alt="qr-code"
                 class="rounded-md border border-slate-400"
             />

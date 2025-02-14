@@ -56,6 +56,7 @@ type ICategories = z.infer<typeof CategoriesSchema>;
 
 const MenuSchema = z.object({
     _id: z.instanceof(Types.ObjectId).optional(),
+    urlMenu: z.string().min(MIN_MENU_NAME_LENGTH).max(MAX_MENU_NAME_LENGTH).toLowerCase(),
     name: z.string().min(MIN_MENU_NAME_LENGTH).max(MAX_MENU_NAME_LENGTH).regex(/^[a-zA-Z0-9]+$/, { message: "Solo se permiten letras y números" }),
     userId: z.string(),
     description: z.string().max(MAX_LENGTH_DESCRIPTION).optional(),
@@ -146,6 +147,7 @@ export class CategoriesError implements ICategoriesErrors {
 export interface IMenuErrors {
     _id?: string[] | undefined;
     name?: string[] | undefined;
+    urlMenu?: string[] | undefined;
     userId?: string[] | undefined;
     description?: string[] | undefined;
     active?: string[] | undefined;
@@ -163,6 +165,7 @@ export interface IMenuErrors {
 export class MenuError implements IMenuErrors {
     _id?: string[] | undefined;
     name?: string[] | undefined;
+    urlMenu?: string[] | undefined;
     userId?: string[] | undefined;
     description?: string[] | undefined;
     active?: string[] | undefined;
@@ -182,6 +185,7 @@ export class MenuError implements IMenuErrors {
 
     constructor(error: IMenuErrors) {
         this._id = error._id;
+        this.urlMenu = error.urlMenu;
         this.name = error.name;
         this.userId = error.userId;
         this.description = error.description;

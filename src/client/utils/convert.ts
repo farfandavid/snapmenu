@@ -16,8 +16,12 @@ const base64toFile = (base64: string, filename: string): File => {
 }
 
 const isBase64 = (str: string): boolean => {
+    // Eliminar el prefijo si está presente
+    const base64Data = str.split(',')[1] || str;
+
     try {
-        return btoa(atob(str)) === str;
+        // Verificar que la cadena sea Base64 válida
+        return btoa(atob(base64Data)) === base64Data;
     } catch (err) {
         return false;
     }

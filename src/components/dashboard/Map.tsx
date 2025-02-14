@@ -6,67 +6,42 @@ interface MapProps {
     initialCoordinates?: { lat: number; lng: number } | null;
     onSelectedCoordinates?: (coordinates: { lat: number; lng: number }) => void;
     viewOnly?: boolean;
+    onChange?: () => void;
 }
 
 const Map = ({
     initialCoordinates = null,
     onSelectedCoordinates,
-    viewOnly = false
+    viewOnly = false,
+    onChange,
 }: MapProps) => {
     const mapRef = useRef<HTMLDivElement>(null);
     const mapInstanceRef = useRef<L.Map | null>(null);
     const markerRef = useRef<L.Marker | null>(null);
-    const zoomRef = useRef<number>(initialCoordinates ? 13 : 5);
 
+    // Efecto para inicializar el mapa (solo se ejecuta una vez)
     useEffect(() => {
         if (!mapRef.current) return;
 
-        const initialView = initialCoordinates
-            ? [initialCoordinates.lat, initialCoordinates.lng]
-            : [-35, -65];
-
-        // Crear instancia del mapa
+        // Inicializar el mapa
         const map = L.map(mapRef.current).setView(
-            initialView as [number, number],
-            zoomRef.current
+            initialCoordinates
+                ? [initialCoordinates.lat, initialCoordinates.lng]
+                : [-35, -65],
+            initialCoordinates ? 18 : 5
         );
 
         mapInstanceRef.current = map;
-
-        // Guardar el nivel de zoom cuando cambie
-        map.on('zoomend', () => {
-            zoomRef.current = map.getZoom();
-        });
 
         // Agregar capa de mosaico
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap contributors',
         }).addTo(map);
 
-        // Crear marcador inicial si hay coordenadas
-        if (initialCoordinates) {
-            markerRef.current = L.marker([initialCoordinates.lat, initialCoordinates.lng])
-                .addTo(map)
-                .bindPopup(`Ubicación: ${initialCoordinates.lat.toFixed(4)}, ${initialCoordinates.lng.toFixed(4)}`)
-                .openPopup();
-        }
-
         // Manejar clicks si no es modo vista
         if (!viewOnly && onSelectedCoordinates) {
             map.on('click', (e) => {
                 const { lat, lng } = e.latlng;
-
-                // Eliminar marcador anterior si existe
-                if (markerRef.current) {
-                    markerRef.current.remove();
-                }
-
-                // Crear nuevo marcador
-                markerRef.current = L.marker([lat, lng])
-                    .addTo(map)
-                    .bindPopup(`Ubicación: ${lat.toFixed(4)}, ${lng.toFixed(4)}`)
-                    .openPopup();
-
                 onSelectedCoordinates({ lat, lng });
             });
         }
@@ -76,12 +51,35 @@ const Map = ({
             map.remove();
             mapInstanceRef.current = null;
         };
-    }, [initialCoordinates, onSelectedCoordinates, viewOnly]);
+    }, []); // Solo se ejecuta al montar el componente
+
+    // Efecto para manejar las actualizaciones de coordenadas
+    useEffect(() => {
+        const map = mapInstanceRef.current;
+        if (!map) return;
+
+        // Eliminar marcador existente
+        if (markerRef.current) {
+            markerRef.current.remove();
+            onChange?.();
+        }
+
+        // Si hay coordenadas, añadir nuevo marcador
+        if (initialCoordinates) {
+
+            markerRef.current = L.marker([initialCoordinates.lat, initialCoordinates.lng])
+                .addTo(map)
+                .bindPopup(
+                    `Ubicación: ${initialCoordinates.lat.toFixed(4)}, ${initialCoordinates.lng.toFixed(4)}`
+                )
+                .openPopup();
+        }
+    }, [initialCoordinates]); // Se ejecuta cuando cambian las coordenadas
 
     return (
         <div
             ref={mapRef}
-            className={`h-[500px] w-full ${!viewOnly ? 'cursor-pointer' : ''}`}
+            className={`h-[500px] w-full ${!viewOnly ? 'cursor-pointer' : ''} z-10`}
         />
     );
 };

@@ -9,6 +9,15 @@ export const onRequest = defineMiddleware(async (context, next,) => {
     if (import.meta.env.SSR) {
         console.log(context.clientAddress + ";" + context.url.pathname);
     }
+
+    // case-insensitive routes
+    const url = new URL(context.request.url);
+    const toLowerCase = url.pathname.toLowerCase();
+    if (url.pathname !== toLowerCase) {
+        url.pathname = toLowerCase;
+        return context.redirect(url.toString());
+    }
+
     if (context.url.pathname === "/api/payment/webhook" && context.request.method === "POST" && context.request.headers.get("Referer") === "https://mercadopago.com.ar") {
         const dataID = context.url.searchParams.get("data.id");
         if (verifyMPWebhook(context.request.headers, dataID || "")) {

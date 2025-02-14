@@ -8,7 +8,7 @@ import react from "@astrojs/react";
 export default defineConfig({
   integrations: [tailwind(), react()],
   security: {
-    checkOrigin: true
+    checkOrigin: true,
   },
   output: "server",
   adapter: node({
@@ -21,5 +21,6 @@ export default defineConfig({
   vite: {
     mode: "production"
   },
+  compressHTML: true,
   site: 'https://snapmenu.online'
 });

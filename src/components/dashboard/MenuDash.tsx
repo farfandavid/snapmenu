@@ -1,8 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Modal from "./Modal";
 import type { IModalMessage } from "../../client/types/Interfaces";
 import Map from "./Map";
 import { base64toFile, isBase64 } from "../../client/utils/convert";
+import { uploadImage } from "../../client/services/menu-service";
+import { CDN_URL } from "../../client/utils/constant";
 
 interface IMenuInfo {
     _id?: string;
@@ -63,6 +65,12 @@ export default function MenuDash() {
         }
     });
     const acceptAction = () => setShowModalMessage({ show: false, message: "", type: "success" });
+    const lastLogo = useRef<string | null>(null);
+    const lastBanner = useRef<string | null>(null);
+
+    useEffect(() => {
+        console.log("MenuInfo", menuInfo);
+    }, [menuInfo]);
 
     useEffect(() => {
         setMenuSelected("");
@@ -82,6 +90,8 @@ export default function MenuDash() {
         const fetchMenuInfo = async () => {
             const data = await fetch(`/api/dashboard/menu/${menuSelected}/info-menu`);
             const menuInfo = await data.json();
+            lastLogo.current = menuInfo.logoUrl;
+            lastBanner.current = menuInfo.bannerUrl;
             setMenuInfo(menuInfo);
             setCoords(menuInfo.map);
             console.log(menuInfo);
@@ -121,7 +131,7 @@ export default function MenuDash() {
         }
     }
 
-    const uploadImages = async (logoFile?: File, bannerFile?: File) => {
+    /* const uploadImages = async (logoFile?: File, bannerFile?: File) => {
         const promises = [];
         if (logoFile) {
             promises.push(fetch("/api/dashboard/upload", {
@@ -146,32 +156,63 @@ export default function MenuDash() {
         const [logData, banData] = await Promise.all(responses.map(res => res.json()));
 
         return { logoUrl: logData.url, bannerUrl: banData.url };
-    }
+    } */
     const handleSaveChanges = async () => {
         if (menuSelected === "") {
             setShowModalMessage({ show: true, message: "Selecciona un Menú para Guardar los Cambios", type: "error", acceptAction });
             return;
         }
-        /* const logoFile = base64toFile(menuInfo.logoUrl || "", "logo.png");
-        const bannerFile = base64toFile(menuInfo.bannerUrl || "", "banner.png"); */
-        const res = await fetch(`/api/dashboard/menu/${menuSelected}/info-menu`, {
+        /* const res = await fetch(`/api/dashboard/menu/${menuSelected}/info-menu`, {
             method: "PUT",
             body: JSON.stringify({ ...menuInfo, map: coords }),
             headers: {
                 "Content-Type": "application/json"
             }
-        })
-        const data = await res.json();
-        if (data.error) {
-            setShowModalMessage({ show: true, message: "Error al guardar los cambios", type: "error", acceptAction });
-            return;
+        }) */
+        // TEST
+        const promises = [];
+        if (isBase64(menuInfo.logoUrl || "")) {
+            const logoImage = base64toFile(menuInfo.logoUrl || "", "logo");
+            promises.push(uploadImage(menuSelected, logoImage));
         }
-        setShowModalMessage({ show: true, message: "Cambios Guardados Exitosamente", type: "success", acceptAction });
-        setIsSaved(true);
-        console.log(data);
+        if (isBase64(menuInfo.bannerUrl || "")) {
+            const bannerImage = base64toFile(menuInfo.bannerUrl || "", "banner");
+            promises.push(uploadImage(menuSelected, bannerImage));
+        }
+        setShowModalMessage({ show: true, message: "Guardando Cambios...", type: "waiting" });
+        try {
+            const results = await Promise.allSettled(promises);
+            const data = await Promise.all(results.map(async (result) => {
+                if (result.status === "fulfilled") {
+                    const response = result.value;
+                    if (!response.ok) {
+                        throw new Error("Error al subir la imagen");
+                    }
+                    return response.json(); // Convertir la respuesta a JSON
+                } else {
+                    console.error(result.reason);
+                    return JSON.parse(result.reason);
+                }
+            }));
+            const unsuccessfulUploads = data.filter((res: any) => !res.success);
+            const successfulUploads = data.filter((res: any) => res.success);
+
+            const errorMessage = unsuccessfulUploads.length > 0 ? `No se ha logrado subir: ${unsuccessfulUploads.map(res => res.name).join(', ')}` : "";
+            if (errorMessage !== "") {
+                setShowModalMessage({ show: true, message: errorMessage, type: "error", acceptAction });
+            }
+            const logUrl = successfulUploads.find((res: any) => res.name === "logo")?.imageUrl;
+            const banUrl = successfulUploads.find((res: any) => res.name === "banner")?.imageUrl;
+            console.log(logUrl, banUrl);
+            setMenuInfo((prev) => {
+                return { ...prev, logoUrl: logUrl || lastLogo.current, bannerUrl: banUrl || lastBanner.current };
+            });
+        } catch (error) {
+            //console.error(error);
+            setShowModalMessage({ show: true, message: "Error al subir la imagen", type: "error", acceptAction });
+        }
     }
     const styleSaved = isSaved ? "bg-green-500 hover:bg-green-400 disabled:hover:bg-green-500" : "bg-blue-500 hover:bg-blue-400 disabled:hover:bg-blue-500";
-
 
     return (
         <div className="w-full flex flex-col relative p-2 gap-2">
@@ -228,17 +269,17 @@ export default function MenuDash() {
                         <h3 className="text-2xl font-bold mb-3">Imágenes de Perfil</h3>
                         <div className="relative">
                             <div id="img-portrait" className="relative">
-                                <img src={menuInfo.bannerUrl || "https://placehold.co/1280x480"} className="rounded-t-xl w-full h-auto object-cover aspect-[8/3]" alt="Profile Placeholder" />
+                                <img src={menuInfo.bannerUrl ? `${CDN_URL}${menuInfo.bannerUrl}` : "https://placehold.co/1280x480"} className="rounded-t-xl w-full h-auto object-cover aspect-[8/3]" alt="Profile Placeholder" />
                                 <label htmlFor="bannerUrl" className="w-full h-full hover:bg-black/40 opacity-0 hover:opacity-100 absolute top-0 rounded-t-xl">
                                     <span className="text-xl font-bold text-slate-50 absolute top-1/2 left-1/2 transform -translate-x-1/2">Cambiar Portada</span>
-                                    <input type="file" name="bannerUrl" id="bannerUrl" className="opacity-0" onChange={handleChangeImages} accept="image/*" />
+                                    <input type="file" name="bannerUrl" id="bannerUrl" className="opacity-0" onChange={handleChangeImages} accept="image/jpeg, image/jpg, image/png, image/webp" />
                                 </label>
                             </div>
                             <div id="img-logo" className="w-1/5 max-w-40 absolute bottom-4 left-5 z-10 transform translate-y-1/2 border-4 border-slate-50 rounded-full">
-                                <img src={menuInfo.logoUrl || "https://placehold.co/480x480"} alt="" className="rounded-full w-full h-auto object-cover aspect-square" />
+                                <img src={menuInfo.logoUrl ? `${CDN_URL}${menuInfo.logoUrl}` : "https://placehold.co/480x480"} alt="" className="rounded-full w-full h-auto object-cover aspect-square" />
                                 <label htmlFor="logoUrl" className="w-full h-full hover:bg-black/40 opacity-0 hover:opacity-100 absolute top-0 rounded-full">
                                     <span className="text-base font-bold text-slate-50 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-nowrap">Cambiar Logo</span>
-                                    <input type="file" name="logoUrl" id="logoUrl" className="opacity-0" onChange={handleChangeImages} accept="image/*" />
+                                    <input type="file" name="logoUrl" id="logoUrl" className="opacity-0" onChange={handleChangeImages} accept="image/jpeg, image/jpg, image/png, image/webp" />
                                 </label>
                             </div>
                         </div>
@@ -248,8 +289,19 @@ export default function MenuDash() {
                         <h3 className="text-2xl font-bold mb-3">Información del Resturante</h3>
                         <form>
                             <div className="py-2 flex flex-col gap-2">
+                                <label htmlFor="name" className="font-bold">Nombre</label>
+                                <input type="text" name="name" id="name" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500" minLength={4} maxLength={50} placeholder="Nombre del Restaurante"
+                                    value={menuInfo.name}
+                                    onChange={
+                                        (e) => {
+                                            setMenuInfo({ ...menuInfo, name: e.target.value });
+                                            setIsSaved(false);
+                                        }
+                                    } />
+                            </div>
+                            <div className="py-2 flex flex-col gap-2">
                                 <label htmlFor="description" className="font-bold">Descripción</label>
-                                <textarea name="description" id="description" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500" placeholder="Descripción del Restaurante"
+                                <textarea name="description" id="description" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500" placeholder="Descripción del Restaurante" maxLength={250}
                                     value={menuInfo.description}
                                     onChange={
                                         (e) => {
@@ -260,7 +312,7 @@ export default function MenuDash() {
                             </div>
                             <div className="py-2 flex flex-col gap-2">
                                 <label htmlFor="address" className="font-bold">Dirección</label>
-                                <input type="text" name="address" id="address" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500" placeholder="Dirección"
+                                <input type="text" name="address" id="address" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500" placeholder="Dirección" maxLength={250}
                                     value={menuInfo.address}
                                     onChange={
                                         (e) => {
@@ -273,7 +325,7 @@ export default function MenuDash() {
                                 <div className="py-2 flex flex-col gap-2 w-full">
                                     <label htmlFor="city" className="font-bold">Ciudad</label>
                                     <input type="text" name="city" id="city" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1" placeholder="Ciudad"
-                                        value={menuInfo.city}
+                                        value={menuInfo.city} maxLength={250}
                                         onChange={
                                             (e) => {
                                                 setMenuInfo({ ...menuInfo, city: e.target.value });
@@ -284,7 +336,7 @@ export default function MenuDash() {
                                 <div className="py-2 flex flex-col gap-2 w-full">
                                     <label htmlFor="state" className="font-bold">Provincia</label>
                                     <input type="text" name="state" id="state" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1" placeholder="Estado"
-                                        value={menuInfo.state}
+                                        value={menuInfo.state} maxLength={250}
                                         onChange={
                                             (e) => {
                                                 setMenuInfo({ ...menuInfo, state: e.target.value });
@@ -294,7 +346,7 @@ export default function MenuDash() {
                                 </div>
                                 <div className="py-2 flex flex-col gap-2 w-full">
                                     <label htmlFor="postalCode" className="font-bold">Código Postal</label>
-                                    <input type="text" name="postalCode" id="postalCode" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1" placeholder="Código Postal"
+                                    <input type="text" name="postalCode" id="postalCode" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1" placeholder="Código Postal" maxLength={250}
                                         value={menuInfo.postalCode}
                                         onChange={
                                             (e) => {
@@ -306,7 +358,7 @@ export default function MenuDash() {
                             </div>
                             <div className="py-2 flex flex-col gap-2">
                                 <label htmlFor="country" className="font-bold">País</label>
-                                <input type="text" name="country" id="country" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500" placeholder="País"
+                                <input type="text" name="country" id="country" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500" placeholder="País" maxLength={250}
                                     value={menuInfo.country}
                                     onChange={
                                         (e) => {
@@ -318,12 +370,16 @@ export default function MenuDash() {
                             <div className="py-2 flex flex-col gap-2">
                                 <label htmlFor="mapUrl" className="font-bold">Mapa</label>
                                 <input type="text" name="mapUrl" id="mapUrl" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500 hidden" placeholder="URL del Mapa" />
-                                <Map onSelectedCoordinates={setCoords} initialCoordinates={coords}></Map>
+                                <Map onSelectedCoordinates={setCoords} initialCoordinates={coords} onChange={
+                                    () => {
+                                        setIsSaved(false);
+                                    }
+                                }></Map>
                             </div>
                             <h3 className="text-2xl font-bold my-3">Contacto</h3>
                             <div className="flex flex-col gap-2 py-2">
                                 <label htmlFor="phone" className="font-bold">Whatsapp</label>
-                                <input type="text" name="phone" id="phone" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500" placeholder="Whatsapp"
+                                <input type="text" name="phone" id="phone" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500" placeholder="Whatsapp" maxLength={250}
                                     value={menuInfo.phone}
                                     onChange={
                                         (e) => {
@@ -335,7 +391,7 @@ export default function MenuDash() {
                             <h3 className="text-2xl font-bold my-3">Redes Sociales</h3>
                             <div className="flex flex-col gap-2 py-2">
                                 <label htmlFor="facebook" className="font-bold">Facebook</label>
-                                <input type="text" name="facebook" id="facebook" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500" placeholder="Facebook"
+                                <input type="text" name="facebook" id="facebook" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500" placeholder="Facebook" maxLength={450}
                                     value={menuInfo.social?.facebook}
                                     onChange={
                                         (e) => {
@@ -346,7 +402,7 @@ export default function MenuDash() {
                             </div>
                             <div className="flex flex-col gap-2 py-2">
                                 <label htmlFor="instagram" className="font-bold">Instagram</label>
-                                <input type="text" name="instagram" id="instagram" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500" placeholder="Instagram"
+                                <input type="text" name="instagram" id="instagram" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500" placeholder="Instagram" maxLength={450}
                                     value={menuInfo.social?.instagram}
                                     onChange={
                                         (e) => {
@@ -357,7 +413,7 @@ export default function MenuDash() {
                             </div>
                             <div className="flex flex-col gap-2 py-2">
                                 <label htmlFor="twitter" className="font-bold">Twitter</label>
-                                <input type="text" name="twitter" id="twitter" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500" placeholder="Twitter"
+                                <input type="text" name="twitter" id="twitter" className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md ring-1 focus:ring-orange-500" placeholder="Twitter" maxLength={450}
                                     value={menuInfo.social?.twitter}
                                     onChange={
                                         (e) => {

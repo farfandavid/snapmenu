@@ -4,7 +4,7 @@ import Modal from "./Modal";
 import FormProduct from "./FormProduct";
 import FormCategory from "./FormCategory";
 import { type ICategory, type ISelectedItem, type IProduct } from '../../client/types/Interfaces';
-import { addCategory, addProduct, deleteCategory, deleteProduct, saveAllCategories, updateCategory, updateProduct } from "../../client/services/products";
+import { addCategory, addProduct, deleteCategory, deleteProduct, saveAllCategories, updateCategory, updateProduct } from "../../client/services/products-service";
 
 interface IModalMessage {
     show: boolean;
